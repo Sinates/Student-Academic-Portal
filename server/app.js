@@ -4,10 +4,10 @@ const { helment } = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
 const passport = require("passport");
-const { Strategy } = require("passport-google-oath20");
+const { Strategy } = require("passport-google-oauth20");
 const cookieSession = require("cookie-session");
 const exp = require("constants");
-require("dotent").config();
+require("dotenv").config();
 
 const config = {
   CLIENT_ID: process.env.CLIENT_ID,
