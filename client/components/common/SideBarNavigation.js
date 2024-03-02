@@ -33,11 +33,8 @@ export default function SideBarNav() {
 
     if (role == "Super Admin" || role == "Admin") map.set("dashboard", 1);
     if (role == "Super Admin" || role == "Admin") map.set("course", 2);
-    map.set("category", 3);
-    map.set("topic", 4);
-    map.set("insights", 5);
-    map.set("quiz", 6);
-    map.set("settings", 7);
+    map.set("student", 3);
+    map.set("payment", 4);
 
     const [activeTab, setActiveTab] = useState(map.get(paths[1]));
     const [isNavOpen, setIsNavOpen] = useState(true);
@@ -86,20 +83,20 @@ export default function SideBarNav() {
     ];
     else
     navigation = [
-        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/admin/dashboard" },
         {
             name: "Courses",
             i: 2,
             icon: RiGroupLine,
-            link: "/course",
+            link: "/admin/course",
         },
         {
             name: "Students",
             i: 3,
             icon: IoFolderOpenOutline,
-            link: "/student",
+            link: "/admin/student",
         },
-        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payment" },
+        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/admin/payment" },
 
     ];
 
@@ -182,7 +179,30 @@ export default function SideBarNav() {
                             </ul>
                         </li>
 
-                       
+                        <li className="w-full mt-auto">
+                            <button
+                                onClick={() => SetActiveMenuTab(7, "/settings")}
+                                className={classNames(
+                                    activeTab == 7
+                                        ? "bg-[#EBD7E7] text-primary"
+                                        : "text-secondary hover:bg-lightPrimaryBg",
+                                    "group flex gap-x-3 rounded-xl p-2 py-3 text-sm leading-6 font-medium h-full w-full"
+                                )}
+                            >
+                                <IoSettingsOutline className="h-4 w-4 text-primary mt-1 ml-1" />
+                                <span
+                                    className={classNames(
+                                        activeTab == 7
+                                            ? "text-primary"
+                                            : "text-secondary",
+                                        "mx-3 font-medium"
+                                    )}
+                                    aria-hidden="true"
+                                >
+                                    Settings
+                                </span>
+                            </button>
+                        </li>
                         <li className="w-full mt-auto">
                             <button
                                 onClick={() => signOut()}
