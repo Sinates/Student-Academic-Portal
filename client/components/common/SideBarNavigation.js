@@ -32,7 +32,7 @@ export default function SideBarNav() {
     const map = useMemo(() => new Map(), []);
 
     if (role == "Super Admin" || role == "Admin") map.set("dashboard", 1);
-    if (role == "Super Admin" || role == "Admin") map.set("user-management", 2);
+    if (role == "Super Admin" || role == "Admin") map.set("course", 2);
     map.set("category", 3);
     map.set("topic", 4);
     map.set("insights", 5);
@@ -48,55 +48,60 @@ export default function SideBarNav() {
 
     let navigation = [];
 
-    if (role == "Super Admin")
+    if (role == "Admin")
         navigation = [
-            { name: "Analysis", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+            { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
             {
-                name: "User Management",
+                name: "Courses",
                 i: 2,
                 icon: RiGroupLine,
-                link: "/user-management",
+                link: "/courses",
             },
             {
-                name: "Categories",
+                name: "Students",
                 i: 3,
                 icon: IoFolderOpenOutline,
-                link: "/category",
+                link: "/students",
             },
-            { name: "Topics", i: 4, icon: MdOutlineTopic, link: "/topic" },
-            { name: "Insights", i: 5, icon: IoBulbOutline, link: "/insights" },
-            { name: "Quizzes", i: 6, icon: MdOutlineQuiz, link: "/quiz" },
+            { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payments" },
+
         ];
-    else if (role == "Admin")
-        navigation = [
-            {
-                name: "User Management",
-                i: 2,
-                icon: RiGroupLine,
-                link: "/user-management",
-            },
-            {
-                name: "Categories",
-                i: 3,
-                icon: IoFolderOpenOutline,
-                link: "/category",
-            },
-            { name: "Topics", i: 4, icon: MdOutlineTopic, link: "/topic" },
-            { name: "Insights", i: 5, icon: IoBulbOutline, link: "/insights" },
-            { name: "Quizzes", i: 6, icon: MdOutlineQuiz, link: "/quiz" },
-        ];
+    else if (role == "Teacher")
+    navigation = [
+        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+        {
+            name: "Courses",
+            i: 2,
+            icon: RiGroupLine,
+            link: "/courses",
+        },
+        {
+            name: "Students",
+            i: 3,
+            icon: IoFolderOpenOutline,
+            link: "/students",
+        },
+        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payments" },
+
+    ];
     else
-        navigation = [
-            {
-                name: "Categories",
-                i: 3,
-                icon: IoFolderOpenOutline,
-                link: "/category",
-            },
-            { name: "Topics", i: 4, icon: MdOutlineTopic, link: "/topic" },
-            { name: "Insights", i: 5, icon: IoBulbOutline, link: "/insights" },
-            { name: "Quizzes", i: 6, icon: MdOutlineQuiz, link: "/quiz" },
-        ];
+    navigation = [
+        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+        {
+            name: "Courses",
+            i: 2,
+            icon: RiGroupLine,
+            link: "/course",
+        },
+        {
+            name: "Students",
+            i: 3,
+            icon: IoFolderOpenOutline,
+            link: "/student",
+        },
+        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payment" },
+
+    ];
 
     const SetActiveMenuTab = (tab, link) => {
         router.push(link);
