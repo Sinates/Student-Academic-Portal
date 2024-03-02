@@ -19,7 +19,7 @@ module.exports =  withMT({
         bgTile: '#F9F9F9',
         archive:'#FF3B30',
         lightPrimary: '#EFE2EC',
-        lightPrimaryBg: '#FFF7FD'
+        lightPrimaryBg: '#7FC7D9'
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
