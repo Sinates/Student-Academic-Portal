@@ -1,7 +1,19 @@
 const express = require("express");
-
 const studentModel = require("../model/student.model");
 const router = express.Router();
+const fileUpload = require("express-fileupload");
+const app = express();
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // Define the destination directory for file uploads
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname); // Define the filename for the uploaded file
+  },
+});
+
+const path = require("path");
 
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -20,7 +32,21 @@ function generateID() {
   return id;
 }
 
-router.post("/register", (req, res) => {
+// Configure Multer to restrict the maximum file size to 5MB
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "uploads/"); // Define the destination directory for file uploads
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + "-" + file.originalname); // Define the filename for the uploaded file
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+});
+
+// Handle POST request to register a new student with file upload for academic record
+router.post("/register", upload.single("academicRecord"), (req, res) => {
   // Check if the provided email already exists
   studentModel
     .findOne({ email: req.body.email })
@@ -48,7 +74,7 @@ router.post("/register", (req, res) => {
                 guardianPhone: req.body.guardianPhone,
                 department: req.body.department,
                 aboutYou: req.body.aboutYou,
-                academicRecord: req.body.academicRecord,
+                academicRecord: req.file ? req.file.filename : null, // Save filename if file is uploaded
               });
 
               newStudent

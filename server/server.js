@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParses = require("body-parser");
+const fileUpload = require("express-fileupload");
+
 const app = express();
 const MongoClient = require("mongodb").MongoClient;
 require("dotenv").config();
