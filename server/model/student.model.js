@@ -1,12 +1,23 @@
 const mongoose = require("mongoose");
-const schema = mongoose.schema;
 
-const newSchema = new schema({
+const newSchema = new mongoose.Schema({
   id: String,
   name: String,
-  gender: Stirng,
+  gender: String,
   email: String,
-  password: String,
+  password: {
+    type: String,
+    default: null,
+  },
   phone: Number,
-  guardianPhone: Number,
+  guardianPhone: String,
+  guardianName: String,
+  department: String,
+  aboutYou: String,
+  academicRecord: String,
+  restricted: {
+    default: true,
+    type: Boolean,
+  },
 });
+module.exports = mongoose.model("student", newSchema);
