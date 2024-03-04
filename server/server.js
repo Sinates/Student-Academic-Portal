@@ -1,17 +1,16 @@
-const fs = require("fs");
-const https = require("https");
-const app = require("./app");
-
+const express = require("express");
+const cors = require("cors");
+const app = express();
 require("dotenv").config();
-const PORT = process.env.PORT || 8000;
-https
-  .createServer(
-    {
-      key: fs.readFileSync("key.pem"),
-      cert: fs.readFileSync("cert.pem"),
-    },
-    app
-  )
-  .listen(PORT, () => {
-    console.log(`Listening to port ${PORT}...`);
-  });
+const PORT = 8000 || process.env.PORT;
+const mongoose = require("mongoose");
+mongoose.connect(process.env.MONGO_URL);
+
+app.use(cors());
+
+app.use("/teacher", require("./router/teacher.router"));
+app.use("/admin", require("./router/admin.router"));
+app.use("/student", require("./router/student.router"));
+app.listen(PORT, () => {
+  console.log(`Listening to port ${PORT}`);
+});
