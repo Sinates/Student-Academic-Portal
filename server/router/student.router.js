@@ -33,6 +33,7 @@ function generateID() {
 }
 
 // Configure Multer to restrict the maximum file size to 5MB
+
 const upload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
@@ -46,7 +47,7 @@ const upload = multer({
 });
 
 // Handle POST request to register a new student with file upload for academic record
-router.post("/register", upload.single("academicRecord"), (req, res) => {
+router.post("/register", (req, res) => {
   // Check if the provided email already exists
   studentModel
     .findOne({ email: req.body.email })
@@ -57,35 +58,44 @@ router.post("/register", upload.single("academicRecord"), (req, res) => {
       } else {
         // Check if the provided ID already exists
         studentModel
-          .findOne({ id: generateID() })
+          .findOne({ id: req.body.id })
           .then((existingID) => {
             if (existingID) {
               // ID already exists
               return res.status(409).json({ error: "ID already exists" });
             } else {
-              // Both email and ID are unique, create and save the new student
-              const newStudent = new studentModel({
-                id: generateID(), // Use provided ID
-                name: req.body.name,
-                gender: req.body.gender,
-                email: req.body.email,
-                phone: req.body.phone,
-                guardianName: req.body.guardianName,
-                guardianPhone: req.body.guardianPhone,
-                department: req.body.department,
-                aboutYou: req.body.aboutYou,
-                academicRecord: req.file ? req.file.filename : null, // Save filename if file is uploaded
-              });
-
-              newStudent
-                .save()
-                .then((savedStudent) => {
-                  res.status(201).json(savedStudent);
-                })
-                .catch((err) => {
+              // Both email and ID are unique, perform file upload
+              upload.single("academicRecord")(req, res, (err) => {
+                if (err) {
+                  // Error during file upload
                   console.error(err);
-                  res.status(500).json({ error: "Internal server error" });
+                  return res.status(500).json({ error: "File upload error" });
+                }
+
+                // File uploaded successfully, create and save the new student
+                const newStudent = new studentModel({
+                  id: req.body.id, // Use provided ID
+                  name: req.body.name,
+                  gender: req.body.gender,
+                  email: req.body.email,
+                  phone: req.body.phone,
+                  guardianName: req.body.guardianName,
+                  guardianPhone: req.body.guardianPhone,
+                  department: req.body.department,
+                  aboutYou: req.body.aboutYou,
+                  academicRecord: req.file ? req.file.filename : null, // Save filename if file is uploaded
                 });
+
+                newStudent
+                  .save()
+                  .then((savedStudent) => {
+                    res.status(201).json(savedStudent);
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                    res.status(500).json({ error: "Internal server error" });
+                  });
+              });
             }
           })
           .catch((err) => {
