@@ -14,6 +14,7 @@ const storage = multer.diskStorage({
 });
 
 const path = require("path");
+const { error } = require("console");
 
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -58,7 +59,7 @@ router.post("/register", (req, res) => {
       } else {
         // Check if the provided ID already exists
         studentModel
-          .findOne({ id: req.body.id })
+          .findOne({ id: generateID() })
           .then((existingID) => {
             if (existingID) {
               // ID already exists
@@ -74,7 +75,7 @@ router.post("/register", (req, res) => {
 
                 // File uploaded successfully, create and save the new student
                 const newStudent = new studentModel({
-                  id: req.body.id, // Use provided ID
+                  id: generateID(), // Use provided ID
                   name: req.body.name,
                   gender: req.body.gender,
                   email: req.body.email,
@@ -109,5 +110,22 @@ router.post("/register", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
-
+router.put("/signup/:id", (req, res) => {
+  const approvedStudent = new student({
+    id: req.params.id,
+    password: req.body.password,
+  });
+  student
+    .updateOne({ id: req.params.id }, approvedStudent)
+    .then(() => {
+      res.status(201).json({
+        massage: "Student account verified!",
+      });
+    })
+    .catch((error) => {
+      res.status(400).json({
+        error: error,
+      });
+    });
+});
 module.exports = router;
