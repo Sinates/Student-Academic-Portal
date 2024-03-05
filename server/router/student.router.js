@@ -110,22 +110,18 @@ router.post("/register", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
-router.put("/signup/:id", (req, res) => {
-  const approvedStudent = new student({
-    id: req.params.id,
-    password: req.body.password,
-  });
-  student
-    .updateOne({ id: req.params.id }, approvedStudent)
-    .then(() => {
-      res.status(201).json({
-        massage: "Student account verified!",
-      });
-    })
-    .catch((error) => {
-      res.status(400).json({
-        error: error,
-      });
-    });
+router.post("/signup", async (req, res) => {
+  try {
+    const id = { id: req.body.id };
+    const pass = { password: req.body.password };
+
+    const result = await studentModel.findOneAndUpdate(id, pass);
+    if (!result) {
+      res.status(404).json({ error: "ID couldn't be found!" });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+  res.status(201).json({ message: "User Signup completed" });
 });
 module.exports = router;
