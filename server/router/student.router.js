@@ -1,20 +1,14 @@
 const express = require("express");
 const studentModel = require("../model/student.model");
 const router = express.Router();
-const fileUpload = require("express-fileupload");
-const app = express();
 const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Define the destination directory for file uploads
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname); // Define the filename for the uploaded file
-  },
-});
+const crypto = require("crypto");
 
-const path = require("path");
-const { error } = require("console");
+const getHashedPassword = (password) => {
+  const sha256 = crypto.createHash("sha256");
+  const hash = sha256.update(password).digest("base64");
+  return hash;
+};
 
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -110,18 +104,28 @@ router.post("/register", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
+
+//TODO: Make sure to add frontend comparison of password and confirmation
 router.post("/signup", async (req, res) => {
   try {
-    const id = { id: req.body.id };
-    const pass = { password: req.body.password };
+    const id = req.body.id;
+    const password = req.body.password;
+    const hashedPassword = getHashedPassword(password);
 
-    const result = await studentModel.findOneAndUpdate(id, pass);
+    const result = await studentModel.findOneAndUpdate(
+      { id: id },
+      { password: hashedPassword }
+    );
+
     if (!result) {
-      res.status(404).json({ error: "ID couldn't be found!" });
+      return res.status(404).json({ error: "ID couldn't be found!" });
     }
+
+    return res.status(201).json({ message: "User Signup completed" });
   } catch (err) {
-    res.status(500).json({ error: err });
+    console.error(err);
+    return res.status(500).json({ error: err.message });
   }
-  res.status(201).json({ message: "User Signup completed" });
 });
+
 module.exports = router;
