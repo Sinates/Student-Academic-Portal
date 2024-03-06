@@ -60,7 +60,15 @@ export default function SideBarNav() {
                 icon: IoFolderOpenOutline,
                 link: "/students",
             },
-            { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payments" },
+            {
+                name: "Teachers",
+                i: 4,
+                icon: IoFolderOpenOutline,
+                link: "/teachers",
+            },
+            
+            
+            { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/payments" },
 
         ];
     else if (role == "Teacher")
@@ -96,7 +104,13 @@ export default function SideBarNav() {
             icon: IoFolderOpenOutline,
             link: "/admin/student",
         },
-        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/admin/payment" },
+        {
+            name: "Teachers",
+            i: 4,
+            icon: IoFolderOpenOutline,
+            link: "/admin/teacher",
+        },
+        { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/admin/payment" },
 
     ];
 
@@ -179,30 +193,7 @@ export default function SideBarNav() {
                             </ul>
                         </li>
 
-                        <li className="w-full mt-auto">
-                            <button
-                                onClick={() => SetActiveMenuTab(7, "/settings")}
-                                className={classNames(
-                                    activeTab == 7
-                                        ? "bg-[#EBD7E7] text-primary"
-                                        : "text-secondary hover:bg-lightPrimaryBg",
-                                    "group flex gap-x-3 rounded-xl p-2 py-3 text-sm leading-6 font-medium h-full w-full"
-                                )}
-                            >
-                                <IoSettingsOutline className="h-4 w-4 text-primary mt-1 ml-1" />
-                                <span
-                                    className={classNames(
-                                        activeTab == 7
-                                            ? "text-primary"
-                                            : "text-secondary",
-                                        "mx-3 font-medium"
-                                    )}
-                                    aria-hidden="true"
-                                >
-                                    Settings
-                                </span>
-                            </button>
-                        </li>
+                        
                         <li className="w-full mt-auto">
                             <button
                                 onClick={() => signOut()}

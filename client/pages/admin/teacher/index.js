@@ -1,4 +1,4 @@
-import StudentList from '@/components/student/StudentList'
+import TeacherList from '@/components/teacher/TeacherList'
 import RootLayout from '@/layouts/RootLayout'
 import TopHeader from '@/components/common/Header';
 import React from 'react'
@@ -9,20 +9,20 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
-import PendlingStudentList from '@/components/student/PendlingStudentList';
+import PendingTeacherList from '@/components/teacher/PendingTeacherList';
 
-function Student() {
+function Teacher() {
   const [activeTab, setActiveTab] = React.useState("currents");
   const data = [
     {
-      label: "Current Students",
+      label: "Current Teachers",
       value: "current",
-      desc: <StudentList/>,
+      desc: <TeacherList/>,
     },
     {
-      label: "Pending Students",
+      label: "Pending Teachers",
       value: "pending",
-      desc: <PendlingStudentList/>,
+      desc: <PendingTeacherList/>,
     },
   ]
   return (
@@ -60,4 +60,4 @@ function Student() {
   )
 }
 
-export default Student
+export default Teacher;
