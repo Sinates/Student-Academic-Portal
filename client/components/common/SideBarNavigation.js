@@ -12,9 +12,11 @@ import { MdAutoGraph, MdOutlineTopic, MdOutlineQuiz } from "react-icons/md";
 import { AiOutlineMenuFold, AiOutlineMenu } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 import Image from "next/image";
-
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import PaidIcon from '@mui/icons-material/Paid';
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
+import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
 
 
 function classNames(...classes) {
@@ -24,7 +26,7 @@ function classNames(...classes) {
 export default function SideBarNav() {
     
 
-    let role = "Super Admin";
+    let role = "student";
 
   
     const router = useRouter();
@@ -86,10 +88,41 @@ export default function SideBarNav() {
             icon: IoFolderOpenOutline,
             link: "/students",
         },
-        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payments" },
+        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/student/payments" },
 
     ];
-    else
+    else if (role=="student")
+    navigation = [
+        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+        {
+            name: "Courses",
+            i: 2,
+            icon: RiGroupLine,
+            link: "/courses",
+        },
+        {
+            name: "Student", // Add the new item for student navigation
+            i: 3,
+            icon: IoFolderOpenOutline,
+            link: "/students",
+        },
+        {
+            name: "Assign Course",
+            i: 5,
+            icon: AssignmentIcon,
+            link: "/Assigncourse",
+        },
+        { 
+            name: "Payments",
+            i: 4,
+            icon: PaidIcon,
+            link: "/payment" },
+        { 
+            name: "Push notification",
+             i: 6, icon: NotificationAddIcon,
+             link: "/gradeReport" },
+    ];
+    else    
     navigation = [
         { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/admin/dashboard" },
         {
