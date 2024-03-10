@@ -1,12 +1,7 @@
-import RootLayout from "@/layouts/RootLayout";
-import React from "react";
+import RootLayout from "@/layouts/RootLayout"
 
-function Dashboard() {
-  return (
-    <RootLayout>
-      <div>Dashboard</div>
-    </RootLayout>
-  );
+const dashboard =()=>{
+    return( <RootLayout><p>helloooo</p>
+</RootLayout>)
 }
-
-export default Dashboard;
+export default dashboard

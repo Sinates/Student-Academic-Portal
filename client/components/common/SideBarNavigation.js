@@ -12,10 +12,13 @@ import { MdAutoGraph, MdOutlineTopic, MdOutlineQuiz } from "react-icons/md";
 import { AiOutlineMenuFold, AiOutlineMenu } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 import Image from "next/image";
-
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import PaidIcon from '@mui/icons-material/Paid';
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
-
+import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
@@ -24,7 +27,7 @@ function classNames(...classes) {
 export default function SideBarNav() {
     
 
-    let role = "Super Admin";
+    let role = "student";
 
   
     const router = useRouter();
@@ -33,11 +36,8 @@ export default function SideBarNav() {
 
     if (role == "Super Admin" || role == "Admin") map.set("dashboard", 1);
     if (role == "Super Admin" || role == "Admin") map.set("course", 2);
-    map.set("category", 3);
-    map.set("topic", 4);
-    map.set("insights", 5);
-    map.set("quiz", 6);
-    map.set("settings", 7);
+    map.set("student", 3);
+    map.set("payment", 4);
 
     const [activeTab, setActiveTab] = useState(map.get(paths[1]));
     const [isNavOpen, setIsNavOpen] = useState(true);
@@ -63,7 +63,15 @@ export default function SideBarNav() {
                 icon: IoFolderOpenOutline,
                 link: "/students",
             },
-            { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payments" },
+            {
+                name: "Teachers",
+                i: 4,
+                icon: IoFolderOpenOutline,
+                link: "/teachers",
+            },
+            
+            
+            { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/payments" },
 
         ];
     else if (role == "Teacher")
@@ -81,25 +89,78 @@ export default function SideBarNav() {
             icon: IoFolderOpenOutline,
             link: "/students",
         },
-        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payments" },
+        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/student/payments" },
 
     ];
-    else
+    else if (role=="student")
     navigation = [
-        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/students/Dashboard" },
+        {
+            name: "Grade Change",
+            i: 2,
+            icon: RiGroupLine,
+            link: "/students/GradeChange",
+        },
+        {
+            name: "Resource", // Add the new item for student navigation
+            i: 3,
+            icon: IoFolderOpenOutline,
+            link: "/students/Resource",
+        },
+        {
+            name: "Grade Report",
+            i: 5,
+            icon: AssignmentIcon,
+            link: "/students/GradeReport",
+        },
+        { 
+            name: "Payments",
+            i: 4,
+            icon: PaidIcon,
+            link: "/students/payment" },
+        { 
+            name: "notifications",
+             i: 6, icon: NotificationAddIcon,
+             link: "/students/Notifications" },
+
+             { 
+             name: "Course List",
+             i: 6, icon: ChecklistIcon,
+             link: "/students/CourseList" },
+
+
+                 
+    ];
+    else    
+    navigation = [
+        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/admin/dashboard" },
         {
             name: "Courses",
             i: 2,
             icon: RiGroupLine,
-            link: "/course",
+            link: "/admin/course",
         },
         {
             name: "Students",
             i: 3,
             icon: IoFolderOpenOutline,
-            link: "/student",
+            link: "/admin/student",
         },
-        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/payment" },
+        {
+            name: "Teachers",
+            i: 4,
+            icon: IoFolderOpenOutline,
+            link: "/admin/teacher",
+        },
+        { name: "Payments",
+          i: 5,
+          icon: MdOutlineTopic,
+          link: "/admin/payment" },
+          
+          { name: "Assign course",
+          i: 6,
+          icon: AssignmentOutlinedIcon,
+          link: "/admin/Assigncourse" },
 
     ];
 
@@ -153,7 +214,7 @@ export default function SideBarNav() {
                                             }
                                             className={classNames(
                                                 activeTab == item.i
-                                                    ? "bg-[#EBD7E7] text-primary"
+                                                    ? "bg-[#D2D5DB] text-primary"
                                                     : "text-secondary hover:bg-lightPrimaryBg",
                                                 "group flex gap-x-3 rounded-xl p-2 pt-5 text-sm leading-6 font-medium h-full w-full"
                                             )}
@@ -182,31 +243,8 @@ export default function SideBarNav() {
                             </ul>
                         </li>
 
+                        
                         <li className="w-full mt-auto">
-                            <button
-                                onClick={() => SetActiveMenuTab(7, "/settings")}
-                                className={classNames(
-                                    activeTab == 7
-                                        ? "bg-[#EBD7E7] text-primary"
-                                        : "text-secondary hover:bg-lightPrimaryBg",
-                                    "group flex gap-x-3 rounded-xl p-2 py-3 text-sm leading-6 font-medium h-full w-full"
-                                )}
-                            >
-                                <IoSettingsOutline className="h-4 w-4 text-primary mt-1 ml-1" />
-                                <span
-                                    className={classNames(
-                                        activeTab == 7
-                                            ? "text-primary"
-                                            : "text-secondary",
-                                        "mx-3 font-medium"
-                                    )}
-                                    aria-hidden="true"
-                                >
-                                    Settings
-                                </span>
-                            </button>
-                        </li>
-                        <li className="w-full mb-4">
                             <button
                                 onClick={() => signOut()}
                                 className="group flex gap-x-3 rounded-xl p-2 py-3 text-sm leading-6 font-medium h-full w-full"

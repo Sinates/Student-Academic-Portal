@@ -56,17 +56,7 @@ function Payment() {
       <AppBar position="static" color="inherit">
         {/* Add any content you want in the AppBar */}
       </AppBar>
-      <Box
-        sx={{
-          backgroundImage: `url('https://img.freepik.com/free-vector/topographic-contour-lines-map-seamless-pattern_1284-52862.jpg?w=740&t=st=1709824881~exp=1709825481~hmac=25ab3f155cb269d447990b0d882db0302aa54243035040751637e92f71cfb8c4')`, // Specify the URL of your background image
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          minHeight: 'calc(100vh - 64px)', // Adjust for AppBar height
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
+    
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -129,7 +119,7 @@ function Payment() {
           </Box>
           <Button type="submit" variant="contained">Submit</Button>
         </Box>
-      </Box>
+      
     </RootLayout>
   );
 }

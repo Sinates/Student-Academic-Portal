@@ -1,14 +1,14 @@
 import RootLayout from '@/layouts/RootLayout'
 import React from 'react'
 
-function Course() {
+function Payment() {
   return (
     <RootLayout>
     <div>
-      Course
+      Payment
     </div>
     </RootLayout>
   )
 }
 
-export default Course
+export default Payment
