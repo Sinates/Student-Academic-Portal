@@ -17,7 +17,8 @@ import PaidIcon from '@mui/icons-material/Paid';
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
-
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
@@ -93,34 +94,42 @@ export default function SideBarNav() {
     ];
     else if (role=="student")
     navigation = [
-        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/students/Dashboard" },
         {
-            name: "Courses",
+            name: "Grade Change",
             i: 2,
             icon: RiGroupLine,
-            link: "/courses",
+            link: "/students/GradeChange",
         },
         {
-            name: "Student", // Add the new item for student navigation
+            name: "Resource", // Add the new item for student navigation
             i: 3,
             icon: IoFolderOpenOutline,
-            link: "/students",
+            link: "/students/Resource",
         },
         {
-            name: "Assign Course",
+            name: "Grade Report",
             i: 5,
             icon: AssignmentIcon,
-            link: "/Assigncourse",
+            link: "/students/GradeReport",
         },
         { 
             name: "Payments",
             i: 4,
             icon: PaidIcon,
-            link: "/payment" },
+            link: "/students/payment" },
         { 
-            name: "Push notification",
+            name: "notifications",
              i: 6, icon: NotificationAddIcon,
-             link: "/gradeReport" },
+             link: "/students/Notifications" },
+
+             { 
+             name: "Course List",
+             i: 6, icon: ChecklistIcon,
+             link: "/students/CourseList" },
+
+
+                 
     ];
     else    
     navigation = [
@@ -143,7 +152,15 @@ export default function SideBarNav() {
             icon: IoFolderOpenOutline,
             link: "/admin/teacher",
         },
-        { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/admin/payment" },
+        { name: "Payments",
+          i: 5,
+          icon: MdOutlineTopic,
+          link: "/admin/payment" },
+          
+          { name: "Assign course",
+          i: 6,
+          icon: AssignmentOutlinedIcon,
+          link: "/admin/Assigncourse" },
 
     ];
 
