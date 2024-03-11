@@ -1,5 +1,7 @@
 const express = require("express");
 const studentModel = require("../model/student.model");
+const payment = require("../model/payment.model");
+
 const router = express.Router();
 const multer = require("multer");
 const crypto = require("crypto");
@@ -32,7 +34,18 @@ function generateID() {
 const upload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, "uploads/"); // Define the destination directory for file uploads
+      cb(null, "uploads/files"); // Define the destination directory for file uploads
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + "-" + file.originalname); // Define the filename for the uploaded file
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+});
+const uploadpayment = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "uploads/payments"); // Define the destination directory for file uploads
     },
     filename: function (req, file, cb) {
       cb(null, Date.now() + "-" + file.originalname); // Define the filename for the uploaded file
@@ -128,34 +141,28 @@ router.post("/signup", async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
-// router.post("/signin", (req, res) => {
-//   studentModel.findOne({
-//     id: req.body.id,
-//     password: getHashedPassword(req.body.password)
-//   }).then((data) => {
-//     if (data) {
-//       console.log(data);
-//       return res.status(200).json(data);
-//     } else {
-//       return res.status(404).json({ error: "Agent doesn't exist." });
-//     }
-//   });
-// });
+
 router.post("/signin", (req, res) => {
   studentModel.findOne({
     id: req.body.id
   }).then((data) => {
     if (data) {
-      // Hash the provided password
-      const hashedPassword = crypto.createHash('sha256').update(req.body.password).digest('base64');
-      
-      // Compare hashed password
-      if (hashedPassword === data.password) {
-        console.log(data);
-        return res.status(200).json(data);
+      // Check if account is restricted
+      if (data.restricted === true) {
+        // Account is restricted, prompt user to contact admin
+        return res.status(403).json({ error: "Your account is restricted. Please contact the system administrator." });
       } else {
-        // Password incorrect
-        return res.status(401).json({ error: "Password incorrect." });
+        // Hash the provided password
+        const hashedPassword = crypto.createHash('sha256').update(req.body.password).digest('base64');
+        
+        // Compare hashed password
+        if (hashedPassword === data.password) {
+          console.log(data);
+          return res.status(200).json(data);
+        } else {
+          // Password incorrect
+          return res.status(401).json({ error: "Password incorrect." });
+        }
       }
     } else {
       // User ID doesn't exist
@@ -168,5 +175,56 @@ router.post("/signin", (req, res) => {
   });
 });
 
+router.post("/uploadpayment", uploadpayment.single("paymentReceipt"), (req, res) => {
+  // Check if the provided ID already exists in the studentModel
+  studentModel.findOne({ id: req.body.id })
+    .then((existingStudent) => {
+      if (!existingStudent) {
+        // ID does not exist, return an error
+        return res.status(404).json({ error: "ID does not exist" });
+      }
 
+      // Create and save the new payment
+      const newPayment = new payment({
+        id: req.body.id,
+        paymentReceipt: req.file ? req.file.filename : null,
+        // Add any other fields related to payment schema here
+      });
+
+      newPayment.save()
+        .then((savedPayment) => {
+          res.status(201).json(savedPayment);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: "Internal server error" });
+        });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+// Define route to get payments by student ID
+// Endpoint to search payment model by ID
+router.get("/payment", (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+      return res.status(400).json({ error: "ID is required in the request body" });
+  }
+
+  // Search the payment model by ID
+  payment.findOne({ id: id })
+      .then((payment) => {
+          if (!payment) {
+              return res.status(404).json({ error: "Payment not found" });
+          }
+          res.status(200).json(payment);
+      })
+      .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: "Internal server error" });
+      });
+});
 module.exports = router;
