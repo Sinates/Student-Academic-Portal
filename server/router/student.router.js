@@ -109,8 +109,8 @@ router.post("/register", (req, res) => {
 router.post("/signup", async (req, res) => {
   try {
     const id = req.body.id;
-    const password = req.body.password;
-    const hashedPassword = getHashedPassword(password);
+    const restriction = req.body.restriction;
+    const hashedPassword = getHashedPassword(req.body.password);
 
     const result = await studentModel.findOneAndUpdate(
       { id: id },
@@ -118,8 +118,9 @@ router.post("/signup", async (req, res) => {
     );
 
     if (!result) {
-      return res.status(404).json({ error: "ID couldn't be found!" });
+      return res.status(404).json({ error: "User doesn't exist!" });
     }
+    //FIXME: check wether student is restricted or not
 
     return res.status(201).json({ message: "User Signup completed" });
   } catch (err) {
@@ -127,5 +128,45 @@ router.post("/signup", async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+// router.post("/signin", (req, res) => {
+//   studentModel.findOne({
+//     id: req.body.id,
+//     password: getHashedPassword(req.body.password)
+//   }).then((data) => {
+//     if (data) {
+//       console.log(data);
+//       return res.status(200).json(data);
+//     } else {
+//       return res.status(404).json({ error: "Agent doesn't exist." });
+//     }
+//   });
+// });
+router.post("/signin", (req, res) => {
+  studentModel.findOne({
+    id: req.body.id
+  }).then((data) => {
+    if (data) {
+      // Hash the provided password
+      const hashedPassword = crypto.createHash('sha256').update(req.body.password).digest('base64');
+      
+      // Compare hashed password
+      if (hashedPassword === data.password) {
+        console.log(data);
+        return res.status(200).json(data);
+      } else {
+        // Password incorrect
+        return res.status(401).json({ error: "Password incorrect." });
+      }
+    } else {
+      // User ID doesn't exist
+      return res.status(404).json({ error: "User doesn't exist." });
+    }
+  }).catch((error) => {
+    // Handle any other errors
+    console.error("Error:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  });
+});
+
 
 module.exports = router;
