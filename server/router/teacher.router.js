@@ -31,17 +31,21 @@ router.post("/upload", upload.single("file"), (req, res) => {
     }
 
     const filePath = req.file.path;
-
-    // Extract instructor name and course name from the file name
     const fileName = req.file.originalname;
-    const fileNameParts = fileName.split("-");
 
-    if (fileNameParts.length !== 2) {
+    console.log("File name:", fileName); // Log the file name
+
+    // Extract instructor name, course name, and batch from the file name
+    const fileNameParts = fileName.split("-");
+    console.log("File name parts:", fileNameParts); // Log the file name parts
+
+    if (fileNameParts.length !== 3 || !fileName.endsWith(".xlsx")) {
       return res.status(400).json({ error: "Invalid file name format" });
     }
 
-    const [instructorName, courseNameWithExtension] = fileNameParts;
-    const courseName = courseNameWithExtension.split(".")[0];
+    const instructorName = fileNameParts[0].trim();
+    const course = fileNameParts[1].trim();
+    const batch = fileNameParts[2].trim().split(".")[0];
 
     // Read the uploaded Excel file
     const workbook = xlsx.readFile(filePath);
@@ -55,10 +59,11 @@ router.post("/upload", upload.single("file"), (req, res) => {
 
       // Populate fields and save to database
       const newGrade = new gradeModel({
-        course: courseName,
-        instructorName: instructorName,
+        instructor: instructorName,
+        course: course,
+        batch: batch,
         studentName: Name,
-        studentID: ID,
+        id: ID,
         grade: Grade,
         mark: Mark,
         file: req.file ? req.file.filename : null, // Use req.file.filename to get the file name

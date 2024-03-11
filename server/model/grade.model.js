@@ -9,6 +9,7 @@ const newSchema = new mongoose.Schema({
   grade: String,
   mark: Number,
   file: String,
+  batch: String,
 });
 
 module.exports = mongoose.model("grade", newSchema);
