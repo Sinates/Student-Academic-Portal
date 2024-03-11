@@ -1,7 +1,7 @@
 const express = require("express");
 const studentModel = require("../model/student.model");
 const payment = require("../model/payment.model");
-
+const courseModel = require("../model/course.model");
 const router = express.Router();
 const multer = require("multer");
 const crypto = require("crypto");
@@ -153,12 +153,10 @@ router.post("/signin", (req, res) => {
         // Check if account is restricted
         if (data.restricted === true) {
           // Account is restricted, prompt user to contact admin
-          return res
-            .status(403)
-            .json({
-              error:
-                "Your account is restricted. Please contact the system administrator.",
-            });
+          return res.status(403).json({
+            error:
+              "Your account is restricted. Please contact the system administrator.",
+          });
         } else {
           // Hash the provided password
           const hashedPassword = crypto
@@ -270,5 +268,21 @@ router.get("/grades", (req, res) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     });
+});
+router.get("/courses", async (req, res) => {
+  try {
+    // Query the database to find all courses
+    const courses = await courseModel.find(
+      {},
+      { _id: 0, courseName: 1, courseid: 1 }
+    );
+
+    // Return the retrieved courses as the response
+    res.status(200).json(courses);
+  } catch (error) {
+    // If an error occurs, return an error response
+    console.error("Error retrieving courses:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 module.exports = router;

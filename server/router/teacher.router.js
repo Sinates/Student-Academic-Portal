@@ -1,28 +1,115 @@
 const express = require("express");
-const Admin = require("../model/teacher.model");
+const teacherModel = require("../model/teacher.model");
 const router = express.Router();
 const gradeModel = require("../model/grade.model");
 const fs = require("fs");
 const path = require("path");
 const xlsx = require("xlsx");
 const multer = require("multer");
+function generateID() {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let id = "TR" + "";
 
+  // Generate two random letters
+  for (let i = 0; i < 2; i++) {
+    id += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+
+  // Generate four random numbers
+  for (let i = 0; i < 4; i++) {
+    id += Math.floor(Math.random() * 10);
+  }
+
+  return id;
+}
 router.get("/response", (req, res) => {
   res.status(200).json({ reponse: "Responds Perfectly" });
 });
+
+// Define storage for multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/grades"); // Save uploaded files to the 'uploads/grades' directory
+    cb(null, "uploads/teacher"); // Save uploaded files to the 'uploads/teacher' directory
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname); // Use the original file name
   },
 });
 
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 10MB
-});
+// Initialize multer upload with defined storage
+const upload = multer({ storage: storage });
+
+router.post(
+  "/register",
+  upload.fields([
+    { name: "curriculumVitae", maxCount: 1 },
+    { name: "qualifications", maxCount: 1 },
+    { name: "certifications", maxCount: 1 },
+  ]),
+  (req, res) => {
+    // Check if the provided email already exists
+    teacherModel
+      .findOne({ email: req.body.email })
+      .then((existingEmail) => {
+        if (existingEmail) {
+          // Email already exists
+          return res.status(409).json({ error: "Email already exists" });
+        } else {
+          // Check if the provided ID already exists
+          teacherModel
+            .findOne({ id: generateID() })
+            .then((existingID) => {
+              if (existingID) {
+                // ID already exists
+                return res.status(409).json({ error: "ID already exists" });
+              } else {
+                // Both email and ID are unique, perform file upload
+                // Retrieve uploaded files
+                const files = req.files;
+                const uploadedCV = files["curriculumVitae"][0];
+                const uploadedQualifications = files["qualifications"][0];
+                const uploadedCertifications = files["certifications"][0];
+
+                // Create and save the new teacher
+                const newTeacher = new teacherModel({
+                  id: generateID(), // Use provided ID
+                  name: req.body.name,
+                  gender: req.body.gender,
+                  email: req.body.email,
+                  phone: req.body.phone,
+                  curriculumVitae: uploadedCV ? uploadedCV.filename : null,
+                  qualifications: uploadedQualifications
+                    ? uploadedQualifications.filename
+                    : null,
+                  certifications: uploadedCertifications
+                    ? uploadedCertifications.filename
+                    : null,
+                  interviewDate: req.body.date,
+                });
+
+                newTeacher
+                  .save()
+                  .then((savedTeacher) => {
+                    res.status(201).json(savedTeacher);
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                    res.status(500).json({ error: "Internal server error" });
+                  });
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+              res.status(500).json({ error: "Internal server error" });
+            });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
+      });
+  }
+);
 
 router.post("/upload", upload.single("file"), (req, res) => {
   try {
