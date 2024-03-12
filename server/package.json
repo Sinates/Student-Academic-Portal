@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
@@ -30,6 +31,12 @@
     "passport": "^0.5.3",
     "passport-google-oauth20": "^2.0.0",
     "path": "^0.12.7",
-    "pnpm": "^8.15.4"
+    "pnpm": "^8.15.4",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "majestic": "^1.8.1",
+    "supertest": "^6.3.4"
   }
 }
