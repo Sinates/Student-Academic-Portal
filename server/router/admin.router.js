@@ -141,5 +141,30 @@
         res.status(500).json({ error: "Internal server error" });
       });
   });
+  router.get("/getbatches", async (req, res) => {
+    try {
+      const uniqueBatches = await studentModel.distinct("batch");
+      res.status(200).json({ batches: uniqueBatches });
+    } catch (error) {
+      console.error("Error retrieving unique batches:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  router.get("/getstudents", async (req, res) => {
+    const { batch } = req.body;
+  
+    try {
+      const studentsInBatch = await studentModel.find({ batch: batch }, { name: 1, _id: 0 });
+      if (studentsInBatch.length === 0) {
+        return res.status(404).json({ error: "No students found in the batch" });
+      }
+      const studentNames = studentsInBatch.map(student => student.name);
+      res.status(200).json({ students: studentNames });
+    } catch (error) {
+      console.error(`Error retrieving students in batch ${batch}:`, error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  
 
   module.exports = router;

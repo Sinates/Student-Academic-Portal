@@ -29,6 +29,18 @@ function generateID() {
 
   return id;
 }
+function generateBatch() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear().toString().substr(2, 2); // Get the last two digits of the year
+  const month = currentDate.getMonth() + 1; // Months are zero-indexed, so add 1
+
+  // Check if it's before or after half the year
+  const batchSuffix = month <= 6 ? '01' : '02';
+  
+  const batch = `DRB${year}${batchSuffix}`;
+  return batch;
+}
+
 
 // Configure Multer to restrict the maximum file size to 5MB
 
@@ -84,6 +96,7 @@ router.post("/register", (req, res) => {
                 // File uploaded successfully, create and save the new student
                 const newStudent = new studentModel({
                   id: generateID(), // Use provided ID
+                  batch: generateBatch(),
                   name: req.body.name,
                   gender: req.body.gender,
                   email: req.body.email,
@@ -285,4 +298,6 @@ router.get("/courses", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 module.exports = router;

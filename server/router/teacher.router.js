@@ -1,5 +1,6 @@
 const express = require("express");
 const teacherModel = require("../model/teacher.model");
+const studentModel = require("../model/student.model");
 const router = express.Router();
 const gradeModel = require("../model/grade.model");
 const fs = require("fs");
@@ -173,5 +174,29 @@ router.post("/upload", upload.single("file"), (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+router.post("/sendnotifications", async (req, res) => {
+  try {
+    const { batch, notification } = req.body;
+
+    // Find all students in the specified batch
+    const students = await studentModel.find({ batch });
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({ error: "No students found in the specified batch." });
+    }
+
+    // Add the notification to each student's notifications array
+    for (const student of students) {
+      student.notifications.push(notification);
+      await student.save();
+    }
+
+    return res.status(200).json({ message: "Notifications sent successfully." });
+  } catch (error) {
+    console.error("Error sending notifications:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 
 module.exports = router;

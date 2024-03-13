@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const newSchema = new mongoose.Schema({
   id: String,
+  batch: String,
   name: String,
   gender: String,
   email: String,
@@ -19,5 +20,7 @@ const newSchema = new mongoose.Schema({
     default: true,
     type: Boolean,
   },
+  notifications: [String] 
 });
+
 module.exports = mongoose.model("student", newSchema);

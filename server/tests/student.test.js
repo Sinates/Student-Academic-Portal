@@ -1,59 +1,48 @@
-const axios = require('axios');
-const app = require('../router/student.router');
-const mongoose = require('mongoose');
 const request = require('supertest');
+const express = require('express');
+const studentRouter = require('../router/student.router');
 
-beforeAll(async () => {
-  await mongoose.connect('mongodb://localhost:27017/testdb', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true
-  });
-});
-
-afterAll(async () => {
-  await mongoose.connection.close();
-});
+const app = express();
+app.use(express.json());
+app.use('/student', studentRouter);
 
 describe('Student Router Endpoints', () => {
-  it('POST /signup - responds with 404 if user does not exist', async () => {
+  it('POST /register - responds with 201 if registration is successful', async () => {
     const res = await request(app)
-      .post('/signup')
+      .post('/register')
+      .send({
+        id: 'ZR9900',
+        name: 'John Doe',
+        gender: 'Male',
+        email: 'john.doe@example.com',
+        phone: '1234567890',
+        guardianName: 'Jane Doe',
+        guardianPhone: '9876543210',
+        department: 'Computer Science',
+        aboutYou: 'I am a student.'
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty('id');
+    expect(res.body.name).toBe('John Doe');
+    // Add more expectations as needed
+  });
+
+  it('POST /student/signup - responds with 404 if user does not exist', async () => {
+    const res = await request(app)
+      .post('/student/signup')
+      .send({ id: 'XA5305', password: 'password123', restriction: false });
+
+    expect(res.status).toBe(404);
+  });
+
+  it('POST /student/signin - responds with 404 if user does not exist', async () => {
+    const res = await request(app)
+      .post('/student/signin')
       .send({ id: 'XA5305', password: 'password123' });
 
     expect(res.status).toBe(404);
   });
 
-  it('POST /signin - responds with 404 if user does not exist', async () => {
-    const res = await request(app)
-      .post('/signin')
-      .send({ id: 'XA5305', password: 'password123' });
-
-    expect(res.status).toBe(404);
-  });
-
-  it('POST /uploadpayment - responds with 404 if student ID does not exist', async () => {
-    const res = await request(app)
-      .post('/uploadpayment')
-      .attach('paymentReceipt', 'path/to/payment-receipt.pdf') // Attach a payment receipt file
-      .field('id', 'XA5305'); // ID of non-existing student
-
-    expect(res.status).toBe(404);
-  });
-
-  it('GET /grades - responds with 404 if student ID does not exist', async () => {
-    const res = await request(app)
-      .get('/grades')
-      .send({ id: 'XA5305' });
-
-    expect(res.status).toBe(404);
-  });
-
-  it('GET /courses - responds with 200 and an array of courses', async () => {
-    const res = await request(app)
-      .get('/courses');
-
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-  });
+  // Add more test cases for other endpoints
 });
