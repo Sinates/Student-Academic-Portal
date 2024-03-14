@@ -87,7 +87,7 @@ router.get("/restricted", (req, res) => {
 router.post("/courses", async (req, res) => {
   try {
     // Extract course name and courseId from request body
-    const { name, courseId } = req.body;
+    const { name, courseId, year } = req.body;
 
     // Check if the courseId already exists
     const existingCourse = await courseModel.findOne({ courseId });
@@ -101,6 +101,7 @@ router.post("/courses", async (req, res) => {
     const newCourse = new courseModel({
       courseName: req.body.name,
       courseid: req.body.courseId,
+      year: req.body.year,
     });
 
     // Save the new course to the database
@@ -339,4 +340,26 @@ router.post("/generateExcel", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+// Route to assign courses to a teacher
+router.post("/assignCourses", async (req, res) => {
+  try {
+    const { email, course } = req.body;
+
+    // Check if the provided teacher email exists
+    const existingTeacher = await teacherModel.findOne({ email });
+    if (!existingTeacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Update the assigned courses for the teacher
+    existingTeacher.assignedCourses.push(course); // Push new courses to the existing array
+    await existingTeacher.save();
+
+    return res.status(200).json({ message: "Courses assigned successfully" });
+  } catch (error) {
+    console.error("Error assigning courses:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;

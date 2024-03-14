@@ -244,45 +244,68 @@ router.post("/signin", (req, res) => {
     });
 });
 
-router.post("/signup", (req, res) => {
+router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
 
-  // Check if the email already exists
-  teacherModel
-    .findOne({ email })
-    .then((existingTeacher) => {
-      // if (existingTeacher) {
-      //   return res.status(400).json({ error: "Email already exists" });
-      // }
+  try {
+    // Check if the email already exists
+    const existingTeacher = await teacherModel.findOne({ email });
 
-      // Hash the provided password
+    if (existingTeacher) {
+      // Email already exists, assign the password to the existing teacher
       const hashedPassword = crypto
         .createHash("sha256")
         .update(password)
         .digest("base64");
 
-      // Create a new admin
-      const newTeacher = new teacherModel({
-        email,
-        password: hashedPassword,
-      });
+      existingTeacher.password = hashedPassword;
+      await existingTeacher.save();
 
-      // Save the new admin to the database
-      newTeacher
-        .save()
-        .then((savedTeacher) => {
-          console.log("New admin created:", savedTeacher);
-          res.status(201).json({ message: "Teacher created successfully" });
-        })
-        .catch((error) => {
-          console.error("Error saving admin:", error);
-          res.status(500).json({ error: "Internal Server Error" });
-        });
-    })
-    .catch((error) => {
-      console.error("Error checking for existing admin:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      return res
+        .status(200)
+        .json({ message: "Password assigned successfully" });
+    }
+
+    // Hash the provided password
+    const hashedPassword = crypto
+      .createHash("sha256")
+      .update(password)
+      .digest("base64");
+
+    // Create a new teacher
+    const newTeacher = new teacherModel({
+      email,
+      password: hashedPassword,
     });
+
+    // Save the new teacher to the database
+    const savedTeacher = await newTeacher.save();
+
+    console.log("New teacher created:", savedTeacher);
+    return res.status(201).json({ message: "Teacher created successfully" });
+  } catch (error) {
+    console.error("Error saving teacher:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+router.get("/allocatedCourses", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if the provided email exists
+    const existingTeacher = await teacherModel.findOne({ email });
+    if (!existingTeacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Retrieve assigned courses for the teacher
+    const allocatedCourses = existingTeacher.assignedCourses;
+
+    return res.status(200).json({ allocatedCourses });
+  } catch (error) {
+    console.error("Error retrieving allocated courses:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 module.exports = router;

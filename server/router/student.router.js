@@ -200,39 +200,35 @@ router.post("/signin", (req, res) => {
 router.post(
   "/uploadpayment",
   uploadpayment.single("paymentReceipt"),
-  (req, res) => {
-    // Check if the provided ID already exists in the studentModel
-    studentModel
-      .findOne({ id: req.body.id })
-      .then((existingStudent) => {
-        if (!existingStudent) {
-          // ID does not exist, return an error
-          return res.status(404).json({ error: "ID does not exist" });
-        }
+  async (req, res) => {
+    try {
+      const studentId = req.body.id;
 
-        // Create and save the new payment
-        const newPayment = new payment({
-          id: req.body.id,
-          paymentReceipt: req.file ? req.file.filename : null,
-          // Add any other fields related to payment schema here
-        });
+      // Check if the provided ID already exists in the studentModel
+      const existingStudent = await studentModel.findOne({ id: studentId });
 
-        newPayment
-          .save()
-          .then((savedPayment) => {
-            res.status(201).json(savedPayment);
-          })
-          .catch((err) => {
-            console.error(err);
-            res.status(500).json({ error: "Internal server error" });
-          });
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).json({ error: "Internal server error" });
+      if (!existingStudent) {
+        // ID does not exist, return an error
+        return res.status(404).json({ error: "ID does not exist" });
+      }
+
+      // Create and save the new payment with the student's name
+      const newPayment = new payment({
+        id: studentId,
+        studentName: existingStudent.name,
+        paymentReceipt: req.file ? req.file.filename : null,
+        // Add any other fields related to payment schema here
       });
+
+      const savedPayment = await newPayment.save();
+      return res.status(201).json(savedPayment);
+    } catch (error) {
+      console.error("Error uploading payment:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
   }
 );
+
 // Define route to get payments by student ID
 // Endpoint to search payment model by ID
 router.get("/payment", (req, res) => {

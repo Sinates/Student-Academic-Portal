@@ -15,5 +15,6 @@ const newSchema = new mongoose.Schema({
   qualifications: String,
   certifications: String,
   interviewDate: Date,
+  assignedCourses: [String],
 });
 module.exports = mongoose.model("teacher", newSchema);
