@@ -22,8 +22,10 @@ const newSchema = new mongoose.Schema({
   },
   notifications: [
     {
+
       sender: String,
       message: String,
+      file: String,
       time: {
         type: Date,
         default: Date.now,

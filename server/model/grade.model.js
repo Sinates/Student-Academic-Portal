@@ -13,6 +13,7 @@ const newSchema = new mongoose.Schema({
   total: Number,
   file: String,
   batch: String,
+  attendance: [ String]
 });
 
 module.exports = mongoose.model("grade", newSchema);

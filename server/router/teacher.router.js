@@ -1,6 +1,7 @@
 const express = require("express");
 const teacherModel = require("../model/teacher.model");
 const studentModel = require("../model/student.model");
+const materialModel = require("../model/material.model");
 const router = express.Router();
 const gradeModel = require("../model/grade.model");
 const fs = require("fs");
@@ -308,4 +309,83 @@ router.get("/allocatedCourses", async (req, res) => {
   }
 });
 
+
+// Route to upload file and send notifications to all students
+const materialStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/material"); // Save uploaded files to the 'uploads/material' directory
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname); // Use the original file name
+  },
+});
+
+const uploadMaterial = multer({ storage: materialStorage });
+
+router.post("/uploadmaterial", uploadMaterial.single("file"), async (req, res) => {
+  try {
+    // Extract notification message, sender, and batch from request body
+    const { message, sender, batch } = req.body;
+
+    // Save the uploaded file path in the database
+    const newMaterial = new materialModel({
+      sender: sender, // Assuming admin is sending the notification
+      message: message,
+      file: req.file.path, // File path returned by Multer
+    });
+    await newMaterial.save();
+
+    // Fetch students belonging to the specified batch from the database
+    const students = await studentModel.find({ batch: batch });
+
+    // Iterate over each student and send notification
+    students.forEach(async (student) => {
+      // Update student's notifications array with the new message
+      student.notifications.push({ message: message,sender: sender , file:req.file.path });
+      await student.save();
+    });
+
+    // Return success response
+    res.status(200).json({ message: "File uploaded and notifications sent to students in the specified batch." });
+  } catch (error) {
+    console.error("Error uploading file and sending notifications:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+router.post("/uploadattendance", async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded." });
+    }
+
+    // Load the attendance Excel file
+    const workbook = xlsx.readFile(req.file.path);
+
+    // Assuming the attendance data is in the first sheet and has columns "ID" and "Attendance"
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const attendanceData = xlsx.utils.sheet_to_json(worksheet);
+
+    // Iterate over each attendance record and update attendance in the grade model
+    for (const record of attendanceData) {
+      const { ID, Attendance } = record;
+
+      // Search for the student's grade using the ID
+      const grade = await gradeModel.findOne({ id: ID });
+
+      if (grade) {
+        // Update attendance array in the grade document
+        grade.attendance.push({ date: new Date(), status: Attendance });
+        await grade.save();
+      }
+    }
+
+    // Delete the uploaded file after processing
+    // fs.unlinkSync(req.file.path);
+
+    return res.status(200).json({ message: "Attendance updated successfully." });
+  } catch (error) {
+    console.error("Error updating attendance:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
 module.exports = router;
