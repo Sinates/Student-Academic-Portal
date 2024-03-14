@@ -1,10 +1,14 @@
 const express = require("express");
+const path = require("path");
 const Admin = require("../model/admin.model");
 const studentModel = require("../model/student.model");
 const payment = require("../model/payment.model");
 const courseModel = require("../model/course.model");
+const adminModel = require("../model/admin.model");
 const router = express.Router();
-
+const ExcelJS = require("exceljs");
+const crypto = require("crypto");
+const teacherModel = require("../model/teacher.model");
 router.post("/verifypayment", (req, res) => {
   const studentId = req.body.id;
 
@@ -166,5 +170,173 @@ router.get("/getstudents", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+router.post("/signin", (req, res) => {
+  adminModel
+    .findOne({
+      email: req.body.email,
+    })
+    .then((data) => {
+      if (data) {
+        // Hash the provided password
+        const hashedPassword = crypto
+          .createHash("sha256")
+          .update(req.body.password)
+          .digest("base64");
 
+        // Compare hashed password
+        if (hashedPassword === data.password) {
+          console.log(data);
+          return res.status(200).json(data);
+        } else {
+          // Password incorrect
+          return res.status(401).json({ error: "Password incorrect." });
+        }
+      } else {
+        // User ID doesn't exist
+        return res.status(404).json({ error: "User doesn't exist." });
+      }
+    })
+    .catch((error) => {
+      // Handle any other errors
+      console.error("Error:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    });
+});
+router.post("/signup", (req, res) => {
+  const { email, password } = req.body;
+
+  // Check if the email already exists
+  adminModel
+    .findOne({ email })
+    .then((existingAdmin) => {
+      if (existingAdmin) {
+        return res.status(400).json({ error: "Email already exists" });
+      }
+
+      // Hash the provided password
+      const hashedPassword = crypto
+        .createHash("sha256")
+        .update(password)
+        .digest("base64");
+
+      // Create a new admin
+      const newAdmin = new adminModel({
+        email,
+        password: hashedPassword,
+      });
+
+      // Save the new admin to the database
+      newAdmin
+        .save()
+        .then((savedAdmin) => {
+          console.log("New admin created:", savedAdmin);
+          res.status(201).json({ message: "Admin created successfully" });
+        })
+        .catch((error) => {
+          console.error("Error saving admin:", error);
+          res.status(500).json({ error: "Internal Server Error" });
+        });
+    })
+    .catch((error) => {
+      console.error("Error checking for existing admin:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    });
+});
+router.post("/verifyteacher", (req, res) => {
+  const teacherEmail = req.body.email;
+
+  // Check if the student exists
+  teacherModel
+    .findOne({ email: teacherEmail })
+    .then((teacher) => {
+      if (!teacher) {
+        // Student not found
+        return res.status(404).json({ error: "Teacher not found" });
+      }
+
+      // Update the student's verification status
+      teacher.restricted = false;
+      teacher
+        .save()
+        .then(() => {
+          res
+            .status(200)
+            .json({ message: "Teacher sign-up verified successfully" });
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: "Internal server error" });
+        });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+// Function to fetch student data based on batch
+async function getStudentsByBatch(batch) {
+  try {
+    const students = await studentModel.find({ batch: batch }).lean(); // Assuming batch is a field in your student model
+    return students;
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    throw error;
+  }
+}
+
+// Function to generate Excel file
+async function generateExcel(batch) {
+  const students = await getStudentsByBatch(batch);
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Students");
+
+  // Define headers
+  worksheet.columns = [
+    { header: "ID", key: "id", width: 10 },
+    { header: "Name", key: "name", width: 20 },
+    { header: "Mid", key: "mid", width: 10 },
+    { header: "Final", key: "final", width: 10 },
+    { header: "Assessment", key: "assessment", width: 15 },
+    { header: "Total", key: "total", width: 10 },
+    { header: "Grade", key: "grade", width: 10 },
+  ];
+
+  // Populate data
+  students.forEach((student) => {
+    worksheet.addRow({
+      id: student.id.toString(), // Assuming ID is stored as _id in MongoDB
+      name: student.name,
+      mid: student.mid || "", // Handle cases where the values might be null or undefined
+      final: student.final || "",
+      assessment: student.assessment || "",
+      total: student.total || "",
+      grade: student.grade || "",
+    });
+  });
+
+  // Save the workbook
+  const folderPath = path.join(__dirname, "../uploads/generate");
+  const fileName = `students_batch_${batch}.xlsx`;
+  const filePath = path.join(folderPath, fileName);
+  await workbook.xlsx.writeFile(filePath);
+  console.log(`Excel file "${fileName}" generated successfully.`);
+  return filePath;
+}
+
+// Route to generate Excel file using POST request
+router.post("/generateExcel", async (req, res) => {
+  const batch = req.body.batch;
+  if (!batch) {
+    return res.status(400).json({ error: "Batch parameter is required" });
+  }
+
+  try {
+    const fileName = await generateExcel(batch);
+    res.download(fileName);
+  } catch (error) {
+    console.error("Error generating Excel file:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 module.exports = router;

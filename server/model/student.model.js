@@ -20,7 +20,16 @@ const newSchema = new mongoose.Schema({
     default: true,
     type: Boolean,
   },
-  notifications: [String] 
+  notifications: [
+    {
+      sender: String,
+      message: String,
+      time: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 });
 
 module.exports = mongoose.model("student", newSchema);

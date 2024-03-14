@@ -7,6 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const xlsx = require("xlsx");
 const multer = require("multer");
+const crypto = require("crypto");
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let id = "TR" + "";
@@ -179,7 +180,7 @@ router.post("/upload", upload.single("file"), (req, res) => {
 });
 router.post("/sendnotifications", async (req, res) => {
   try {
-    const { batch, notification } = req.body;
+    const { batch, sender, message } = req.body;
 
     // Find all students in the specified batch
     const students = await studentModel.find({ batch });
@@ -192,7 +193,7 @@ router.post("/sendnotifications", async (req, res) => {
 
     // Add the notification to each student's notifications array
     for (const student of students) {
-      student.notifications.push(notification);
+      student.notifications.push({ sender, message, time: Date.now() });
       await student.save();
     }
 
@@ -203,6 +204,85 @@ router.post("/sendnotifications", async (req, res) => {
     console.error("Error sending notifications:", error);
     return res.status(500).json({ error: "Internal server error." });
   }
+});
+
+router.post("/signin", (req, res) => {
+  teacherModel
+    .findOne({
+      email: req.body.email,
+    })
+    .then((data) => {
+      if (data) {
+        // Check if the user is restricted
+        if (data.restricted) {
+          return res.status(403).json({ error: "User is restricted." });
+        }
+
+        // Hash the provided password
+        const hashedPassword = crypto
+          .createHash("sha256")
+          .update(req.body.password)
+          .digest("base64");
+
+        // Compare hashed password
+        if (hashedPassword === data.password) {
+          console.log(data);
+          return res.status(200).json(data);
+        } else {
+          // Password incorrect
+          return res.status(401).json({ error: "Password incorrect." });
+        }
+      } else {
+        // User ID doesn't exist
+        return res.status(404).json({ error: "User doesn't exist." });
+      }
+    })
+    .catch((error) => {
+      // Handle any other errors
+      console.error("Error:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    });
+});
+
+router.post("/signup", (req, res) => {
+  const { email, password } = req.body;
+
+  // Check if the email already exists
+  teacherModel
+    .findOne({ email })
+    .then((existingTeacher) => {
+      // if (existingTeacher) {
+      //   return res.status(400).json({ error: "Email already exists" });
+      // }
+
+      // Hash the provided password
+      const hashedPassword = crypto
+        .createHash("sha256")
+        .update(password)
+        .digest("base64");
+
+      // Create a new admin
+      const newTeacher = new teacherModel({
+        email,
+        password: hashedPassword,
+      });
+
+      // Save the new admin to the database
+      newTeacher
+        .save()
+        .then((savedTeacher) => {
+          console.log("New admin created:", savedTeacher);
+          res.status(201).json({ message: "Teacher created successfully" });
+        })
+        .catch((error) => {
+          console.error("Error saving admin:", error);
+          res.status(500).json({ error: "Internal Server Error" });
+        });
+    })
+    .catch((error) => {
+      console.error("Error checking for existing admin:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    });
 });
 
 module.exports = router;

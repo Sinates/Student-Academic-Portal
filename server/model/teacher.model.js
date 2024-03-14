@@ -7,6 +7,10 @@ const newSchema = new mongoose.Schema({
   email: String,
   password: String,
   phone: Number,
+  restricted: {
+    type: Boolean,
+    default: true,
+  },
   curriculumVitae: String,
   qualifications: String,
   certifications: String,
