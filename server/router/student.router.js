@@ -6,7 +6,7 @@ const router = express.Router();
 const multer = require("multer");
 const crypto = require("crypto");
 const gradeModel = require("../model/grade.model");
-
+const teacherModel = require("../model/teacher.model");
 const getHashedPassword = (password) => {
   const sha256 = crypto.createHash("sha256");
   const hash = sha256.update(password).digest("base64");
@@ -28,6 +28,22 @@ function generateID() {
   }
 
   return id;
+}
+function changeRequestID() {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let id = "";
+
+  // Generate two random letters
+  for (let i = 0; i < 2; i++) {
+    id += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+
+  // Generate four random numbers
+  for (let i = 0; i < 4; i++) {
+    id += Math.floor(Math.random() * 10);
+  }
+
+  return "CR" + id;
 }
 function generateBatch() {
   const currentDate = new Date();
@@ -291,6 +307,44 @@ router.get("/courses", async (req, res) => {
     // If an error occurs, return an error response
     console.error("Error retrieving courses:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/gradeChangeRequest", async (req, res) => {
+  try {
+    const { studentId, teacherId, message } = req.body;
+
+    // Find the student by ID
+    const student = await studentModel.findOne({ id: studentId });
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Create the grade change request object
+    const changeRequest = {
+      sender: studentId,
+      message: message,
+      approved: false,
+      time: Date.now(),
+    };
+
+    // Find the teacher by ID
+    const teacher = await teacherModel.findOne({ id: teacherId });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Add the grade change request to the teacher's changeRequests array
+    teacher.changeRequests.push(changeRequest);
+
+    // Save the updated teacher document
+    await teacher.save();
+
+    return res
+      .status(200)
+      .json({ message: "Grade change request submitted successfully" });
+  } catch (error) {
+    console.error("Error submitting grade change request:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
