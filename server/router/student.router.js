@@ -35,12 +35,11 @@ function generateBatch() {
   const month = currentDate.getMonth() + 1; // Months are zero-indexed, so add 1
 
   // Check if it's before or after half the year
-  const batchSuffix = month <= 6 ? '01' : '02';
-  
+  const batchSuffix = month <= 6 ? "01" : "02";
+
   const batch = `DRB${year}${batchSuffix}`;
   return batch;
 }
-
 
 // Configure Multer to restrict the maximum file size to 5MB
 
@@ -273,7 +272,7 @@ router.get("/grades", (req, res) => {
     .findOne({ id: id })
     .then((grade) => {
       if (!grade) {
-        return res.status(404).json({ error: "Payment not found" });
+        return res.status(404).json({ error: "Grade not found" });
       }
       res.status(200).json(grade);
     })
@@ -298,6 +297,5 @@ router.get("/courses", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 module.exports = router;

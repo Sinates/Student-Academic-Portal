@@ -7,7 +7,10 @@ const newSchema = new mongoose.Schema({
   instructor: String,
   course: String,
   grade: String,
-  mark: Number,
+  mid: Number,
+  final: Number,
+  assessment: Number,
+  total: Number,
   file: String,
   batch: String,
 });

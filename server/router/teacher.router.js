@@ -143,7 +143,7 @@ router.post("/upload", upload.single("file"), (req, res) => {
 
     // Process the data and populate fields accordingly
     data.forEach((row) => {
-      const { Name, ID, Grade, Mark } = row;
+      const { Name, ID, Grade, Mid, Final, Assessment, Total } = row;
 
       // Populate fields and save to database
       const newGrade = new gradeModel({
@@ -153,7 +153,10 @@ router.post("/upload", upload.single("file"), (req, res) => {
         studentName: Name,
         id: ID,
         grade: Grade,
-        mark: Mark,
+        mid: Mid,
+        final: Final,
+        assessment: Assessment,
+        total: Total,
         file: req.file ? req.file.filename : null, // Use req.file.filename to get the file name
       });
 
@@ -182,7 +185,9 @@ router.post("/sendnotifications", async (req, res) => {
     const students = await studentModel.find({ batch });
 
     if (!students || students.length === 0) {
-      return res.status(404).json({ error: "No students found in the specified batch." });
+      return res
+        .status(404)
+        .json({ error: "No students found in the specified batch." });
     }
 
     // Add the notification to each student's notifications array
@@ -191,12 +196,13 @@ router.post("/sendnotifications", async (req, res) => {
       await student.save();
     }
 
-    return res.status(200).json({ message: "Notifications sent successfully." });
+    return res
+      .status(200)
+      .json({ message: "Notifications sent successfully." });
   } catch (error) {
     console.error("Error sending notifications:", error);
     return res.status(500).json({ error: "Internal server error." });
   }
 });
-
 
 module.exports = router;
