@@ -352,11 +352,16 @@ router.post("/uploadmaterial", uploadMaterial.single("file"), async (req, res) =
     res.status(500).json({ error: "Internal server error." });
   }
 });
-router.post("/uploadattendance", async (req, res) => {
+router.post("/uploadattendance", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded." });
     }
+
+    const fileName = req.file.originalname;
+    const fileNameParts = fileName.split("-");
+    const batch = fileNameParts[1]; // Assuming batch name is in the second part
+    const courseCode = fileNameParts[2]; // Assuming course code is in the third part
 
     // Load the attendance Excel file
     const workbook = xlsx.readFile(req.file.path);
@@ -369,18 +374,27 @@ router.post("/uploadattendance", async (req, res) => {
     for (const record of attendanceData) {
       const { ID, Attendance } = record;
 
-      // Search for the student's grade using the ID
-      const grade = await gradeModel.findOne({ id: ID });
+      // Update attendance for the student's grade using the ID, batch, and course code
+      let updatedGrade = await gradeModel.findOneAndUpdate(
+        { id: ID, batch: batch, course: courseCode },
+        { $set: { "attendance.0": { date: new Date(), status: Attendance } } },
+        { new: true } // Return the updated document
+      );
 
-      if (grade) {
-        // Update attendance array in the grade document
-        grade.attendance.push({ date: new Date(), status: Attendance });
-        await grade.save();
+      // If grade document doesn't exist, create a new one
+      if (!updatedGrade) {
+        updatedGrade = new gradeModel({
+          id: ID,
+          batch: batch,
+          course: courseCode,
+          attendance: [{ date: new Date(), status: Attendance }],
+        });
+        await updatedGrade.save();
       }
     }
 
     // Delete the uploaded file after processing
-    // fs.unlinkSync(req.file.path);
+    fs.unlinkSync(req.file.path);
 
     return res.status(200).json({ message: "Attendance updated successfully." });
   } catch (error) {
@@ -388,4 +402,5 @@ router.post("/uploadattendance", async (req, res) => {
     return res.status(500).json({ error: "Internal server error." });
   }
 });
+
 module.exports = router;
