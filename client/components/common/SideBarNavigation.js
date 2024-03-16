@@ -20,7 +20,6 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import PaidIcon from '@mui/icons-material/Paid';
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
-import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 
@@ -31,7 +30,7 @@ function classNames(...classes) {
 export default function SideBarNav() {
     
 
-    let role = "Student";
+    let role = "Admin";
 
   
     const router = useRouter();
@@ -59,19 +58,19 @@ export default function SideBarNav() {
                 name: "Courses",
                 i: 2,
                 icon: RiGroupLine,
-                link: "/student/course",
+                link: "/students/course",
             },
             {
                 name: "Notification",
                 i: 3,
                 icon: IoFolderOpenOutline,
-                link: "/student/notification",
+                link: "/students/notification",
             },
             {
                 name: "Teachers",
                 i: 4,
                 icon: IoFolderOpenOutline,
-                link: "/student/teacher",
+                link: "/students/teacher",
             },
             
             
