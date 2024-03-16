@@ -31,15 +31,15 @@ function classNames(...classes) {
 export default function SideBarNav() {
     
 
-    let role = "student";
+    let role = "Student";
 
   
     const router = useRouter();
     const paths = router.pathname.split("/");
     const map = useMemo(() => new Map(), []);
 
-    if (role == "Super Admin" || role == "Admin") map.set("dashboard", 1);
-    if (role == "Super Admin" || role == "Admin") map.set("course", 2);
+    map.set("dashboard", 1);
+    map.set("course", 2);
     map.set("student", 3);
     map.set("payment", 4);
 
@@ -52,30 +52,30 @@ export default function SideBarNav() {
 
     let navigation = [];
 
-    if (role == "Admin")
+    if (role == "Student")
         navigation = [
-            { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+            { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/student/dashboard" },
             {
                 name: "Courses",
                 i: 2,
                 icon: RiGroupLine,
-                link: "/courses",
+                link: "/student/course",
             },
             {
-                name: "Students",
+                name: "Notification",
                 i: 3,
                 icon: IoFolderOpenOutline,
-                link: "/students",
+                link: "/student/notification",
             },
             {
                 name: "Teachers",
                 i: 4,
                 icon: IoFolderOpenOutline,
-                link: "/teachers",
+                link: "/student/teacher",
             },
             
             
-            { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/payments" },
+            { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/student/payment" },
 
         ];
     else if (role == "Teacher")
@@ -105,7 +105,8 @@ export default function SideBarNav() {
             icon: NotificationAddIcon,
             link: "/teachers/pushNotification" 
         },
-
+        {   name: "Notification", i: 4, icon: MdOutlineTopic, link: "/teacher/notification" },
+        
     ];
     else if (role=="student")
     navigation = [

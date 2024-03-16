@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { Card, Input, Button, Typography, Select } from "@material-tailwind/react";
-export default function TeacherRegistration2(){
+ 
+
+export default function TeacherRegistrationPage2(){
     const [id, setId] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [gender, setGender] = useState('');
   const [password, setPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  
   const handleGenderChange = (event) => {
     setGender(event.target.value);
   };
+   
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -21,6 +25,7 @@ export default function TeacherRegistration2(){
     console.log("Gender:", gender);
     console.log("Password:", password);
     console.log("Phone Number:", phoneNumber);
+ 
   };
     return (
         <Card color="transparent" shadow={false} className="">
