@@ -2,6 +2,7 @@ import { Card, Typography , IconButton,
     Tooltip } from "@material-tailwind/react";
 import { IoPencil } from "react-icons/io5";
 import { FaTrash } from "react-icons/fa";
+import RootLayout from "@/layouts/RootLayout";
 
 const TABLE_HEAD = ["Course Code", "Course Name", "Credit Hour", "Grade","Status"];
 
@@ -64,8 +65,9 @@ const TABLE_ROWS = [
   },
 ];
 
-export default function CourseList() {
+export default function Course() {
   return (
+    <RootLayout>
     <Card className="h-full  overflow-auto mx-8 mt-10">
       <table className="w-full min-w-max table-auto text-left">
         <thead>
@@ -140,5 +142,6 @@ export default function CourseList() {
         </tbody>
       </table>
     </Card>
+    </RootLayout>
   );
 }
