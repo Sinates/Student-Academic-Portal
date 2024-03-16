@@ -9,6 +9,10 @@ import {
     IoSettingsOutline,
 } from "react-icons/io5";
 import { MdAutoGraph, MdOutlineTopic, MdOutlineQuiz } from "react-icons/md";
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { AiOutlineMenuFold, AiOutlineMenu } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 import Image from "next/image";
@@ -76,20 +80,31 @@ export default function SideBarNav() {
         ];
     else if (role == "Teacher")
     navigation = [
-        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+       { name: "Dashboard", i: 1 , icon: MdAutoGraph, link: "/teachers/dashboard" },
         {
-            name: "Courses",
+            name: "Upload",
             i: 2,
-            icon: RiGroupLine,
-            link: "/courses",
+            icon: FileUploadIcon,
+            link: "/teachers/upload",
         },
-        {
-            name: "Students",
-            i: 3,
-            icon: IoFolderOpenOutline,
-            link: "/students",
+        { 
+            name: "Change Request", 
+            i: 3, 
+            icon: ChangeCircleIcon,
+            link: "/teachers/gradeAttendanceChange" 
         },
-        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/student/payments" },
+        { 
+            name: "Notification", 
+            i: 4, 
+            icon: NotificationsActiveIcon, 
+            link: "/teachers/notification" 
+        },
+        { 
+            name: "Push notification", 
+            i: 5, 
+            icon: NotificationAddIcon,
+            link: "/teachers/pushNotification" 
+        },
 
     ];
     else if (role=="student")
