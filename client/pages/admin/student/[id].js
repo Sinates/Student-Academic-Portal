@@ -1,46 +1,3 @@
-// import TopHeader from "@/components/common/Header";
-// import React from "react";
-// import RootLayout from "@/layouts/RootLayout";
-
-// function SingleStudent() {
-//   return (
-//     <RootLayout>
-//           <TopHeader />
-//       <div className=" my-6 h-full">
-
-//         <div className="bg-white my-6 h-full rounded-2xl shadow-2xl pb-24 overflow-auto ">
-//           <div className=" p-12">
-//             <div className="h-28 mt-12 mb-10 rounded-xl bg-[#EBD7E7] bg-opacity-40 px-14  flex items-center">
-//               <div className="mt-16"></div>
-
-//                   <div className="text-primary text-lg">Sina Tesfaye</div>
-//                 </div>
-
-//                   <div className="text-tableTitle font-bold my-4 ">
-//                     {" "}
-//                     Description
-//                   </div>
-//                   <div className="text-[#4C4C4C] text-sm overflow-auto ">
-//                     lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-//                     do eiusmod tempor incididunt ut labore et dolore magna
-//                     aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-//                     ullamco laboris nisi ut aliquip ex ea commodo consequat.
-//                     Duis aute irure dolor in reprehenderit in voluptate velit
-//                     esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-//                     occaecat cupidatat non proident, sunt in culpa qui officia
-//                     deserunt mollit anim id est laborum
-//                   </div>
-
-//             </div>
-
-//         </div>
-//       </div>
-//     </RootLayout>
-//   );
-// }
-
-// export default SingleStudent;
-
 import React from "react";
 import TopHeader from "@/components/common/Header";
 import RootLayout from "@/layouts/RootLayout";
@@ -63,7 +20,7 @@ function StudentProfile() {
 
   return (
     <RootLayout>
-      <TopHeader />
+      <TopHeader title={"Student"} />
       <div className="mt-16 mx-auto max-w-5xl">
         <div className="bg-white rounded-lg shadow-xl p-8">
           <div className="flex items-center justify-center mb-8">
