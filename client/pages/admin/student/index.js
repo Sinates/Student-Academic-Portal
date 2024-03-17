@@ -27,7 +27,7 @@ function Student() {
   ]
   return (
     <RootLayout>
-      <TopHeader/>
+      <TopHeader title={"Student"}/>
         <Tabs value={activeTab}>
       <TabsHeader
         className="rounded-none border-b border-blue-gray-50 bg-transparent p-0"

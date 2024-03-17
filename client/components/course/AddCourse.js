@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input, Typography, Checkbox, Button } from "@material-tailwind/react";
-import { useAddCourseMutation } from "../../api/course-api";
+import { useAddCourseMutation } from "../../api/api-slice";
 
 function AddCourse() {
   const [addCourse] = useAddCourseMutation();
