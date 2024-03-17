@@ -361,15 +361,25 @@ router.post("/assignCourses", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+// router.get("/getteachers", async (req, res) => {
+//   try {
+//     const teachers = await teacherModel.find({}, { _id: 0, name: 1 });
+//     return res.status(200).json(teachers.map(teacher => teacher.name));
+//   } catch (error) {
+//     console.error("Error fetching teachers:", error);
+//     return res.status(500).json({ error: "Internal server error." });
+//   }
+// });
 router.get("/getteachers", async (req, res) => {
   try {
-    const teachers = await teacherModel.find({}, { _id: 0, name: 1 });
-    return res.status(200).json(teachers.map(teacher => teacher.name));
+    const teachers = await teacherModel.find({});
+    return res.status(200).json(teachers);
   } catch (error) {
     console.error("Error fetching teachers:", error);
     return res.status(500).json({ error: "Internal server error." });
   }
 });
+
 router.post("/sendnotifications", async (req, res) => {
   try {
     const { sender, message } = req.body;
