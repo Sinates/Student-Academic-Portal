@@ -4,7 +4,7 @@ import RootLayout from "@/layouts/RootLayout";
 import { Avatar } from "@material-tailwind/react";
 import Image from "next/image";
 
-function StudentProfile() {
+function TeacherProfile() {
   // Mock student data
   const student = {
     id: "CS330",
@@ -20,7 +20,7 @@ function StudentProfile() {
 
   return (
     <RootLayout>
-      <TopHeader title={"Student"} />
+      <TopHeader title={"Teacher"} />
       <div className="mt-16 mx-auto max-w-5xl">
         <div className="bg-white rounded-lg shadow-xl p-8">
           <div className="flex items-center justify-center mb-8">
@@ -81,4 +81,4 @@ function StudentProfile() {
   );
 }
 
-export default StudentProfile;
+export default TeacherProfile;
