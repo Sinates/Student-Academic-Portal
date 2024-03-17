@@ -2,6 +2,7 @@ import { Card, Typography , IconButton,
     Tooltip } from "@material-tailwind/react";
 import { IoPencil } from "react-icons/io5";
 import { FaTrash } from "react-icons/fa";
+import { useGetStudentsQuery } from "@/api/api-slice";
 
 const TABLE_HEAD = ["ID", "Full Name", "Gender", "Email","Phone Number","Department","Actions"];
 
@@ -19,6 +20,8 @@ const TABLE_ROWS = [
 ];
 
 export default function StudentList() {
+  const {data,isLoading,isError} = useGetStudentsQuery();
+  console.log(data);
   return (
     <Card className="h-full  overflow-auto mx-8 mt-10">
       <table className="w-full min-w-max table-auto text-left">
