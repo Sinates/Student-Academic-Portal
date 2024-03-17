@@ -49,6 +49,7 @@ router.post(
     { name: "qualifications", maxCount: 1 },
     { name: "certifications", maxCount: 1 },
   ]),
+  
   (req, res) => {
     // Check if the provided email already exists
     teacherModel
