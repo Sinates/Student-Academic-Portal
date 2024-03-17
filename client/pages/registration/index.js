@@ -9,7 +9,6 @@ import {
 } from "@material-tailwind/react";
 import TeacherRegistration from '@/components/teacher/TeacherRegistration';
 import StudentRegistration from '@/components/student/StudentRegistration'; 
-import TeacherRegistration2 from '@/components/teacher/TeacherRegistration2';
  
 function Registration() {
   const [id, setId] = useState('');
@@ -30,7 +29,7 @@ function Registration() {
       value: "teacher",
       desc: <TeacherRegistration/>,
     },
-  
+   
   ]
 
   const handleGenderChange = (event) => {
@@ -52,7 +51,7 @@ function Registration() {
   return (
     <div className="flex justify-start">
        <div >
-        <img src="/student.png" alt="Image" className="w-full h-auto w-65 h-auto" style={{ marginLeft: '120px', marginTop:'77px' }} />
+        <img src="/student.png" alt="Image" className="w-full h-auto w-65 h-auto" style={{ marginLeft: '50px', marginTop:'77px' }} />
       </div>
            <Tabs value={activeTab}>
       <TabsHeader

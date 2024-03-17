@@ -9,6 +9,10 @@ import {
     IoSettingsOutline,
 } from "react-icons/io5";
 import { MdAutoGraph, MdOutlineTopic, MdOutlineQuiz } from "react-icons/md";
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { AiOutlineMenuFold, AiOutlineMenu } from "react-icons/ai";
 import { BiLogOut } from "react-icons/bi";
 import Image from "next/image";
@@ -16,7 +20,6 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import PaidIcon from '@mui/icons-material/Paid';
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
-import NotificationAddIcon from '@mui/icons-material/NotificationAdd';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 
@@ -27,15 +30,15 @@ function classNames(...classes) {
 export default function SideBarNav() {
     
 
-    let role = "student";
+    let role = "Admin";
 
   
     const router = useRouter();
     const paths = router.pathname.split("/");
     const map = useMemo(() => new Map(), []);
 
-    if (role == "Super Admin" || role == "Admin") map.set("dashboard", 1);
-    if (role == "Super Admin" || role == "Admin") map.set("course", 2);
+    map.set("dashboard", 1);
+    map.set("course", 2);
     map.set("student", 3);
     map.set("payment", 4);
 
@@ -48,49 +51,61 @@ export default function SideBarNav() {
 
     let navigation = [];
 
-    if (role == "Admin")
+    if (role == "Student")
         navigation = [
-            { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+            { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/student/dashboard" },
             {
                 name: "Courses",
                 i: 2,
                 icon: RiGroupLine,
-                link: "/courses",
+                link: "/students/course",
             },
             {
-                name: "Students",
+                name: "Notification",
                 i: 3,
                 icon: IoFolderOpenOutline,
-                link: "/students",
+                link: "/students/notification",
             },
             {
                 name: "Teachers",
                 i: 4,
                 icon: IoFolderOpenOutline,
-                link: "/teachers",
+                link: "/students/teacher",
             },
             
             
-            { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/payments" },
+            { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/student/payment" },
 
         ];
     else if (role == "Teacher")
     navigation = [
-        { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/dashboard" },
+       { name: "Dashboard", i: 1 , icon: MdAutoGraph, link: "/teachers/dashboard" },
         {
-            name: "Courses",
+            name: "Upload",
             i: 2,
-            icon: RiGroupLine,
-            link: "/courses",
+            icon: FileUploadIcon,
+            link: "/teachers/upload",
         },
-        {
-            name: "Students",
-            i: 3,
-            icon: IoFolderOpenOutline,
-            link: "/students",
+        { 
+            name: "Change Request", 
+            i: 3, 
+            icon: ChangeCircleIcon,
+            link: "/teachers/gradeAttendanceChange" 
         },
-        { name: "Payments", i: 4, icon: MdOutlineTopic, link: "/student/payments" },
-
+        { 
+            name: "Notification", 
+            i: 4, 
+            icon: NotificationsActiveIcon, 
+            link: "/teachers/notification" 
+        },
+        { 
+            name: "Push notification", 
+            i: 5, 
+            icon: NotificationAddIcon,
+            link: "/teachers/pushNotification" 
+        },
+        {   name: "Notification", i: 4, icon: MdOutlineTopic, link: "/teacher/notification" },
+        
     ];
     else if (role=="student")
     navigation = [

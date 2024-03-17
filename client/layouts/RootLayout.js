@@ -8,7 +8,6 @@ const RootLayout = ({ children }) => {
         <SideBarNavigation />
       </div>
       <div style={{ marginLeft: 250, flexGrow: 1 }}>
-        <div className=" h-20 w-full mb-10 mt-4 rounded-3xl bg-primary px-14"></div>
         <div>{children}</div>
       </div>
     </div>
