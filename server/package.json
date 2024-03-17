@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node api/server.js",
+    "start": "node server.js",
     "test": "jest",
-    "dev": "nodemon api/server.js"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
