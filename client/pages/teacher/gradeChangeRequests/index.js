@@ -1,128 +1,130 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, Button, Grid } from '@mui/material';
+import { Card, CardContent, Typography, Button, Grid, ThemeProvider, createTheme } from '@mui/material';
 import RootLayout from '@/layouts/RootLayout';
-import SendIcon from '@mui/icons-material/Send';
 
 const GradeChangeRequestsPage = () => {
     const [gradeChangeRequests, setGradeChangeRequests] = useState([
         {
             id: 1,
-            studentName: 'John Doe',
-            studentId: '1',
+            studentName: 'Darwin Nunez',
+            studentId: '123456',
             term: 'Spring 2024',
-            reason: 'Request for reconsideration due to illness which caused me to not attend the final exam and there are also 50 corrections',
+            reason: 'Request for reconsideration',
         },
         {
             id: 2,
-            studentName: 'John Doe',
-            studentId: '2',
-            term: 'Spring 2024',
-            reason: 'Request for reconsideration due to illness which caused me to not attend the final exam and there are also 50 corrections',
+            studentName: 'mohammed salah',
+            studentId: '654321',
+            term: 'Fall 2023',
+            reason: 'Request for grade adjustment',
         },
         {
             id: 3,
-            studentName: 'John Doe',
-            studentId: '3',
-            term: 'Spring 2024',
-            reason: 'Request for reconsideration due to illness which caused me to not attend the final exam and there are also 50 corrections',
+            studentName: 'Jane Smith',
+            studentId: '654321',
+            term: 'Fall 2023',
+            reason: 'Request for grade adjustment',
         },
         {
             id: 4,
-            studentName: 'John Doe',
-            studentId: '4',
-            term: 'Spring 2024',
-            reason: 'Request for reconsideration due to illness which caused me to not attend the final exam and there are also 50 corrections',
+            studentName: 'suarez',
+            studentId: '654321',
+            term: 'Fall 2023',
+            reason: 'Request for grade adjustment',
         },
         {
             id: 5,
-            studentName: 'John Doe',
-            studentId: '4',
-            term: 'Spring 2024',
-            reason: 'Request for reconsideration due to illness which caused me to not attend the final exam and there are also 50 corrections',
+            studentName: 'divock origi',
+            studentId: '654321',
+            term: 'Fall 2023',
+            reason: 'Request for grade adjustment',
         },
         // Add more sample grade change requests as needed
     ]);
 
-    const handleApprove = (id) => {
-        // Logic to approve the grade change request with the given id
-        // Send the result to the server
-        // Example:
-        // sendApprovalToServer(id).then(() => {
-        //     setGradeChangeRequests(prevRequests => prevRequests.filter(request => request.id !== id));
-        // });
-        
-        // For demonstration, let's just remove the request without server communication
-        setGradeChangeRequests(prevRequests => prevRequests.filter(request => request.id !== id));
+    const handleAction = (id, action) => {
+        // Send the action (approve or reject) along with the request
+        sendActionToServer(id, action).then(() => {
+            // Remove the request from the list after action is completed
+            setGradeChangeRequests(prevRequests => prevRequests.filter(request => request.id !== id));
+        });
     };
 
-    const handleReject = (id) => {
-        // Logic to reject the grade change request with the given id
-        // Send the result to the server
-        // Example:
-        // sendRejectionToServer(id).then(() => {
-        //     setGradeChangeRequests(prevRequests => prevRequests.filter(request => request.id !== id));
-        // });
-        
-        // For demonstration, let's just remove the request without server communication
-        setGradeChangeRequests(prevRequests => prevRequests.filter(request => request.id !== id));
+    const sendActionToServer = (id, action) => {
+        // Replace 'action_endpoint' with your actual combined action endpoint URL
+        return fetch(`action_endpoint/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action }), // Send the action in the request body
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to ${action} grade change request`);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error(`Error ${action} grade change request:`, error);
+        });
     };
 
-    // Example functions to send approval and rejection to the server
-    // const sendApprovalToServer = (id) => {
-    //     return fetch(`/approve/${id}`, {
-    //         method: 'POST',
-    //         // Add headers and body as needed
-    //     });
-    // };
-    
-    // const sendRejectionToServer = (id) => {
-    //     return fetch(`/reject/${id}`, {
-    //         method: 'POST',
-    //         // Add headers and body as needed
-    //     });
-    // };
+    // Create a custom theme with the desired button colors
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: '#2196f3', // Primary button color
+            },
+            secondary: {
+                main: '#f44336', // Secondary button color
+            },
+        },
+    });
 
     return (
-        <RootLayout>
-        <Grid container spacing={2}>
-            {gradeChangeRequests.map(request => (
-                <Grid item xs={12} key={request.id}>
-                    <Card>
-                        <CardContent>
-                            <Grid container spacing={2} justifyContent="space-around">
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="h5" component="h2">
-                                        Student Name: {request.studentName}
-                                    </Typography>
+        <ThemeProvider theme={theme}>
+            <RootLayout>
+            <Grid container spacing={2}>
+                {gradeChangeRequests.map(request => (
+                    <Grid item xs={12} key={request.id}>
+                        <Card>
+                            <CardContent>
+                                <Grid container spacing={2} justifyContent="space-around">
+                                    <Grid item xs={12} md={6}>
+                                        <Typography variant="h5" component="h2">
+                                            Student Name: {request.studentName}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <Typography color="textSecondary">
+                                            Student ID: {request.studentId}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <Typography variant="body2" component="p">
+                                            Term: {request.term}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <Typography variant="body2" component="p">
+                                            Reason: {request.reason}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+                                            <Button onClick={() => handleAction(request.id, 'approve')} variant="contained" color="primary" style={{ marginLeft: '8px' }}>Approve</Button>
+                                            <Button onClick={() => handleAction(request.id, 'reject')} variant="contained" color="secondary" style={{ marginLeft: '8px' }}>Reject</Button>
+                                        </div>
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography color="textSecondary">
-                                        Student ID: {request.studentId}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="body2" component="p">
-                                        Term: {request.term}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="body2" component="p">
-                                        Reason: {request.reason}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1px' }}>
-                                        <Button onClick={() => handleApprove(request.id)} variant="contained" style={{ backgroundColor: '#4caf50', color: '#ffffff', marginLeft: '8px' }}>Approve</Button>
-                                        <Button onClick={() => handleReject(request.id)} variant="contained" style={{ backgroundColor: '#f44336', color: '#ffffff', marginLeft: '8px' }}>Reject</Button>
-                                    </div>
-                                </Grid>
-                            </Grid>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            ))}
-        </Grid>
-    </RootLayout>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+            </RootLayout>
+        </ThemeProvider>
     );
 };
 
