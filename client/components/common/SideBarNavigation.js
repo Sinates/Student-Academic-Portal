@@ -40,7 +40,7 @@ export default function SideBarNav() {
     map.set("dashboard", 1);
     map.set("course", 2);
     map.set("student", 3);
-    map.set("payment", 4);
+    map.set("payment", 5);
 
     const [activeTab, setActiveTab] = useState(map.get(paths[1]));
     const [isNavOpen, setIsNavOpen] = useState(true);
@@ -104,8 +104,15 @@ export default function SideBarNav() {
             icon: NotificationAddIcon,
             link: "/teachers/pushNotification" 
         },
-        {   name: "Notification", i: 4, icon: MdOutlineTopic, link: "/teacher/notification" },
+       
         
+        { name: "Payments", i: 6, icon: MdOutlineTopic, link: "/student/payments" },
+        {
+            name: "Grade change requests",
+            i: 7,
+            icon: IoFolderOpenOutline,
+            link: "/teacher/gradeChangeRequests",
+        },
     ];
     else if (role=="student")
     navigation = [
