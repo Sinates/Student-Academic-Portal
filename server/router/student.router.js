@@ -112,6 +112,7 @@ router.post("/register", (req, res) => {
                 const newStudent = new studentModel({
                   id: generateID(), // Use provided ID
                   batch: generateBatch(),
+                  role: 'Student',
                   name: req.body.name,
                   gender: req.body.gender,
                   email: req.body.email,

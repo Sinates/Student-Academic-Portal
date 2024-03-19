@@ -99,9 +99,9 @@ router.post("/courses", async (req, res) => {
 
     // Create a new course instance
     const newCourse = new courseModel({
-      courseName: req.body.name,
+      courseName: name,
       courseid: req.body.courseId,
-      year: req.body.year,
+      year: year,
     });
 
     // Save the new course to the database
