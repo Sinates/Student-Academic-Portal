@@ -1,6 +1,6 @@
 import RootLayout from "@/layouts/RootLayout";
 import React from "react";
-import 'chart.js/auto';
+import Chart from'chart.js/auto';
 import { Box, useTheme } from "@mui/material";
 import StatBox from "@/components/student/StatBox";
 import SchoolIcon from '@mui/icons-material/School';
