@@ -30,7 +30,7 @@ function classNames(...classes) {
 export default function SideBarNav() {
     
 
-    let role = "Admin";
+    let role = "Teacher";
 
   
     const router = useRouter();

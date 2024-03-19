@@ -5,22 +5,22 @@ import RootLayout from '@/layouts/RootLayout';
 // Sample data for the assigned courses table
 const assignedCoursesData = [
   { courseCode: 'CS101', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
+  { courseCode: 'MATH10110', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
+  { courseCode: 'CS1048', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
   { courseCode: 'MATH101', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
-  { courseCode: 'CS101', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
-  { courseCode: 'MATH101', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
-  { courseCode: 'CS101', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
-  { courseCode: 'MATH101', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
-  { courseCode: 'CS101', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
-  { courseCode: 'MATH101', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
-  { courseCode: 'CS101', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
-  { courseCode: 'MATH101', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
-  { courseCode: 'CS101', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
-  { courseCode: 'MATH101', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
+  { courseCode: 'CS107', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
+  { courseCode: 'MATH201', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
+  { courseCode: 'CS102', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
+  { courseCode: 'MATH301', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
+  { courseCode: 'CS103', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
+  { courseCode: 'MATH401', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
+  { courseCode: 'CS104', courseName: 'Introduction to Computer Science', teacherName: 'John Doe', batch: '2023A' },
+  { courseCode: 'MATH501', courseName: 'Introduction to Mathematics', teacherName: 'Jane Smith', batch: '2023B' },
   // Add more sample data if needed
 ];
 
 const AssignCoursePage = () => {
-  const [courseCode, setCourseCode] = useState('');
+  const [courseCode, setCourseCode] = useState('');// files that are sent to the server that assigns a course to a teacher
   const [courseName, setCourseName] = useState('');
   const [teacher, setTeacher] = useState('');
   const [batch, setBatch] = useState('');

@@ -1,0 +1,14 @@
+[
+    {
+      "label": "Total courses",
+      "value": 50
+    },
+    {
+      "label": "Taken courses",
+      "value": 45
+    },
+    {
+      "label": "Remaining courses",
+      "value": 5
+    }
+  ]
