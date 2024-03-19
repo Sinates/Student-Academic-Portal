@@ -1,5 +1,4 @@
-import RootLayout from "@/layouts/RootLayout"
-
+import RootLayout from "@/layouts/RootLayout";
 import React, { useState } from 'react';
 import { Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 
@@ -42,50 +41,65 @@ const Resource = () => {
         fetchMaterials(course.id);
     };
 
-    const handleDownload = (materialId) => {
+    const handleDownload = (materialId, materialName) => {
         // Simulate file download
-        console.log(`Downloading material with ID ${materialId}`);
+        const fileName = `${materialName}.pdf`; // Change the extension based on the material type
+        const fileContent = 'Dummy PDF content'; // Replace with actual file content or fetch from the server
+        downloadFile(fileContent, fileName);
     };
 
+    const downloadFile = (content, fileName) => {
+        const blob = new Blob([content], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    
     return (
-        <RootLayout>        <div>
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: '0 20px' }}>
-    {courses.map(course => (
-        <Card key={course.id} onClick={() => handleCourseClick(course)} style={{ margin: '0 5px' }}>
-            <CardContent>
-                {course.name}
-            </CardContent>
-        </Card>
-    ))}
-</div>
+        <RootLayout>
+            <div>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: '0 20px' }}>
+                    {courses.map(course => (
+                        <Card key={course.id} onClick={() => handleCourseClick(course)} style={{ margin: '0 5px' }}>
+                            <CardContent>
+                                {course.name}
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
 
-            {selectedCourse && (
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Resource</TableCell>
-                                <TableCell>Type</TableCell>
-                                <TableCell>Download</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {materials.map(material => (
-                                <TableRow key={material.id}>
-                                    <TableCell>{material.name}</TableCell>
-                                    <TableCell>{material.type}</TableCell>
-                                    <TableCell>
-                                        <Button onClick={() => handleDownload(material.id)} variant="contained" color="primary">Download</Button>
-                                    </TableCell>
+                {selectedCourse && (
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Resource</TableCell>
+                                    <TableCell>Type</TableCell>
+                                    <TableCell>Download</TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
-        </div>
+                            </TableHead>
+                            <TableBody>
+                                {materials.map(material => (
+                                    <TableRow key={material.id}>
+                                        <TableCell>{material.name}</TableCell>
+                                        <TableCell>{material.type}</TableCell>
+                                        <TableCell>
+                                            <Button onClick={() => handleDownload(material.id, material.name)} variant="contained" color="primary">Download</Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
+            </div>
         </RootLayout>
-
     );
 };
 
