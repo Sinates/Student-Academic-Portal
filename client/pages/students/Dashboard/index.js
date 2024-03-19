@@ -1,31 +1,64 @@
 import RootLayout from "@/layouts/RootLayout";
 import React from "react";
+import 'chart.js/auto';
 import { Box, useTheme } from "@mui/material";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
 import StatBox from "@/components/student/StatBox";
 import SchoolIcon from '@mui/icons-material/School';
+import { Doughnut } from "react-chartjs-2";
+import StudentProfile from "@/components/student/StudentProfile";
+// import sourceData from "@/data/sourceData.json"
+import sourceData from "../../../data/sourceData.json"
+import { useState, useEffect } from "react";
 
 function Dashboard() {
+
+
+  const [studentProfile, setStudentProfile] = useState(null);
+
+  useEffect(() => {
+    // Dummy student profile data
+    const dummyData = {
+      id: 1,
+      name: "John Doe",
+      department: "Computer Science",
+      year: "3rd",
+    };
+    
+    // Simulating API call with setTimeout
+    setTimeout(() => {
+      setStudentProfile(dummyData);
+    }, 1000); // Simulating a delay of 1 second
+  }, []);
+
+  //actual api call
+  // useEffect(() => {
+  //   // Fetch student profile data from API
+  //   fetch('your-api-endpoint')
+  //     .then(response => response.json())
+  //     .then(data => setStudentProfile(data))
+  //     .catch(error => console.error('Error fetching student profile data:', error));
+  // }, []);
+  //student profile aboveapi
   const theme = useTheme();
   const colors = theme.palette.mode === "dark" ? theme.palette.primary : theme.palette.secondary;
 
   // Custom background color for StatBox components
   const statBoxBackgroundColor = '#334155'; // Custom color
 
+  // Icon color for all StatBox components
+  const iconColor = 'white';
+
+  // Data for the StatBox components
+  const statBoxData = [
+    { subtitle: "Database", progress: 0.75, increase: "14%" },
+    { subtitle: "Calculus", progress: 0.5, increase: "21%" },
+    { subtitle: "Compiler", progress: 0.30, increase: "5%" },
+    { subtitle: "Networking", progress: 0.80, increase: "43%" }
+  ];
+
   return (
     <RootLayout>
       <Box m="20px">
-        {/* HEADER */}
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-           
-
-          
-        </Box>
-
         {/* GRID & CHARTS */}
         <Box
           display="grid"
@@ -33,66 +66,64 @@ function Dashboard() {
           gridAutoRows="140px"
           gap="20px"
         >
-          {/* ROW 1 */}
-          <Box
-            gridColumn="span 3"
-            backgroundColor={statBoxBackgroundColor} // Custom background color
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              // title="12,361"
-              subtitle="Database"
-              progress={0.75}
-              increase="14%"
-              icon={<SchoolIcon sx={{ color: colors.dark }} />}
-            />
-          </Box>
-          <Box
-            gridColumn="span 3"
-            backgroundColor={statBoxBackgroundColor} // Custom background color
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              // title="Calculus"
-              subtitle="Calculus"
-              progress={0.5}
-              increase="21%"
-              icon={<SchoolIcon sx={{ color: colors.dark }} />}
-            />
-          </Box>
-          <Box
-            gridColumn="span 3"
-            backgroundColor={statBoxBackgroundColor} // Custom background color
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              // title="Data structures"
-              subtitle="compiler"
-              progress={0.30}
-              increase="5%"
-              icon={<SchoolIcon sx={{ color: colors.primary }} />}
-            />
-          </Box>
-          <Box
-            gridColumn="span 3"
-            backgroundColor={statBoxBackgroundColor} // Custom background color
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              // title="Networking"
-              subtitle="Networking"
-              progress={0.80}
-              increase="43%"
-              icon={<SchoolIcon sx={{ color: colors.dark }} />}
-            />
+          {/* Render StatBox components dynamically */}
+          {statBoxData.map((data, index) => (
+            <Box
+              key={index}
+              gridColumn="span 3"
+              backgroundColor={statBoxBackgroundColor}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <StatBox
+                subtitle={data.subtitle}
+                progress={data.progress}
+                increase={data.increase}
+                icon={<SchoolIcon sx={{ color: iconColor }} />}
+              />
+            </Box>
+          ))}
+          
+          {/* Two components side by side below the StatBox components */}
+          <Box gridColumn="span 12" display="flex" justifyContent="space-between" gap="20px">
+            {/* Insert your first component here */}
+            {/* <YourFirstComponent /> */}
+         
+            <Box backgroundColor="" width="90%" height="400px" sx={{ paddingLeft: '100px' }}><Doughnut
+          data={{
+            labels: sourceData.map((data) => data.label),
+            datasets: [
+              {
+                label: "Count",
+                data: sourceData.map((data) => data.value),
+                backgroundColor: [
+                  "rgb(67, 86, 112)",
+                  "rgb(77, 135, 189)",
+                  "rgb(33,150,243)",
+                ],
+                borderColor: [
+                  "rgba(67, 86, 112)",
+                  "rgba(77, 135, 189)",
+                  "rgba(33,150,243)",
+                ],
+              },
+            ],
+          }}
+          options={{
+            plugins: {
+              title: {
+                text: "courses",
+              },
+            },
+          }}
+        /></Box>
+            
+            {/* Insert your second component here */}
+            {/* <YourSecondComponent /> */}
+            <Box width="100%" height="400px" padding="20px" marginTop="50px"> 
+      {studentProfile && <StudentProfile {...studentProfile} />}
+    </Box>
           </Box>
         </Box>
       </Box>
