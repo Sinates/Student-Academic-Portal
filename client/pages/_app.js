@@ -13,9 +13,11 @@ const poppins = Poppins({
 
 export default function App({ Component, pageProps }) {
   return (
-    <Provider store={store}>
+<Provider store={store}>
     <main className={poppins.className}>
-      <Component {...pageProps} />
+      <div className="bg-primary bg-opacity-5">
+        <Component {...pageProps} />
+      </div>
     </main>
     </Provider>
   );

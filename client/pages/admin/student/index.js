@@ -12,7 +12,7 @@ import {
 import PendlingStudentList from '@/components/student/PendlingStudentList';
 
 function Student() {
-  const [activeTab, setActiveTab] = React.useState("currents");
+  const [activeTab, setActiveTab] = React.useState("current");
   const data = [
     {
       label: "Current Students",

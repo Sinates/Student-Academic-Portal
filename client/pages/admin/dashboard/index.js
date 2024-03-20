@@ -1,14 +1,12 @@
 import RootLayout from "@/layouts/RootLayout";
 import React from "react";
 import { Box, useTheme } from "@mui/material";
-import { mockTransactions } from "../../data/mockData";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import EmailIcon from "@mui/icons-material/Email";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import TrafficIcon from "@mui/icons-material/Traffic";
-import Header from "../../components/Header";
-import StatBox from "../../components/StatBox";
+
+// import StatBox from "../../components/StatBox";
 
 function Dashboard() {
   const theme = useTheme();
@@ -19,18 +17,15 @@ function Dashboard() {
 
   return (
     <RootLayout>
-      <Box m="20px">
-        {/* HEADER */}
-       
-
-        {/* GRID & CHARTS */}
-        <Box
+    {/*  <Box m="20px">
+ 
+         <Box
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
           gridAutoRows="140px"
           gap="20px"
         >
-          {/* ROW 1 */}
+       
           <Box
             gridColumn="span 3"
             backgroundColor={statBoxBackgroundColor} // Custom background color
@@ -96,7 +91,7 @@ function Dashboard() {
             />
           </Box>
         </Box>
-      </Box>
+      </Box> */}
     </RootLayout>
   );
 }
