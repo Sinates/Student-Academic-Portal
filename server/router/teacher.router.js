@@ -4,7 +4,6 @@ const studentModel = require("../model/student.model");
 const materialModel = require("../model/material.model");
 const router = express.Router();
 const gradeModel = require("../model/grade.model");
-const fs = require("fs");
 const path = require("path");
 const xlsx = require("xlsx");
 const multer = require("multer");

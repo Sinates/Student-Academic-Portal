@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
+
 const Admin = require("../model/admin.model");
 const studentModel = require("../model/student.model");
 const payment = require("../model/payment.model");
@@ -540,5 +542,104 @@ router.get("/getpayments", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+async function generateAttendanceExcel(batch) {
+  // Fetch students in the specified batch
+  const students = await studentModel.find({ batch });
 
+  // Fetch attendance records for the specified batch
+  const attendanceRecords = await attendanceModel.find({ batch });
+
+  // Create a new workbook and worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Attendance");
+
+  // Add headers to the worksheet
+  worksheet.columns = [
+    { header: "Student Name", key: "name", width: 20 },
+    { header: "Student ID", key: "id", width: 15 },
+    { header: "Attendance", key: "attendance", width: 15 },
+  ];
+
+  // Add data rows for each student
+  students.forEach((student) => {
+    const attendanceRecord = attendanceRecords.find(
+      (record) => record.studentId === student.id
+    );
+    const attendanceStatus = attendanceRecord
+      ? attendanceRecord.attendance
+      : "Absent";
+    worksheet.addRow({
+      name: student.name,
+      id: student.id,
+      attendance: attendanceStatus,
+    });
+  });
+
+  // Generate a unique filename for the Excel file
+  const fileName = `attendance_${batch}_${Date.now()}.xlsx`;
+
+  // Save the workbook to a file
+  await workbook.xlsx.writeFile(fileName);
+
+  return fileName;
+}
+router.post("/generateAttendanceExcel", async (req, res) => {
+  const { batch } = req.body;
+  if (!batch) {
+    return res.status(400).json({ error: "Batch parameter is required" });
+  }
+
+  try {
+    // Fetch students in the specified batch
+    const students = await studentModel.find({ batch });
+
+    // Fetch attendance records for the specified batch
+    const attendanceRecords = await studentModel.find({ batch });
+
+    // Create a new workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Attendance");
+
+    // Add headers to the worksheet
+    worksheet.columns = [
+      { header: "Student Name", key: "name", width: 20 },
+      { header: "Student ID", key: "id", width: 15 },
+      { header: "Attendance", key: "attendance", width: 15 },
+    ];
+
+    // Add data rows for each student
+    students.forEach((student) => {
+      const attendanceRecord = attendanceRecords.find(
+        (record) => record.studentId === student.id
+      );
+      const attendanceStatus = attendanceRecord
+        ? attendanceRecord.attendance
+        : "";
+      worksheet.addRow({
+        name: student.name,
+        id: student.id,
+        attendance: attendanceStatus,
+      });
+    });
+
+    // Generate a unique filename for the Excel file
+    const fileName = `attendance_${batch}_${Date.now()}.xlsx`;
+
+    // Save the workbook to a file
+    const filePath = path.join(
+      __dirname,
+      "..",
+      "uploads",
+      "attendance",
+      fileName
+    );
+    await workbook.xlsx.writeFile(filePath);
+
+    // Send the generated Excel file as a download
+    res.download(filePath);
+  } catch (error) {
+    console.error("Error generating attendance Excel file:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 module.exports = router;
