@@ -300,36 +300,67 @@ router.post("/signup", (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     });
 });
-router.post("/verifyteacher", (req, res) => {
-  const teacherEmail = req.body.email;
+router.post("/verifyteacher", async (req, res) => {
+  try {
+    const { email, accepted } = req.body;
 
-  // Check if the student exists
-  teacherModel
-    .findOne({ email: teacherEmail })
-    .then((teacher) => {
-      if (!teacher) {
-        // Student not found
-        return res.status(404).json({ error: "Teacher not found" });
-      }
+    // Find the teacher by email
+    const teacher = await teacherModel.findOne({ email });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
 
-      // Update the student's verification status
-      teacher.restricted = false;
-      teacher
-        .save()
-        .then(() => {
-          res
-            .status(200)
-            .json({ message: "Teacher sign-up verified successfully" });
-        })
-        .catch((err) => {
-          console.error(err);
-          res.status(500).json({ error: "Internal server error" });
-        });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+    // Update the teacher's verification status based on acceptance
+    teacher.restricted = false;
+    await teacher.save();
+
+    // Create transporter for sending emails
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.pass,
+      },
     });
+
+    // Configure email options based on acceptance status
+    const mailOptions = {
+      from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>',
+      to: teacher.email,
+      subject: !teacher.restricted
+        ? "Congratulations! You've been accepted as a teacher"
+        : "Regarding your application as a teacher",
+      text: !teacher.restricted
+        ? `Dear ${teacher.name},\n\nCongratulations! We are pleased to inform you that you have been accepted as a teacher at Hilcoe School of Computer Science & Technology. Welcome to the team!\n\nBest regards,\nHilcoe School Admissions Team`
+        : `Dear ${teacher.name},\n\nWe regret to inform you that your application as a teacher at Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest in our institution.\n\nBest regards,\nHilcoe School Admissions Team`,
+      html: !teacher.restricted
+        ? `
+          <p>Dear ${teacher.name},</p>
+          <p>Congratulations! We are pleased to inform you that you have been accepted as a teacher at Hilcoe School of Computer Science & Technology. Welcome to the team!</p>
+          <p>Best regards,<br>Hilcoe School Admissions Team</p>
+        `
+        : `
+          <p>Dear ${teacher.name},</p>
+          <p>We regret to inform you that your application as a teacher at Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest in our institution.</p>
+          <p>Best regards,<br>Hilcoe School Admissions Team</p>
+        `,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+    console.log(
+      `${!teacher.restricted ? "Acceptance" : "Rejection"} email sent to teacher:`,
+      teacher.email
+    );
+
+    // Send response
+    return res.status(200).json({
+      message: `Teacher ${!teacher.restricted ? "accepted" : "rejected"} successfully`,
+    });
+  } catch (error) {
+    console.error("Error verifying teacher:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
 // Function to fetch student data based on batch
 async function getStudentsByBatch(batch) {
