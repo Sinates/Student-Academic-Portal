@@ -513,16 +513,32 @@ router.get("/courselist", async (req, res) => {
 router.get("/getpayments", async (req, res) => {
   try {
     // Fetch all payments from the PaymentModel
-    const payments = await payment.find(
+    const payments = await paymentModel.find(
       {},
       { id: 1, paymentReceipt: 1, verified: 1, _id: 0 }
     );
 
-    // Return the payments
-    res.status(200).json(payments);
+    // Map over the payments to retrieve student names
+    const paymentsWithNames = await Promise.all(
+      payments.map(async (payment) => {
+        // Fetch student details using the student ID from the payment
+        const student = await studentModel.findOne({ id: payment.id });
+        if (student) {
+          // If student found, add their name to the payment object
+          return { ...payment.toObject(), studentName: student.name };
+        } else {
+          // If student not found, add a placeholder name
+          return { ...payment.toObject(), studentName: "Unknown" };
+        }
+      })
+    );
+
+    // Return the payments with student names
+    res.status(200).json(paymentsWithNames);
   } catch (error) {
     console.error("Error fetching payments:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 module.exports = router;
