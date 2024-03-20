@@ -319,6 +319,9 @@ router.post("/verifyteacher", async (req, res) => {
         user: process.env.email,
         pass: process.env.pass,
       },
+      tls: {
+        rejectUnauthorized: false, // Bypass SSL certificate verification
+      },
     });
 
     // Configure email options based on acceptance status
