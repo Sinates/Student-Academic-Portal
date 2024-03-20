@@ -432,7 +432,7 @@ router.post("/generateExcel", async (req, res) => {
 // Route to assign courses to a teacher
 router.post("/assignCourses", async (req, res) => {
   try {
-    const { email, course } = req.body;
+    const { email, course, batch } = req.body;
 
     // Check if the provided teacher email exists
     const existingTeacher = await teacherModel.findOne({ email });
@@ -441,7 +441,9 @@ router.post("/assignCourses", async (req, res) => {
     }
 
     // Update the assigned courses for the teacher
-    existingTeacher.assignedCourses.push(course); // Push new courses to the existing array
+    existingTeacher.assignedCourses.push(course);
+    existingTeacher.batch.push(batch); // Push new courses to the existing array
+    // Push new courses to the existing array
     await existingTeacher.save();
 
     return res.status(200).json({ message: "Courses assigned successfully" });
