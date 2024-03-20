@@ -213,7 +213,7 @@ router.post("/sendnotifications", async (req, res) => {
 router.post("/signin", (req, res) => {
   teacherModel
     .findOne({
-      id: req.body.id,
+      email: req.body.email,
     })
     .then((data) => {
       if (data) {
@@ -249,11 +249,11 @@ router.post("/signin", (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-  const { id, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     // Check if the email already exists
-    const existingTeacher = await teacherModel.findOne({ id });
+    const existingTeacher = await teacherModel.findOne({ email });
 
     if (existingTeacher) {
       // Email already exists, assign the password to the existing teacher
