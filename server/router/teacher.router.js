@@ -291,6 +291,7 @@ router.post("/signup", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+const courseModel = require("../model/course.model");
 router.get("/allocatedCourses", async (req, res) => {
   try {
     const { email } = req.body;
@@ -303,8 +304,25 @@ router.get("/allocatedCourses", async (req, res) => {
 
     // Retrieve assigned courses for the teacher
     const allocatedCourses = existingTeacher.assignedCourses;
+    const batch = existingTeacher.assignedCourses;
 
-    return res.status(200).json({ allocatedCourses });
+    // Fetch course details for each allocated course ID
+    const allocatedCourseNames = [];
+    for (const courseid of allocatedCourses) {
+      const course = await courseModel.findOne({ courseid });
+      if (course) {
+        allocatedCourseNames.push(course.courseName);
+      } else {
+        allocatedCourseNames.push(null);
+      }
+    }
+
+    // Return allocated courses with their names
+    return res.status(200).json({
+      allocatedCourses: allocatedCourses,
+      courseNames: allocatedCourseNames,
+      batch: batch,
+    });
   } catch (error) {
     console.error("Error retrieving allocated courses:", error);
     return res.status(500).json({ error: "Internal server error" });

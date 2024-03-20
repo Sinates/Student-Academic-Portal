@@ -39,6 +39,7 @@ router.post("/verifypayment", (req, res) => {
     });
 });
 const nodemailer = require("nodemailer");
+const paymentModel = require("../model/payment.model");
 
 router.post("/verifystudent", async (req, res) => {
   try {
@@ -507,6 +508,21 @@ router.get("/courselist", async (req, res) => {
     // If an error occurs, return an error response
     console.error("Error retrieving courses:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/getpayments", async (req, res) => {
+  try {
+    // Fetch all payments from the PaymentModel
+    const payments = await payment.find(
+      {},
+      { id: 1, paymentReceipt: 1, verified: 1, _id: 0 }
+    );
+
+    // Return the payments
+    res.status(200).json(payments);
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 module.exports = router;
