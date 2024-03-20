@@ -1,27 +1,16 @@
 import { Card, Typography , IconButton,
     Tooltip } from "@material-tailwind/react";
+import {students} from "../../data/student";
 import { IoPencil } from "react-icons/io5";
 import { FaTrash } from "react-icons/fa";
 import { useGetStudentsQuery } from "@/api/api-slice";
 
 const TABLE_HEAD = ["ID", "Full Name", "Gender", "Email","Phone Number","Department","Actions"];
 
-const TABLE_ROWS = [
-  {
-    id: "CS330",
-    fullName: "Jhone Doe",
-    gender: "Female",
-    email:"jhone@gmail.com",
-    phoneNumber:"+251912345657",
-    department:"Computer Science"
-
-  },
- 
-];
 
 export default function StudentList() {
-  const {data,isLoading,isError} = useGetStudentsQuery();
-  console.log(data);
+  // const {data,isLoading,isError} = useGetStudentsQuery();
+  // console.log(data);
   return (
     <Card className="h-full  overflow-auto mx-8 mt-10">
       <table className="w-full min-w-max table-auto text-left">
@@ -44,7 +33,7 @@ export default function StudentList() {
           </tr>
         </thead>
         <tbody>
-          {TABLE_ROWS.map(({id,fullName,gender,email,phoneNumber,department }, index) => (
+          {students.map(({id,fullName,gender,email,phoneNumber,department }, index) => (
             <tr key={id} className="even:bg-blue-gray-50/50">
               <td className="p-4">
                 <Typography
@@ -102,12 +91,7 @@ export default function StudentList() {
               </td>
             
               <td className="flex">
-                <Tooltip content="Edit Course">
-                  <IconButton variant="text">
-                  <IoPencil />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip content="Delete Course">
+                <Tooltip content="Delete Student">
                   <IconButton variant="text">
                   <FaTrash />
                   </IconButton>
