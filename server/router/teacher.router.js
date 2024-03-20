@@ -49,7 +49,7 @@ router.post(
     { name: "qualifications", maxCount: 1 },
     { name: "certifications", maxCount: 1 },
   ]),
-  
+
   (req, res) => {
     // Check if the provided email already exists
     teacherModel
@@ -311,7 +311,6 @@ router.get("/allocatedCourses", async (req, res) => {
   }
 });
 
-
 // Route to upload file and send notifications to all students
 const materialStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -324,36 +323,47 @@ const materialStorage = multer.diskStorage({
 
 const uploadMaterial = multer({ storage: materialStorage });
 
-router.post("/uploadmaterial", uploadMaterial.single("file"), async (req, res) => {
-  try {
-    // Extract notification message, sender, and batch from request body
-    const { message, sender, batch } = req.body;
+router.post(
+  "/uploadmaterial",
+  uploadMaterial.single("file"),
+  async (req, res) => {
+    try {
+      // Extract notification message, sender, and batch from request body
+      const { message, sender, batch } = req.body;
 
-    // Save the uploaded file path in the database
-    const newMaterial = new materialModel({
-      sender: sender, // Assuming admin is sending the notification
-      message: message,
-      file: req.file.path, // File path returned by Multer
-    });
-    await newMaterial.save();
+      // Save the uploaded file path in the database
+      const newMaterial = new materialModel({
+        sender: sender, // Assuming admin is sending the notification
+        message: message,
+        file: req.file.path, // File path returned by Multer
+      });
+      await newMaterial.save();
 
-    // Fetch students belonging to the specified batch from the database
-    const students = await studentModel.find({ batch: batch });
+      // Fetch students belonging to the specified batch from the database
+      const students = await studentModel.find({ batch: batch });
 
-    // Iterate over each student and send notification
-    students.forEach(async (student) => {
-      // Update student's notifications array with the new message
-      student.notifications.push({ message: message,sender: sender , file:req.file.path });
-      await student.save();
-    });
+      // Iterate over each student and send notification
+      students.forEach(async (student) => {
+        // Update student's notifications array with the new message
+        student.notifications.push({
+          message: message,
+          sender: sender,
+          file: req.file.path,
+        });
+        await student.save();
+      });
 
-    // Return success response
-    res.status(200).json({ message: "File uploaded and notifications sent to students in the specified batch." });
-  } catch (error) {
-    console.error("Error uploading file and sending notifications:", error);
-    res.status(500).json({ error: "Internal server error." });
+      // Return success response
+      res.status(200).json({
+        message:
+          "File uploaded and notifications sent to students in the specified batch.",
+      });
+    } catch (error) {
+      console.error("Error uploading file and sending notifications:", error);
+      res.status(500).json({ error: "Internal server error." });
+    }
   }
-});
+);
 router.post("/uploadattendance", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
@@ -398,7 +408,9 @@ router.post("/uploadattendance", upload.single("file"), async (req, res) => {
     // Delete the uploaded file after processing
     fs.unlinkSync(req.file.path);
 
-    return res.status(200).json({ message: "Attendance updated successfully." });
+    return res
+      .status(200)
+      .json({ message: "Attendance updated successfully." });
   } catch (error) {
     console.error("Error updating attendance:", error);
     return res.status(500).json({ error: "Internal server error." });
@@ -419,9 +431,7 @@ router.post("/approveGradeChangeRequest", async (req, res) => {
       (req) => req.requestId === requestId
     );
     if (!changeRequest) {
-      return res
-        .status(404)
-        .json({ error: "Grade change request not found" });
+      return res.status(404).json({ error: "Grade change request not found" });
     }
 
     // Update the grade change request's approval status
@@ -431,21 +441,33 @@ router.post("/approveGradeChangeRequest", async (req, res) => {
     if (req.body.mid !== "") {
       // Update mid value in the grade model
       await gradeModel.findOneAndUpdate(
-        { studentId: changeRequest.sender, course: changeRequest.course, instructor: instructorName },
+        {
+          studentId: changeRequest.sender,
+          course: changeRequest.course,
+          instructor: instructorName,
+        },
         { mid: req.body.mid }
       );
     }
     if (req.body.final !== "") {
       // Update final value in the grade model
       await gradeModel.findOneAndUpdate(
-        { studentId: changeRequest.sender, course: changeRequest.course, instructor: instructorName },
+        {
+          studentId: changeRequest.sender,
+          course: changeRequest.course,
+          instructor: instructorName,
+        },
         { final: req.body.final }
       );
     }
     if (req.body.assessment !== "") {
       // Update assessment value in the grade model
       await gradeModel.findOneAndUpdate(
-        { studentId: changeRequest.sender, course: changeRequest.course, instructor: instructorName },
+        {
+          studentId: changeRequest.sender,
+          course: changeRequest.course,
+          instructor: instructorName,
+        },
         { assessment: req.body.assessment }
       );
     }
