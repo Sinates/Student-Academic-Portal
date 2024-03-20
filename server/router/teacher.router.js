@@ -8,6 +8,8 @@ const path = require("path");
 const xlsx = require("xlsx");
 const multer = require("multer");
 const crypto = require("crypto");
+const fs = require("fs");
+
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let id = "TR" + "";
@@ -211,7 +213,7 @@ router.post("/sendnotifications", async (req, res) => {
 router.post("/signin", (req, res) => {
   teacherModel
     .findOne({
-      email: req.body.email,
+      id: req.body.id,
     })
     .then((data) => {
       if (data) {
@@ -247,11 +249,11 @@ router.post("/signin", (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
+  const { id, password } = req.body;
 
   try {
     // Check if the email already exists
-    const existingTeacher = await teacherModel.findOne({ email });
+    const existingTeacher = await teacherModel.findOne({ id });
 
     if (existingTeacher) {
       // Email already exists, assign the password to the existing teacher
