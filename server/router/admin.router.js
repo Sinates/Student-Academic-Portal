@@ -224,6 +224,7 @@ router.post("/signup", (req, res) => {
       const newAdmin = new adminModel({
         email,
         password: hashedPassword,
+        role: "Admin",
       });
 
       // Save the new admin to the database
@@ -388,9 +389,7 @@ router.post("/sendnotifications", async (req, res) => {
     const students = await studentModel.find({});
 
     if (!students || students.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No students found." });
+      return res.status(404).json({ error: "No students found." });
     }
 
     // Add the notification to each student's notifications array
@@ -407,13 +406,10 @@ router.post("/sendnotifications", async (req, res) => {
     return res.status(500).json({ error: "Internal server error." });
   }
 });
-router.get("/courses", async (req, res) => {
+router.get("/courselist", async (req, res) => {
   try {
     // Query the database to find all courses
-    const courses = await courseModel.find(
-      {},
-      { _id: 0, courseName: 1, courseid: 1 }
-    );
+    const courses = await courseModel.find({}, {});
 
     // Return the retrieved courses as the response
     res.status(200).json(courses);

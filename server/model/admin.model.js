@@ -6,6 +6,7 @@ const newSchema = new mongoose.Schema({
   email: String,
   password: String,
   phone: Number,
+  role: String,
 });
 
 module.exports = mongoose.model("admin", newSchema);
