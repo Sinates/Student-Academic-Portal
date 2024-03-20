@@ -297,10 +297,7 @@ router.get("/grades", (req, res) => {
 router.get("/courses", async (req, res) => {
   try {
     // Query the database to find all courses
-    const courses = await courseModel.find(
-      {},
-      { _id: 0, courseName: 1, courseid: 1 }
-    );
+    const courses = await courseModel.find({}, {});
 
     // Return the retrieved courses as the response
     res.status(200).json(courses);
