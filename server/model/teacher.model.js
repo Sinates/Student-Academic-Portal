@@ -19,8 +19,13 @@ const newSchema = new mongoose.Schema({
   role: String,
   changeRequests: [
     {
+      course: String,
+      requestId: String,
       sender: String,
       message: String,
+      mid: String,
+      final: String,
+      assessment: String,
       approved: {
         type: Boolean,
         default: false,

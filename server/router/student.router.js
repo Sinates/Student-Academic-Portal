@@ -112,7 +112,7 @@ router.post("/register", (req, res) => {
                 const newStudent = new studentModel({
                   id: generateID(), // Use provided ID
                   batch: generateBatch(),
-                  role: 'Student',
+                  role: "Student",
                   name: req.body.name,
                   gender: req.body.gender,
                   email: req.body.email,
@@ -312,7 +312,8 @@ router.get("/courses", async (req, res) => {
 });
 router.post("/gradeChangeRequest", async (req, res) => {
   try {
-    const { studentId, teacherId, message } = req.body;
+    const { studentId, teacherId, message, course, mid, final, assessment } =
+      req.body;
 
     // Find the student by ID
     const student = await studentModel.findOne({ id: studentId });
@@ -320,19 +321,24 @@ router.post("/gradeChangeRequest", async (req, res) => {
       return res.status(404).json({ error: "Student not found" });
     }
 
-    // Create the grade change request object
-    const changeRequest = {
-      sender: studentId,
-      message: message,
-      approved: false,
-      time: Date.now(),
-    };
-
     // Find the teacher by ID
     const teacher = await teacherModel.findOne({ id: teacherId });
     if (!teacher) {
       return res.status(404).json({ error: "Teacher not found" });
     }
+
+    // Create the grade change request object
+    const changeRequest = {
+      course: course,
+      requestId: "RQ" + generateID(),
+      sender: studentId,
+      message: message,
+      approved: false,
+      time: Date.now(),
+      mid: mid,
+      final: final,
+      assessment: assessment,
+    };
 
     // Add the grade change request to the teacher's changeRequests array
     teacher.changeRequests.push(changeRequest);
@@ -340,13 +346,10 @@ router.post("/gradeChangeRequest", async (req, res) => {
     // Save the updated teacher document
     await teacher.save();
 
-    return res
-      .status(200)
-      .json({ message: "Grade change request submitted successfully" });
+    return res.status(200).json({ changeRequest });
   } catch (error) {
     console.error("Error submitting grade change request:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-
 module.exports = router;
