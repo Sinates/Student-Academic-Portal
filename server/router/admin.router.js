@@ -143,7 +143,7 @@ router.get("/restricted", (req, res) => {
 router.post("/courses", async (req, res) => {
   try {
     // Extract course name and courseId from request body
-    const { name, courseId, year } = req.body;
+    const { name, courseId, year, creditHour } = req.body;
 
     // Check if the courseId already exists
     const existingCourse = await courseModel.findOne({ courseId });
@@ -158,6 +158,7 @@ router.post("/courses", async (req, res) => {
       courseName: name,
       courseid: req.body.courseId,
       year: year,
+      credithour: creditHour,
     });
 
     // Save the new course to the database
