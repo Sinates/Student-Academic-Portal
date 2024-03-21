@@ -280,20 +280,21 @@ router.get("/grades", (req, res) => {
       .json({ error: "ID is required in the request body" });
   }
 
-  // Search the payment model by ID
+  // Search the grade model by ID
   gradeModel
-    .findOne({ id: id })
-    .then((grade) => {
-      if (!grade) {
-        return res.status(404).json({ error: "Grade not found" });
+    .find({ id: id }) // Use find instead of findOne
+    .then((grades) => {
+      if (grades.length === 0) {
+        return res.status(404).json({ error: "Grades not found" });
       }
-      res.status(200).json(grade);
+      res.status(200).json(grades);
     })
     .catch((err) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     });
 });
+
 router.get("/courses", async (req, res) => {
   try {
     // Query the database to find all courses
