@@ -1,21 +1,43 @@
-import React from "react";
-import TopHeader from "@/components/common/Header";
-import RootLayout from "@/layouts/RootLayout";
-import { Avatar } from "@material-tailwind/react";
-import Image from "next/image";
+import React from 'react';
+import TopHeader from '@/components/common/Header';
+import RootLayout from '@/layouts/RootLayout';
+import { Avatar } from '@material-tailwind/react';
+// import Image from 'next/image';
+import { useRouter } from 'next/router';
+// import { useGetStudentByIdQuery } from '@/api/api-slice';
 
 function StudentProfile() {
   // Mock student data
+  const router = useRouter();
+  const { id } = router.query;
+  
+  // const {data,isLoading,isError, isSuccess} = useGetStudentByIdQuery();
+  // const [student, setStudent] = useState({
+  //   id: '',
+  //   fullName: '',
+  //   gender: '',
+  //   email: '',
+  //   phoneNumber: '',
+  //   department: '',
+  //   about: '',
+  //   imageUrl: '',
+  // });
+
+  // useEffect(() => {
+  //   if (isSuccess)
+  //   setStudent(data)
+  // }, [data, isSuccess])
+
   const student = {
-    id: "CS330",
-    fullName: "Jhone Doe",
-    gender: "Female",
-    email: "jhone@gmail.com",
-    phoneNumber: "+251912345657",
-    department: "Computer Science",
+    id: 'CS330',
+    fullName: 'Jhone Doe',
+    gender: 'Female',
+    email: 'jhone@gmail.com',
+    phoneNumber: '+251912345657',
+    department: 'Computer Science',
     about:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et doloreLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore",
-    imageUrl: "https://res.cloudinary.com/eskalate/image/upload/c_scale,f_auto,q_auto,w_100/v1/gallery/Afrochat",
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et doloreLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore',
+    imageUrl: 'https://res.cloudinary.com/eskalate/image/upload/c_scale,f_auto,q_auto,w_100/v1/gallery/Afrochat',
   };
 
   return (
@@ -36,7 +58,6 @@ function StudentProfile() {
             </h1>
             <p className="text-gray-500">{student.department}</p>
           </div>
-
           <div>
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
               Personal Information
