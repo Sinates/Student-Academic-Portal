@@ -7,30 +7,31 @@ function AddCourse() {
   const [courseCode, setCourseCode] = useState("");
   const [courseName, setCourseName] = useState("");
   const [creditHour, setCreditHour] = useState(0);
+  const [year, setYear] = useState("");
 
   const handleAddCourse = () => {
     // Call the addCourse mutation with the input values
     addCourse({
-      variables: {
+      data: {
         courseId: courseCode,
         name: courseName,
-        year: "11",
+        year: year,
+        creditHour: creditHour,
       },
     });
   };
 
   return (
-    <div className="w-[70%]">
+    <div className="w-[96%] m-auto">
       <form className="mt-8 mb-2 w-full ">
         <div className="flex justify-around">
           <div className="">
             <Typography variant="h6" color="blue-gray" className="-mb-3">
               Course Code
             </Typography>
-            <Input
+            <input
               size="lg"
-              placeholder="name@mail.com"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900 mt-6"
+              className="border border-gray-500 rounded-md focus:border-gray-700 mt-6 h-12 bg-transparent px-2"
               value={courseCode}
               onChange={(e) => setCourseCode(e.target.value)}
             />
@@ -39,10 +40,9 @@ function AddCourse() {
             <Typography variant="h6" color="blue-gray" className="-mb-3">
               Course Name
             </Typography>
-            <Input
+            <input
               size="lg"
-              placeholder="name@mail.com"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900 mt-6"
+              className="border border-gray-500 rounded-md focus:border-gray-700 mt-6 h-12 bg-transparent px-2"
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
             />
@@ -51,17 +51,30 @@ function AddCourse() {
             <Typography variant="h6" color="blue-gray" className="-mb-3">
               Credit Hour
             </Typography>
-            <Input
+            <input
               type="number"
               size="lg"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900 mt-6"
+              className="border border-gray-500 rounded-md focus:border-gray-700 mt-6 h-12 bg-transparent px-2"
               value={creditHour}
               onChange={(e) => setCreditHour(Number(e.target.value))}
             />
           </div>
+          <div>
+            <Typography variant="h6" color="blue-gray" className="-mb-3">
+              Year
+            </Typography>
+            <input
+              type="text"
+              size="lg"
+              className="border border-gray-500 rounded-md focus:border-gray-700 mt-6 h-12 bg-transparent px-2"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+            />
+          </div>
         </div>
+        
         <div className="mt-8 flex justify-end mr-10">
-          <Button color="lightBlue" ripple="light" onClick={handleAddCourse}>
+          <Button className="bg-primary" ripple="light" onClick={handleAddCourse}>
             Add Course
           </Button>
         </div>
