@@ -642,4 +642,39 @@ router.post("/generateAttendanceExcel", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+router.get("/pendingapproval", async (req, res) => {
+  try {
+    // Find all students where restricted is true
+    const pendingStudents = await studentModel.find({ restricted: true });
+
+    // If no students are found with restricted true, return 404 error
+    if (pendingStudents.length === 0) {
+      return res.status(404).json({ error: "No pending students found" });
+    }
+
+    // Return the list of pending students
+    res.status(200).json(pendingStudents);
+  } catch (error) {
+    console.error("Error retrieving pendin  g students:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/pendingapprovalTeacher", async (req, res) => {
+  try {
+    // Find all students where restricted is true
+    const pendingTeacher = await teacherModel.find({ restricted: true });
+
+    // If no students are found with restricted true, return 404 error
+    if (pendingTeacher.length === 0) {
+      return res.status(404).json({ error: "No pending students found" });
+    }
+
+    // Return the list of pending students
+    res.status(200).json(pendingTeacher);
+  } catch (error) {
+    console.error("Error retrieving pendin  g students:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;
