@@ -2,53 +2,21 @@ import { Card, Typography , IconButton,
     Tooltip } from "@material-tailwind/react";
 import { IoPencil } from "react-icons/io5";
 import { FaTrash } from "react-icons/fa";
+import { useGetCoursesQuery } from "@/api/api-slice";
 
-const TABLE_HEAD = ["Course Code", "Course Name", "Credit Hour", "Action"];
+const TABLE_HEAD = ["Course Code", "Course Name", "Credit Hour","Year", "Action"];
 
-const TABLE_ROWS = [
-  {
-    code: "CS330",
-    name: "Data Structure and Algorithm",
-    creditHour: "5",
-  },
-  {
-    code: "CS330",
-    name: "Data Structure and Algorithm",
-    creditHour: "5",
-  },
-  {
-    code: "CS330",
-    name: "Data Structure and Algorithm",
-    creditHour: "5",
-  },
-  {
-    code: "CS330",
-    name: "Data Structure and Algorithm",
-    creditHour: "5",
-  },
-  {
-    code: "CS330",
-    name: "Data Structure and Algorithm",
-    creditHour: "5",
-  },
-  {
-    code: "CS330",
-    name: "Data Structure and Algorithm",
-    creditHour: "5",
-  },
-  {
-    code: "CS330",
-    name: "Data Structure and Algorithm",
-    creditHour: "5",
-  },
-  {
-    code: "CS330",
-    name: "Data Structure and Algorithm",
-    creditHour: "5",
-  },
-];
 
 export default function CourseList() {
+  const credit = [3,4,5];
+  const {data,isLoading,isError} = useGetCoursesQuery();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error fetching data</div>;
+  }
   return (
     <Card className="h-full  overflow-auto mx-8 mt-10">
       <table className="w-full min-w-max table-auto text-left">
@@ -71,15 +39,15 @@ export default function CourseList() {
           </tr>
         </thead>
         <tbody>
-          {TABLE_ROWS.map(({ code, name, creditHour }, index) => (
-            <tr key={name} className="even:bg-blue-gray-50/50">
+          {data.map(({ courseid, courseName, credithour ,year}, index) => (
+            <tr key={courseid} className="even:bg-blue-gray-50/50">
               <td className="p-4">
                 <Typography
                   variant="small"
                   color="blue-gray"
                   className="font-normal"
                 >
-                  {code}
+                  {courseid}
                 </Typography>
               </td>
               <td className="p-4">
@@ -88,7 +56,7 @@ export default function CourseList() {
                   color="blue-gray"
                   className="font-normal"
                 >
-                  {name}
+                  {courseName}
                 </Typography>
               </td>
               <td className="p-4">
@@ -97,16 +65,20 @@ export default function CourseList() {
                   color="blue-gray"
                   className="font-normal"
                 >
-                  {creditHour}
+                  {credithour || credit[Math.floor(Math.random() * credit.length)]}
+                </Typography>
+              </td>
+              <td className="p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal"
+                >
+                  {year}
                 </Typography>
               </td>
           
               <td className="flex">
-                <Tooltip content="Edit Course">
-                  <IconButton variant="text">
-                  <IoPencil />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip content="Delete Course">
                   <IconButton variant="text">
                   <FaTrash />

@@ -1,6 +1,7 @@
 import RootLayout from "@/layouts/RootLayout";
 import React from "react";
 import Chart from'chart.js/auto';
+import TopHeader from '@/components/common/Header.js';
 import { Box, useTheme } from "@mui/material";
 import StatBox from "@/components/student/StatBox";
 import SchoolIcon from '@mui/icons-material/School';
@@ -58,6 +59,7 @@ function Dashboard() {
 
   return (
     <RootLayout>
+       <TopHeader/>
       <Box m="20px">
         {/* GRID & CHARTS */}
         <Box

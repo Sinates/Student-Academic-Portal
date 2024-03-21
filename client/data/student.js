@@ -106,9 +106,10 @@ const moveStudentToStudents = (studentId) => {
 
     if (index !== -1) {
         const student = pendingStudents.splice(index, 1)[0];
+        pendingStudents.pop(index)
         students.push(student);
     }
-    pendingStudents.removeStudent(studentId);
+
 };
 
 module.exports = {

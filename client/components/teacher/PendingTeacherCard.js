@@ -11,7 +11,7 @@ import {
    
   export default function PendingTeacherCard() {
     return (
-      <Card color="transparent" shadow={true} className="w-full max-w-[26rem] mx- my-4">
+      <Card color="#FFFFFF" shadow={true} className="w-full max-w-[26rem] mx- my-4">
         <CardHeader
           color="transparent"
           floated={false}

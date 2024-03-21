@@ -5,6 +5,9 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "apiSlice",
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000" }),
+  tagTypes: [
+    'courses',
+  ],
   endpoints: (builder) => ({
     getAllCourses: builder.query({
       query: () => ({
@@ -20,6 +23,7 @@ export const apiSlice = createApi({
           body: data,
         };
       },
+      invalidatesTags: ['courses'],
     }),
     getTeachers: builder.query({
       query: () => ({
@@ -33,6 +37,19 @@ export const apiSlice = createApi({
         method: "GET",
       }),
     }),
+    getBatches: builder.query({
+      query: () => ({
+        url: "/admin/getbatches",
+        method: "GET",
+      }),
+    }),
+    getCourses: builder.query({
+      query: () => ({
+        url: "/admin/courselist",
+        method: "GET",
+      }),
+      providesTags: ['courses'],
+    }),
     
 
     
@@ -41,4 +58,4 @@ export const apiSlice = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useAddCourseMutation,useGetTeachersQuery,useGetStudentsQuery } = apiSlice;
+export const { useAddCourseMutation,useGetTeachersQuery,useGetStudentsQuery, useGetCoursesQuery } = apiSlice;

@@ -6,6 +6,7 @@ import {
 } from "@material-tailwind/react";
 import { FaTrash } from "react-icons/fa";
 import { useGetTeachersQuery } from "../../api/api-slice";
+import { useRouter } from "next/router";
 
 const TABLE_HEAD = [
   "ID",
@@ -18,6 +19,8 @@ const TABLE_HEAD = [
 
 export default function TeacherList() {
   const { data, isLoading, isError ,isSuccess} = useGetTeachersQuery();
+  const router = useRouter();
+
   return (
     <Card className="h-full  overflow-auto mx-8 mt-10">
       {isLoading && (
@@ -27,23 +30,23 @@ export default function TeacherList() {
       )}
 
       {isError && (
-        <Typography variant="body" color="red" className="text-center mt-4">
+        <Typography variant="body" color="red" className="text-center mt-4 mx-16">
           Error loading teachers. Please try again later.
         </Typography>
       )}
       {isSuccess && (
-        <table className="w-full min-w-max table-auto text-left">
+        <table className="w-full min-w-max table-auto text-left px-20">
           <thead>
             <tr>
               {TABLE_HEAD.map((head) => (
                 <th
                   key={head}
-                  className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
+                  className="border-b border-blue-gray-100 bg-[#E8F1FF] p-4"
                 >
                   <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-normal leading-none opacity-70"
+                    variant="h6"
+                    color="#334155"
+                    className="font-normal text-[#334155] leading-none opacity-70"
                   >
                     {head}
                   </Typography>
@@ -57,7 +60,7 @@ export default function TeacherList() {
                 { id, name, gender, email, phone },
                 index
               ) => (
-                <tr key={id} className="even:bg-blue-gray-50/50">
+                <tr key={id} onClick={() => router.push(`/admin/teacher/${id}`)} className="even:bg-blue-gray-50/50">
                   <td className="p-4">
                     <Typography
                       variant="small"
