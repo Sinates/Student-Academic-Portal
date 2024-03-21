@@ -23,12 +23,13 @@ import { useRouter } from "next/router";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function SideBarNav() {
-  let role = "Student";
+  let role = "Admin";
 
   const router = useRouter();
   const paths = router.pathname.split("/");
@@ -216,13 +217,13 @@ export default function SideBarNav() {
                       className={classNames(
                         activeTab == item.i
                           ? "bg-[#D2D5DB] text-primary"
-                          : "text-secondary hover:bg-lightPrimaryBg",
+                          : "text-secondary hover:bg-primary hover:text-white",
                         "group flex gap-x-3 rounded-xl p-2 pt-5 text-sm leading-6 font-medium h-full w-full"
                       )}
                     >
                       <item.icon
                         className={classNames(
-                          activeTab == item.i ? "text-primary" : "text-primary",
+                          activeTab == item.i ? "text-white" : "text-primary",
                           "h-4 w-4 mt-1 ml-2"
                         )}
                         aria-hidden="true"
@@ -233,7 +234,7 @@ export default function SideBarNav() {
                           className="ml-auto text-center text-xs font-medium leading-5 text-white ring-none pt-2 pr-2"
                           aria-hidden="true"
                         >
-                          <RiCheckboxBlankCircleFill className="h-3 w-3 text-primary" />
+                          <RiCheckboxBlankCircleFill className="h-3 w-3 text-white" />
                         </span>
                       ) : null}
                     </button>
