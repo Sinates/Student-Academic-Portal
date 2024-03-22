@@ -446,24 +446,24 @@ router.post("/approveGradeChangeRequest", async (req, res) => {
       return res.status(404).json({ error: "Teacher not found" });
     }
 
-    // Find the grade change request by requestId
-    const changeRequest = teacher.changeRequests.find(
+    // Find the index of the grade change request by requestId
+    const index = teacher.changeRequests.findIndex(
       (req) => req.requestId === requestId
     );
-    if (!changeRequest) {
+    if (index === -1) {
       return res.status(404).json({ error: "Grade change request not found" });
     }
 
     // Update the grade change request's approval status
-    changeRequest.approved = true;
+    teacher.changeRequests[index].approved = true;
 
     // Update non-empty data (mid, final, assessment) in the grade model
     if (req.body.mid !== "") {
       // Update mid value in the grade model
       await gradeModel.findOneAndUpdate(
         {
-          studentId: changeRequest.sender,
-          course: changeRequest.course,
+          studentId: teacher.changeRequests[index].sender,
+          course: teacher.changeRequests[index].course,
           instructor: instructorName,
         },
         { mid: req.body.mid }
@@ -473,8 +473,8 @@ router.post("/approveGradeChangeRequest", async (req, res) => {
       // Update final value in the grade model
       await gradeModel.findOneAndUpdate(
         {
-          studentId: changeRequest.sender,
-          course: changeRequest.course,
+          studentId: teacher.changeRequests[index].sender,
+          course: teacher.changeRequests[index].course,
           instructor: instructorName,
         },
         { final: req.body.final }
@@ -484,25 +484,31 @@ router.post("/approveGradeChangeRequest", async (req, res) => {
       // Update assessment value in the grade model
       await gradeModel.findOneAndUpdate(
         {
-          studentId: changeRequest.sender,
-          course: changeRequest.course,
+          studentId: teacher.changeRequests[index].sender,
+          course: teacher.changeRequests[index].course,
           instructor: instructorName,
         },
         { assessment: req.body.assessment }
       );
     }
 
+    // Remove the approved request from the changeRequests array
+    teacher.changeRequests = teacher.changeRequests.filter(
+      (req, idx) => idx !== index
+    );
+
     // Save the updated teacher document
     await teacher.save();
 
     return res
       .status(200)
-      .json({ message: "Grade change request approved successfully" });
+      .json({ message: "Grade change request approved and removed successfully" });
   } catch (error) {
     console.error("Error approving grade change request:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 router.get("/gradeChangeRequests", async (req, res) => {
   try {
     const id = req.body.id;
