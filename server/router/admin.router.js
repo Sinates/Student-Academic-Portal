@@ -715,7 +715,8 @@ router.post("/rejectteacher", async (req, res) => {
     await teacherModel.deleteOne({ _id: teacher._id });
 
     return res.status(200).json({
-      message: "Teacher rejection email sent successfully and teacher document deleted",
+      message:
+        "Teacher rejection email sent successfully and teacher document deleted",
     });
   } catch (error) {
     console.error("Error rejecting teacher:", error);
@@ -761,10 +762,31 @@ router.post("/rejectstudent", async (req, res) => {
     await studentModel.deleteOne({ _id: student._id });
 
     return res.status(200).json({
-      message: "Student rejection email sent successfully and student document deleted",
+      message:
+        "Student rejection email sent successfully and student document deleted",
     });
   } catch (error) {
     console.error("Error rejecting teacher:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.delete("/courses", async (req, res) => {
+  try {
+    const courseId = req.body.courseid;
+
+    // Delete the course from the database
+    const result = await courseModel.deleteOne({ courseid: courseId });
+
+    // Check if the course was deleted
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // Return a success message
+    return res.status(200).json({ message: "Course deleted successfully" });
+  } catch (error) {
+    // If an error occurs, return an error response
+    console.error("Error deleting course:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
