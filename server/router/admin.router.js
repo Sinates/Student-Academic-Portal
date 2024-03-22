@@ -277,9 +277,6 @@ router.get("/getstudents", async (req, res) => {
 
   try {
     const studentsInBatch = await studentModel.find({ batch: batch });
-    if (studentsInBatch.length === 0) {
-      return res.status(404).json({ error: "No students found in the batch" });
-    }
     res.status(200).json({ students: studentsInBatch });
   } catch (error) {
     console.error(`Error retrieving students in batch ${batch}:`, error);
@@ -360,12 +357,12 @@ router.post("/signup", (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     });
 });
-router.post("/verifyteacher", async (req, res) => {
+router.post("/verifyteacher/:id", async (req, res) => {
   try {
-    const { email, accepted } = req.body;
+    const teacherId = req.params.id;
 
     // Find the teacher by email
-    const teacher = await teacherModel.findOne({ email });
+    const teacher = await teacherModel.findOne({ _id: teacherId });
     if (!teacher) {
       return res.status(404).json({ error: "Teacher not found" });
     }
@@ -707,9 +704,6 @@ router.get("/pendingapproval", async (req, res) => {
     const pendingStudents = await studentModel.find({ restricted: true });
 
     // If no students are found with restricted true, return 404 error
-    if (pendingStudents.length === 0) {
-      return res.status(404).json({ error: "No pending students found" });
-    }
 
     // Return the list of pending students
     res.status(200).json(pendingStudents);
@@ -724,9 +718,6 @@ router.get("/pendingapprovalTeacher", async (req, res) => {
     const pendingTeacher = await teacherModel.find({ restricted: true });
 
     // If no students are found with restricted true, return 404 error
-    if (pendingTeacher.length === 0) {
-      return res.status(404).json({ error: "No pending students found" });
-    }
 
     // Return the list of pending students
     res.status(200).json(pendingTeacher);
@@ -735,12 +726,12 @@ router.get("/pendingapprovalTeacher", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-router.post("/rejectteacher", async (req, res) => {
+router.post("/rejectteacher/:id", async (req, res) => {
   try {
-    const { id } = req.body;
+    const teacherId = req.params.id;
 
-    // Find the teacher by email
-    const teacher = await teacherModel.findOne({ id });
+
+    const teacher = await teacherModel.findOne({ _id: teacherId });
     if (!teacher) {
       return res.status(404).json({ error: "Teacher not found" });
     }
@@ -847,6 +838,50 @@ router.delete("/courses", async (req, res) => {
     // If an error occurs, return an error response
     console.error("Error deleting course:", error);
     return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.delete("/teachers/:_id", async (req, res) => {
+  try {
+    const _id = req.params._id;
+
+    // Find the course by courseId
+    const course = await teacherModel.findOne({ _id });
+
+    // If the course doesn't exist, return an error
+    if (!course) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Delete the course from the database
+    await teacherModel.deleteOne({ _id });
+
+    // Return success message
+    res.status(200).json({ message: "Teacher deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting teacher:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.delete("/students/:_id", async (req, res) => {
+  try {
+    const _id = req.params._id;
+
+    // Find the course by courseId
+    const course = await studentModel.findOne({ _id });
+
+    // If the course doesn't exist, return an error
+    if (!course) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Delete the course from the database
+    await studentModel.deleteOne({ _id });
+
+    // Return success message
+    res.status(200).json({ message: "Student deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
