@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import DropdownComponent from "@/components/student/dropDown";
 import CourseDropdown from "@/components/student/dropdownCourse";
+import RootLayout from '@/layouts/RootLayout';
 
 const GradeChange = () => {
   const [formData, setFormData] = useState({
@@ -63,7 +64,7 @@ const GradeChange = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <RootLayout>    <Container maxWidth="sm">
       <Box
         sx={{
           background: 'rgb(51 65 85 / var(--tw-bg-opacity))',
@@ -92,6 +93,8 @@ const GradeChange = () => {
         </form>
       </Box>
     </Container>
+    </RootLayout>
+
   );
 };
 

@@ -20,7 +20,7 @@ function Dashboard() {
     // Dummy student profile data
     const dummyData = {
       id: 1,
-      name: "John Doe",
+      name: "Abel kasshun",
       department: "Computer Science",
       year: "3rd",
     };
