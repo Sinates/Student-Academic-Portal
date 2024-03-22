@@ -7,6 +7,7 @@ import {
 import { FaTrash } from "react-icons/fa";
 import { useGetTeachersQuery } from "../../api/api-slice";
 import { useRouter } from "next/router";
+import { useDeleteTeacherMutation } from "../../api/api-slice";
 
 const TABLE_HEAD = [
   "ID",
@@ -19,8 +20,13 @@ const TABLE_HEAD = [
 
 export default function TeacherList() {
   const { data, isLoading, isError ,isSuccess} = useGetTeachersQuery();
-  const router = useRouter();
+  const [deleteTeacher] = useDeleteTeacherMutation();
 
+  const router = useRouter();
+  const handleDelete = (event, teacherId) => {
+    event.stopPropagation();
+    deleteTeacher(teacherId)
+  };
   return (
     <Card className="h-full  overflow-auto mx-8 mt-10">
       {isLoading && (
@@ -109,7 +115,7 @@ export default function TeacherList() {
 
                   <td cl>
                     <Tooltip content="Delete Course">
-                      <IconButton className="px-auto" variant="text">
+                      <IconButton className="px-auto" variant="text" onClick={(e)=>handleDelete(e,_id)}>
                         <FaTrash />
                       </IconButton>
                     </Tooltip>

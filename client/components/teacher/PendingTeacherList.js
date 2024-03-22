@@ -1,10 +1,11 @@
-import React from 'react'
-import PendingTeacherCard from './PendingTeacherCard'
-import { useGetPendingTeachersQuery } from '@/api/api-slice';
+import React from "react";
+import PendingTeacherCard from "./PendingTeacherCard";
+import { useGetPendingTeachersQuery } from "@/api/api-slice";
 import { Typography } from "@material-tailwind/react";
 
 function PendingTeacherList() {
-  const {data, isLoading,isSuccess,isError,error} = useGetPendingTeachersQuery();
+  const { data, isLoading, isSuccess, isError, error } =
+    useGetPendingTeachersQuery();
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-40">
@@ -18,14 +19,19 @@ function PendingTeacherList() {
       </Typography>
     );
   if (isSuccess)
-    return (
-      <div className="grid grid-cols-3 gap-4 mx-16 overflow-y-auto h-[600px]" >
+    if (data.length === 0)
+      return (
+        <div className="flex items-center justify-center h-40">
+          <div className=" text-blue-gray-900">No Pending Requests</div>
+        </div>
+      );
+  return (
+    <div className="grid grid-cols-3 gap-4 mx-16 overflow-y-auto h-[600px]">
       {data.map((teacher) => (
-         <PendingTeacherCard teacher={teacher}/>
+        <PendingTeacherCard teacher={teacher} />
       ))}
-      </div>
-    );
-
+    </div>
+  );
 }
 
-export default PendingTeacherList
+export default PendingTeacherList;

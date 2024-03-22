@@ -5,7 +5,13 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "apiSlice",
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000" }),
-  tagTypes: ["courses", "pendingStudents", "pendingTeachers"],
+  tagTypes: [
+    "courses",
+    "pendingStudents",
+    "pendingTeachers",
+    "students",
+    "teachers",
+  ],
   endpoints: (builder) => ({
     getAllCourses: builder.query({
       query: () => ({
@@ -28,12 +34,14 @@ export const apiSlice = createApi({
         url: "/admin/getteachers",
         method: "GET",
       }),
+      providesTags: ["teachers"],
     }),
     getStudents: builder.query({
       query: () => ({
         url: "/admin/getstudents",
         method: "GET",
       }),
+      providesTags: ["students"],
     }),
     getBatches: builder.query({
       query: () => ({
@@ -76,11 +84,19 @@ export const apiSlice = createApi({
         url: `/admin/pendingapprovalTeacher`,
         method: "GET",
       }),
-      invalidatesTags: ["pendingTeachers"],
+      providesTags: ["pendingTeachers"],
     }),
     registerStudent: builder.mutation({
       query: ({ data }) => ({
         url: `/student/register`,
+        method: "POST",
+        body: data,
+      }),
+      formdata: true,
+    }),
+    registerTeacher: builder.mutation({
+      query: ({ data }) => ({
+        url: `/teacher/register`,
         method: "POST",
         body: data,
       }),
@@ -93,6 +109,20 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["courses"],
     }),
+    deleteStudent: builder.mutation({
+      query: (id) => ({
+        url: `/admin/students/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["students"],
+    }),
+    deleteTeacher: builder.mutation({
+      query: (id ) => ({
+        url: `/admin/teachers/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["teachers"],
+    }),
     getStudent: builder.query({
       query: (id) => ({
         url: `/admin/students/${id}`,
@@ -100,10 +130,30 @@ export const apiSlice = createApi({
       }),
     }),
     getTeacher: builder.query({
-      query: ( id ) => ({
+      query: (id) => ({
         url: `/admin/teachers/${id}`,
         method: "GET",
       }),
+    }),
+    getNotification: builder.query({
+      query: (id) => ({
+        url: `/student/getnotification/${id}`,
+        method: "GET",
+      }),
+    }),
+    approvePendingTeachers: builder.mutation({
+      query: (id) => ({
+        url: `/admin/verifyteacher/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["pendingTeachers"],
+    }),
+    rejectPendingTeachers: builder.mutation({
+      query: (id) => ({
+        url: `/admin/rejectteacher/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["pendingTeachers"],
     }),
   }),
 });
@@ -123,4 +173,10 @@ export const {
   useRegisterTeacherMutation,
   useDeleteCourseMutation,
   useGetTeacherQuery,
+  useGetStudentQuery,
+  useGetNotificationQuery,
+  useDeleteStudentMutation,
+  useDeleteTeacherMutation,
+  useApprovePendingTeachersMutation,
+  useRejectPendingTeachersMutation
 } = apiSlice;

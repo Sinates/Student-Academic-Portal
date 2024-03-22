@@ -391,12 +391,12 @@ router.get("/material", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-router.get("/getnotification", (req, res) => {
-  const studentId = req.body.id;
+router.get("/getnotification/:id", (req, res) => {
+  const studentId = req.params.id;;
 
   // Find the student by ID
   studentModel
-    .findOne({ id: studentId })
+    .findOne({ _id: studentId })
     .then((student) => {
       if (!student) {
         return res.status(404).json({ error: "Student not found" });
