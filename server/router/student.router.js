@@ -7,6 +7,7 @@ const multer = require("multer");
 const crypto = require("crypto");
 const gradeModel = require("../model/grade.model");
 const teacherModel = require("../model/teacher.model");
+const materialModel = require("../model/material.model");
 const getHashedPassword = (password) => {
   const sha256 = crypto.createHash("sha256");
   const hash = sha256.update(password).digest("base64");
@@ -280,27 +281,48 @@ router.get("/grades", (req, res) => {
       .json({ error: "ID is required in the request body" });
   }
 
-  // Search the payment model by ID
+  // Search the grade model by ID
   gradeModel
-    .findOne({ id: id })
-    .then((grade) => {
-      if (!grade) {
-        return res.status(404).json({ error: "Grade not found" });
+    .find({ id: id }) // Use find instead of findOne
+    .then((grades) => {
+      if (grades.length === 0) {
+        return res.status(404).json({ error: "Grades not found" });
       }
-      res.status(200).json(grade);
+      res.status(200).json(grades);
     })
     .catch((err) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     });
 });
+router.get("/gradesoptional", (req, res) => {
+  const id = req.query.id;
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({ error: "ID is required in the query parameters" });
+  }
+
+  // Search the grade model by ID
+  gradeModel
+    .find({ id: id })
+    .then((grades) => {
+      if (grades.length === 0) {
+        return res.status(404).json({ error: "Grades not found" });
+      }
+      res.status(200).json(grades);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+
 router.get("/courses", async (req, res) => {
   try {
     // Query the database to find all courses
-    const courses = await courseModel.find(
-      {},
-      { _id: 0, courseName: 1, courseid: 1 }
-    );
+    const courses = await courseModel.find({}, {});
 
     // Return the retrieved courses as the response
     res.status(200).json(courses);
@@ -352,4 +374,22 @@ router.post("/gradeChangeRequest", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+router.get("/material", async (req, res) => {
+  try {
+    const { batch } = req.body;
+
+    // Find the material by ID
+    const material = await materialModel.find({ batch });
+    if (!material) {
+      return res.status(404).json({ error: "Material not found" });
+    }
+
+    // Return the material data
+    return res.status(200).json(material);
+  } catch (error) {
+    console.error("Error retrieving material:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;

@@ -12,7 +12,7 @@ import {
 import PendingTeacherList from '@/components/teacher/PendingTeacherList';
 
 function Teacher() {
-  const [activeTab, setActiveTab] = React.useState("currents");
+  const [activeTab, setActiveTab] = React.useState("current");
   const data = [
     {
       label: "Current Teachers",
@@ -28,10 +28,10 @@ function Teacher() {
   return (
     <RootLayout>
       <TopHeader title={"Teacher"}/>
-        <Tabs value={activeTab}>
+        <Tabs value={activeTab} className="h-screen">
       <TabsHeader
-        className="rounded-none border-b border-blue-gray-50 bg-transparent p-0"
-        indicatorProps={{
+          className="rounded-none bg-transparent py-2 px-20"
+          indicatorProps={{
           className:
             "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
         }}
@@ -49,7 +49,7 @@ function Teacher() {
       </TabsHeader>
       <TabsBody>
         {data.map(({ value, desc }) => (
-          <TabPanel key={value} value={value}>
+          <TabPanel className='px-10' key={value} value={value}>
             {desc}
           </TabPanel>
         ))}

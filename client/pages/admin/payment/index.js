@@ -5,10 +5,11 @@ import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRo
 import Image from "next/image";
 import { styled } from '@mui/material/styles';
 import PaidIcon from '@mui/icons-material/Paid';
-
+import TopHeader from "@/components/common/Header";
 //import Paper from '@mui/material/Paper';
 //import { Image } from "@material-tailwind/react";
 
+const TABLE_HEAD = ["ID","Name", "Receipt", "Action"];
 const style = {
   position: 'absolute',
   top: '50%',
@@ -64,7 +65,7 @@ function Payment() {
   return (
     <RootLayout>
       
-      <div className=' p-12  bg-blue-gray-900 '></div>
+      <TopHeader />
     <div className='mx-10 my-10' >
          <PaidIcon sx={{fontSize:40 , margin:'20px'}} />
       <TableContainer component={Paper}   >

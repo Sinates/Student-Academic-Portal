@@ -16,6 +16,7 @@ const newSchema = new mongoose.Schema({
   certifications: String,
   interviewDate: Date,
   assignedCourses: [String],
+  batch: [String],
   role: String,
   changeRequests: [
     {

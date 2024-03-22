@@ -5,6 +5,7 @@ const newSchema = new mongoose.Schema({
   courseid: String,
   courseName: String,
   year: Number,
+  instructor: String,
   credithour: Number,
 });
 
