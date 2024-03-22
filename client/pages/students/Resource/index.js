@@ -1,12 +1,12 @@
 import RootLayout from "@/layouts/RootLayout";
 import React, { useState } from 'react';
-import { Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button,ThemeProvider, createTheme } from '@mui/material';
 
 const Resource = () => {
     const [courses] = useState([
-        { id: 1, name: 'Mathematics' },
-        { id: 2, name: 'Physics' },
-        { id: 3, name: 'History' }
+        { id: 1, name: 'data structures and algorithms' },
+        { id: 2, name: 'database' },
+        { id: 3, name: 'Compiler Design' }
     ]);
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [materials, setMaterials] = useState([]);
@@ -16,21 +16,21 @@ const Resource = () => {
         let materialsData = [];
         if (courseId === 1) {
             materialsData = [
-                { id: 1, name: 'Algebra', type: 'PDF' },
-                { id: 2, name: 'Geometry', type: 'PDF' },
-                { id: 3, name: 'Calculus', type: 'PDF' }
+                { id: 1, name: 'Stack', type: 'PDF' },
+                { id: 2, name: 'queue', type: 'PDF' },
+                { id: 3, name: 'sort', type: 'PDF' }
             ];
         } else if (courseId === 2) {
             materialsData = [
-                { id: 4, name: 'Mechanics', type: 'PPT' },
-                { id: 5, name: 'Electromagnetism', type: 'PPT' },
-                { id: 6, name: 'Thermodynamics', type: 'PPT' }
+                { id: 4, name: '1st normal form', type: 'PPT' },
+                { id: 5, name: 'second normal form', type: 'PPT' },
+                { id: 6, name: 'third normal form', type: 'PPT' }
             ];
         } else if (courseId === 3) {
             materialsData = [
-                { id: 7, name: 'Ancient Civilization', type: 'PDF' },
-                { id: 8, name: 'World Wars', type: 'PDF' },
-                { id: 9, name: 'Renaissance', type: 'PDF' }
+                { id: 7, name: 'chapter1', type: 'PDF' },
+                { id: 8, name: 'chapter2', type: 'PDF' },
+                { id: 9, name: 'chapter3', type: 'PDF' }
             ];
         }
         setMaterials(materialsData);
@@ -60,7 +60,16 @@ const Resource = () => {
         URL.revokeObjectURL(url);
     };
 
-    
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: '#2196f3', // Primary button color
+            },
+            secondary: {
+                main: '#f44336', // Secondary button color
+            },
+        },
+    });
     return (
         <RootLayout>
             <div>
