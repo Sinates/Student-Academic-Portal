@@ -47,8 +47,8 @@ export default function StudentList() {
             </tr>
           </thead>
           <tbody>
-            {students.map(({ id, fullName, gender, email, phoneNumber, department }, index) => (
-              <tr onClick={() => router.push(`/admin/student/${id}`)} key={id} className="even:bg-blue-gray-50/50">
+            {students.map(({_id, id, fullName, gender, email, phoneNumber, department }, index) => (
+              <tr onClick={() => router.push(`/admin/student/${_id}`)} key={id} className="even:bg-blue-gray-50/50">
                 <td className="p-4">
                   <Typography
                     variant="small"

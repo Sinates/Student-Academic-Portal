@@ -57,10 +57,10 @@ export default function TeacherList() {
           <tbody>
             {data.map(
               (
-                { id, name, gender, email, phone },
+                { _id,id, name, gender, email, phone },
                 index
               ) => (
-                <tr key={id} onClick={() => router.push(`/admin/teacher/${id}`)} className="even:bg-blue-gray-50/50">
+                <tr key={id} onClick={() => router.push(`/admin/teacher/${_id}`)} className="even:bg-blue-gray-50/50">
                   <td className="p-4">
                     <Typography
                       variant="small"

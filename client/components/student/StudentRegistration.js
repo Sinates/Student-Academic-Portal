@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Input, Button, Typography, Select } from "@material-tailwind/react";
 import { Textarea } from "@material-tailwind/react";
+import { useRegisterStudentMutation } from '@/api/api-slice';
 
 export default function StudentRegistration() {
   const [inputWidth, setInputWidth] = useState(300); // Initial width value
@@ -10,18 +11,25 @@ export default function StudentRegistration() {
   const [email, setEmail] = useState('');
   const [gender, setGender] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [guardianPhoneNumber, setGuardianPhoneNumber] = useState('');
   const [guardianName, setGuardianName] = useState('');
   const [department, setDepartment] = useState('');
   const [aboutYou, setAboutYou] = useState('');
-  const [academicRecord, setAcademicRecord] = useState('');
+  const [academicRecord, setAcademicRecord] = useState(null);
 
   const handleGenderChange = (event) => {
     setGender(event.target.value);
   };
+  const [registerStudent] = useRegisterStudentMutation();
 
   const handleSubmit = (event) => {
+    //  if (password !== confirmPassword) {
+    //   // Display an error message
+    //   alert("Password and Confirm Password do not match");
+    //   return;
+    // }
     event.preventDefault();
     // Handle form submission here
     console.log("Submitted!");
@@ -30,12 +38,25 @@ export default function StudentRegistration() {
     console.log("Email:", email);
     console.log("Gender:", gender);
     console.log("Password:", password);
+
     console.log("Phone Number:", phoneNumber);
     console.log("Guardian Phone Number:", guardianPhoneNumber);
     console.log("Guardian Name:", guardianName);
     console.log("Department:", department);
     console.log("About You:", aboutYou);
     console.log("Academic Record:", academicRecord);
+    registerStudent({data:{
+      name:fullName,
+      email:email,
+      gender:gender,
+      phone:phoneNumber,
+      guardianName:guardianName,
+      guardianPhone:guardianPhoneNumber,
+      password:password,
+      aboutYou:aboutYou,
+      department:department,
+      academicRecord:academicRecord
+    }})
   };
 
   return (
@@ -50,17 +71,7 @@ export default function StudentRegistration() {
           <div className="grid grid-cols-2 gap-12">
             <div className="col-span-1">
               <div className="flex flex-col gap-4  mb-8  ">
-                <Typography variant="h6" color="blue-gray" className="-mb-2">
-                  ID
-                </Typography>
-                <Input
-                  size="sm"
-                  placeholder="ID"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                className="px-4 py-2"
-                style={{ width: `${inputWidth}px` }} 
-                />
+                
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Full Name
                 </Typography>
@@ -94,16 +105,17 @@ export default function StudentRegistration() {
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Gender
                 </Typography>
-                <Select
+                <select
                   size="sm"
+                  className='h-10 rounded-md bg-transparent border-gray-500 border px-2'
                   value={gender}
                   onChange={handleGenderChange}
                   style={{ width: `${inputWidth}px` }} 
                 >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </Select>
+          
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Password
                 </Typography>
@@ -113,6 +125,17 @@ export default function StudentRegistration() {
                   placeholder="********"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  style={{ width: `${inputWidth}px` }} 
+                />
+                 <Typography variant="h6" color="blue-gray" className="-mb-2">
+                  Confirm Password
+                </Typography>
+                <Input
+                  type="password"
+                  size="sm"
+                  placeholder="********"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   style={{ width: `${inputWidth}px` }} 
                 />
               </div>
@@ -144,16 +167,18 @@ export default function StudentRegistration() {
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Department
                 </Typography>
-                <Select
+                <select
                   size="sm"
+                  className='h-10 rounded-md bg-transparent border-gray-500 border px-2'
                   value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
+                  onChange={(e) => {
+                    console.log(e)
+                    setDepartment(e.target.value)}}
                   style={{ width: `${inputWidth}px` }} 
                 >
-                  <option value="">Select Department</option>
                   <option value="Computer Science">Computer Science</option>
-                  <option value="Software">Software</option>
-                </Select>
+                  <option value="Software">Software Engineering</option>
+                </select>
                 
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   About You

@@ -51,7 +51,7 @@ function Registration() {
   return (
     <div className="flex justify-start">
        <div >
-        <img src="/student.png" alt="Image" className="w-full h-auto w-65 h-auto" style={{ marginLeft: '50px', marginTop:'77px' }} />
+        <img src="/student.png" alt="Image" className="w-full h-auto w-65 " style={{ marginLeft: '50px', marginTop:'77px' }} />
       </div>
            <Tabs value={activeTab}>
       <TabsHeader

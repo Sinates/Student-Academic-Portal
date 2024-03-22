@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import { Card, Input, Button, Typography, Select } from "@material-tailwind/react";
 import { Textarea } from "@material-tailwind/react";
-
+import  {useRegisterTeacherMutation} from '@/api/api-slice';
 export default function StudentRegistration() {
   const [inputWidth, setInputWidth] = useState(300); // Initial width value
-  const [id, setId] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [gender, setGender] = useState('');
   const [password, setPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [guardianPhoneNumber, setGuardianPhoneNumber] = useState('');
-  const [guardianName, setGuardianName] = useState('');
   const [qualifications, setQualifications] = useState('');
   const [certification, setCertification] = useState('');
   const [curriculumVitae, setCurriculumVitae] = useState('');
-
+  const [registerTeacher]=useRegisterTeacherMutation();
   const handleGenderChange = (event) => {
     setGender(event.target.value);
   };
@@ -24,17 +21,24 @@ export default function StudentRegistration() {
     event.preventDefault();
     // Handle form submission here
     console.log("Submitted!");
-    console.log("ID:", id);
     console.log("Full Name:", fullName);
     console.log("Email:", email);
     console.log("Gender:", gender);
     console.log("Password:", password);
     console.log("Phone Number:", phoneNumber);
-    console.log("Guardian Phone Number:", guardianPhoneNumber);
-    console.log("Guardian Name:", guardianName);
     console.log("Qualification:", qualifications);
     console.log("Certification:", certification);
     console.log("Curriculum Vitae:", curriculumVitae);
+    registerTeacher({data:{
+      name:fullName,
+      email:email,
+      phone:phoneNumber,
+      gender:gender,
+      password:password,
+      qualifications:qualifications,
+      certification:certification,
+      curriculumVitae:curriculumVitae
+    }})
   };
 
   return (
@@ -48,16 +52,7 @@ export default function StudentRegistration() {
           <div className="grid grid-cols-2 gap-12">
             <div className="col-span-1">
               <div className="flex flex-col gap-4  mb-8  ">
-                <Typography variant="h6" color="blue-gray" className="-mb-2">
-                  ID
-                </Typography>
-                <Input
-                  size="sm"
-                  placeholder="ID"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                  style={{ width: `${inputWidth}px` }} 
-                />
+
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Full Name
                 </Typography>
@@ -90,16 +85,16 @@ export default function StudentRegistration() {
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Gender
                 </Typography>
-                <Select
+                <select
                   size="sm"
                   value={gender}
+                  className='h-10 rounded-md bg-transparent border-gray-500 border px-2'
                   onChange={handleGenderChange}
                   style={{ width: `${inputWidth}px` }} 
                 >
-                  <option value="">Select Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
-                </Select>
+                </select>
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Password
                 </Typography>
@@ -116,26 +111,8 @@ export default function StudentRegistration() {
             <div className="col-span-1 flex flex-col gap-4" style={{ marginLeft: '70px' }}>
 
               <div className="flex flex-col gap-4 " >
-                <Typography variant="h6" color="blue-gray" className="-mb-2">
-                  Guardian Name
-                </Typography>
-                <Input
-                  size="sm"
-                  placeholder="Guardian Name"
-                  value={guardianName}
-                  onChange={(e) => setGuardianName(e.target.value)}
-                  style={{ width: `${inputWidth}px` }} 
-                />
-                <Typography variant="h6" color="blue-gray" className="-mb-2">
-                  Guardian Phone Number
-                </Typography>
-                <Input
-                  size="sm"
-                  placeholder="Guardian Phone Number"
-                  value={guardianPhoneNumber}
-                  onChange={(e) => setGuardianPhoneNumber(e.target.value)}
-                  style={{ width: `${inputWidth}px` }} 
-                />
+            
+            
                 
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Qualifications

@@ -2,7 +2,7 @@ import { Card, Typography , IconButton,
     Tooltip } from "@material-tailwind/react";
 import { IoPencil } from "react-icons/io5";
 import { FaTrash } from "react-icons/fa";
-import { useGetCoursesQuery } from "@/api/api-slice";
+import { useGetCoursesQuery ,useDeleteCourseMutation} from "@/api/api-slice";
 
 const TABLE_HEAD = ["Course Code", "Course Name", "Credit Hour","Year", "Action"];
 
@@ -10,6 +10,8 @@ const TABLE_HEAD = ["Course Code", "Course Name", "Credit Hour","Year", "Action"
 export default function CourseList() {
   const credit = [3,4,5];
   const {data,isLoading,isError} = useGetCoursesQuery();
+ 
+  const [deleteCourse] = useDeleteCourseMutation();
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -39,8 +41,9 @@ export default function CourseList() {
           </tr>
         </thead>
         <tbody>
-          {data.map(({ courseid, courseName, credithour ,year}, index) => (
-            <tr key={courseid} className="even:bg-blue-gray-50/50">
+          {data.map(({_id, courseid, courseName, credithour ,year}, index) => (
+         
+            <tr key={_id} className="even:bg-blue-gray-50/50">
               <td className="p-4">
                 <Typography
                   variant="small"
@@ -80,7 +83,7 @@ export default function CourseList() {
           
               <td className="flex">
                 <Tooltip content="Delete Course">
-                  <IconButton variant="text">
+                  <IconButton variant="text" onClick={()=>deleteCourse({id:_id})}>
                   <FaTrash />
                   </IconButton>
                 </Tooltip>

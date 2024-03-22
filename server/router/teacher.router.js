@@ -53,6 +53,7 @@ router.post(
 
   (req, res) => {
     // Check if the provided email already exists
+    console.log(req.body)
     teacherModel
       .findOne({ email: req.body.email })
       .then((existingEmail) => {
@@ -71,9 +72,9 @@ router.post(
                 // Both email and ID are unique, perform file upload
                 // Retrieve uploaded files
                 const files = req.files;
-                const uploadedCV = files["curriculumVitae"][0];
-                const uploadedQualifications = files["qualifications"][0];
-                const uploadedCertifications = files["certifications"][0];
+                const uploadedCV = req.body.curriculumVitae;
+                const uploadedQualifications = req.body.qualifications;
+                const uploadedCertifications = req.body.certification
 
                 // Create and save the new teacher
                 const newTeacher = new teacherModel({

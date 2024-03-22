@@ -4,12 +4,13 @@ import RootLayout from '@/layouts/RootLayout';
 import { Avatar } from '@material-tailwind/react';
 // import Image from 'next/image';
 import { useRouter } from 'next/router';
-// import { useGetStudentByIdQuery } from '@/api/api-slice';
+ import { useGetStudentQuery } from '@/api/api-slice';
 
 function StudentProfile() {
   // Mock student data
   const router = useRouter();
   const { id } = router.query;
+  const {data,isloading,isError,isSuccess} = useGetStudentQuery(id);
   
   // const {data,isLoading,isError, isSuccess} = useGetStudentByIdQuery();
   // const [student, setStudent] = useState({

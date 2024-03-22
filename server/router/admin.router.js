@@ -175,6 +175,65 @@ router.post("/courses", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+// Route to delete a course
+router.delete("/courses/:_id", async (req, res) => {
+  try {
+    const _id = req.params._id;
+
+    // Find the course by courseId
+    const course = await courseModel.findOne({ _id });
+
+    // If the course doesn't exist, return an error
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // Delete the course from the database
+    await courseModel.deleteOne({ _id });
+
+    // Return success message
+    res.status(200).json({ message: "Course deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting course:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+// Endpoint to get a student by ID
+router.get("/students/:id", (req, res) => {
+  const studentId = req.params.id;
+
+  // Find the student by ID
+  studentModel
+    .findOne({ _id: studentId })
+    .then((student) => {
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      res.status(200).json(student);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+// Endpoint to fetch a teacher by ID
+router.get("/teachers/:id", (req, res) => {
+  const teacherId = req.params.id;
+  // Find the teacher by ID
+  teacherModel
+    .findOne({ _id: teacherId })
+    .then((teacher) => {
+      if (!teacher) {
+        return res.status(404).json({ error: "Teacher not found" });
+      }
+      res.status(200).json(teacher);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+
 router.post("/restrictstudent", (req, res) => {
   const studentId = req.body.id;
 
@@ -319,8 +378,8 @@ router.post("/verifyteacher", async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD,
+        user: process.env.email,
+        pass: process.env.pass,
       },
       tls: {
         rejectUnauthorized: false, // Bypass SSL certificate verification
@@ -763,7 +822,7 @@ router.post("/rejectstudent", async (req, res) => {
 
     return res.status(200).json({
       message:
-        "Student rejection email sent successfully and student document deleted",
+        "Student rejection email sent successfully and teacher document deleted",
     });
   } catch (error) {
     console.error("Error rejecting teacher:", error);
