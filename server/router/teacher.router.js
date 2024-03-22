@@ -503,5 +503,29 @@ router.post("/approveGradeChangeRequest", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+router.get("/gradeChangeRequests", async (req, res) => {
+  try {
+    const id = req.body.id;
+
+    // Find the teacher by ID
+    const teacher = await teacherModel.findOne({ id: id });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Check if there are any change requests for the teacher
+    if (!teacher.changeRequests || teacher.changeRequests.length === 0) {
+      return res.status(404).json({ message: "No change requests found for this teacher" });
+    }
+
+    // Retrieve the change requests for the teacher
+    const changeRequests = teacher.changeRequests;
+
+    res.status(200).json(changeRequests);
+  } catch (error) {
+    console.error("Error retrieving change requests:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 module.exports = router;
