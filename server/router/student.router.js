@@ -391,5 +391,27 @@ router.get("/material", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+router.get("/getnotification", (req, res) => {
+  const studentId = req.body.id;
+
+  // Find the student by ID
+  studentModel
+    .findOne({ id: studentId })
+    .then((student) => {
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+
+      // Get the notifications array from the student object
+      const notifications = student.notifications;
+
+      // Return the notifications array as the response
+      res.status(200).json({ notifications });
+    })
+    .catch((error) => {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
 
 module.exports = router;
