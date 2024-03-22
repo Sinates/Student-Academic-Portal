@@ -2,7 +2,8 @@ import RootLayout from '@/layouts/RootLayout';
 import * as React from 'react';
 import { AppBar, Box, TextField, Button, Typography } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-
+import TopHeader from '@/components/common/Header';
+import Header from '@/components/common/Header'
 function Payment() {
   const [formData, setFormData] = React.useState({
     fullName: '',
@@ -13,8 +14,10 @@ function Payment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
     try {
-      const response = await fetch('your_api_endpoint', {
+      console.log(formData);
+      const response = await fetch('http://localhost:8000/student/uploadpayment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,6 +35,7 @@ function Payment() {
       });
     } catch (error) {
       console.error('Error:', error);
+      console.log(formData);
     }
   };
 
@@ -53,6 +57,8 @@ function Payment() {
 
   return (
     <RootLayout>
+      <TopHeader/>
+      <Header/>
       <AppBar position="static" color="inherit">
         {/* Add any content you want in the AppBar */}
       </AppBar>

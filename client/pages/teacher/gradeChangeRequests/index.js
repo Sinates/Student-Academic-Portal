@@ -113,8 +113,8 @@ const GradeChangeRequestsPage = () => {
                                     </Grid>
                                     <Grid item xs={12}>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-                                            <Button onClick={() => handleAction(request.id, 'approve')} variant="contained" color="primary" style={{ marginLeft: '8px' }}>Approve</Button>
-                                            <Button onClick={() => handleAction(request.id, 'reject')} variant="contained" color="secondary" style={{ marginLeft: '8px' }}>Reject</Button>
+                                            <Button onClick={() => handleAction(request.id, 'approve')} variant="outlined" color="primary" style={{ marginLeft: '8px' }}>Approve</Button>
+                                            <Button onClick={() => handleAction(request.id, 'reject')} variant="outlined" color="secondary" style={{ marginLeft: '8px' }}>Reject</Button>
                                         </div>
                                     </Grid>
                                 </Grid>
