@@ -7,6 +7,7 @@ import {
 import { FaTrash } from "react-icons/fa";
 import { useGetTeachersQuery } from "../../api/api-slice";
 import { useRouter } from "next/router";
+import { useDeleteTeacherMutation } from "../../api/api-slice";
 
 const TABLE_HEAD = [
   "ID",
@@ -19,8 +20,13 @@ const TABLE_HEAD = [
 
 export default function TeacherList() {
   const { data, isLoading, isError ,isSuccess} = useGetTeachersQuery();
-  const router = useRouter();
+  const [deleteTeacher] = useDeleteTeacherMutation();
 
+  const router = useRouter();
+  const handleDelete = (event, teacherId) => {
+    event.stopPropagation();
+    deleteTeacher(teacherId)
+  };
   return (
     <Card className="h-full  overflow-auto mx-8 mt-10">
       {isLoading && (
@@ -57,10 +63,10 @@ export default function TeacherList() {
           <tbody>
             {data.map(
               (
-                { id, name, gender, email, phone },
+                { _id,id, name, gender, email, phone },
                 index
               ) => (
-                <tr key={id} onClick={() => router.push(`/admin/teacher/${id}`)} className="even:bg-blue-gray-50/50">
+                <tr key={id} onClick={() => router.push(`/admin/teacher/${_id}`)} className="even:bg-blue-gray-50/50">
                   <td className="p-4">
                     <Typography
                       variant="small"
@@ -109,7 +115,7 @@ export default function TeacherList() {
 
                   <td cl>
                     <Tooltip content="Delete Course">
-                      <IconButton className="px-auto" variant="text">
+                      <IconButton className="px-auto" variant="text" onClick={(e)=>handleDelete(e,_id)}>
                         <FaTrash />
                       </IconButton>
                     </Tooltip>

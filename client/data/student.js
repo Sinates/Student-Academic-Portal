@@ -41,9 +41,9 @@ const pendingStudents = [
     gender: "Female",
     email: "alice.brown@example.com",
     phoneNumber: "1111111111",
-    department: "Chemistry",
+    department: "Computer Science",
     aboutMe:
-      "I have a strong interest in chemistry and enjoy conducting experiments. I am excited to learn more about the different chemical reactions and their applications.",
+      "I am a passionate student studying Computer Science. I enjoy coding and building software applications.",
   },
   {
     id: 5,
@@ -51,9 +51,9 @@ const pendingStudents = [
     gender: "Male",
     email: "michael.johnson@example.com",
     phoneNumber: "2222222222",
-    department: "Biology",
+    department: "Computer Science",
     aboutMe:
-      "I am passionate about studying living organisms and their interactions. Biology is a fascinating field that allows me to explore the wonders of life.",
+      "I am a dedicated student pursuing Computer Science. I love exploring new technologies and solving complex problems.",
   },
   {
     id: 6,
@@ -61,20 +61,19 @@ const pendingStudents = [
     gender: "Female",
     email: "emily.davis@example.com",
     phoneNumber: "3333333333",
-    department: "History",
+    department: "Computer Science",
     aboutMe:
-      "I have a deep interest in history and enjoy studying different time periods and civilizations. Understanding the past helps me make sense of the present.",
+      "I am an enthusiastic student studying Computer Science. I enjoy working on software projects and collaborating with others.",
   },
-
   {
     id: 7,
     fullName: "Sarah Johnson",
     gender: "Female",
     email: "sarah.johnson@example.com",
     phoneNumber: "4444444444",
-    department: "English",
+    department: "Computer Science",
     aboutMe:
-      "I have a passion for literature and enjoy analyzing and interpreting texts. English language and literature allow me to express my creativity and explore different perspectives.",
+      "I am a curious student passionate about Computer Science. I love learning new programming languages and exploring different algorithms.",
   },
   {
     id: 8,
@@ -82,9 +81,9 @@ const pendingStudents = [
     gender: "Male",
     email: "david.lee@example.com",
     phoneNumber: "6666666666",
-    department: "Art",
+    department: "Computer Science",
     aboutMe:
-      "I am an artist who loves to express myself through various mediums. Art allows me to communicate my thoughts, emotions, and experiences in a visual and meaningful way.",
+      "I am an ambitious student pursuing Computer Science. I enjoy building web applications and creating innovative solutions.",
   },
 ];
 
@@ -102,14 +101,15 @@ const removeStudent = (studentId) => {
 };
 // Move a student from pendingStudents to students
 const moveStudentToStudents = (studentId) => {
-    const index = pendingStudents.findIndex((student) => student.id === studentId);
+  const index = pendingStudents.findIndex(
+    (student) => student.id === studentId
+  );
 
-    if (index !== -1) {
-        const student = pendingStudents.splice(index, 1)[0];
-        pendingStudents.pop(index)
-        students.push(student);
-    }
-
+  if (index !== -1) {
+    const student = pendingStudents.splice(index, 1)[0];
+    pendingStudents.pop(index);
+    students.push(student);
+  }
 };
 
 module.exports = {
@@ -117,5 +117,5 @@ module.exports = {
   addStudent,
   removeStudent,
   pendingStudents,
-  moveStudentToStudents
+  moveStudentToStudents,
 };

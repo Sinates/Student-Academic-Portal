@@ -6,8 +6,9 @@ import Overview from "@/components/dashboard/TotalCountOverview";
 //import{ useState} from 'react';
 import axios from "axios";
 import { Container, Typography, Box, IconButton } from "@mui/material";
+import { useGetCoursesQuery } from "@/api/api-slice";
 import { FileDownload } from "@mui/icons-material";
-import  Link  from "next/link";
+import Link from "next/link";
 
 function Dashboard() {
   const user = {
@@ -19,41 +20,10 @@ function Dashboard() {
     profileImage: "",
   };
 
-  const downloadStudentsList = async (courseId) => {
-    const response = await axios.get(
-      `http://localhost:8000/teacher/students/${courseId}`
-    );
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "students.xlsx");
-    document.body.appendChild(link);
-    link.click();
-  };
+  const { data, isLoading, isError, isSuccess } = useGetCoursesQuery();
+  console.log(data);
 
-  const courses = [
-    {
-      id: "English",
-      courseid: "E12W6",
-      courseName: "Communications English",
-      year: "2023",
-      credithour: "2",
-    },
-    {
-      id: "English1",
-      courseid: "N34W1",
-      courseName: "Fundamentals of Networking",
-      year: "2023",
-      credithour: "3",
-    },
-    {
-      id: "English2",
-      courseid: "P1236",
-      courseName: "Data Structures and Algorithm",
-      year: "2023",
-      credithour: "4",
-    },
-  ];
+  const courses = data?.slice(0, 4);
 
   const batches = [
     {
@@ -84,7 +54,6 @@ function Dashboard() {
       credithour: "3",
     },
   ];
-
 
   return (
     <RootLayout>
@@ -137,47 +106,39 @@ function Dashboard() {
                 View All
               </Link>
             </div>
-            <Box sx={{ marginTop: 2 }}>
-              <Box className="flex justify-between mb-1 mx-4">
-                {courses.map((course) => (
-                  <Box
-                    bgcolor={"#DFE9F7"}
-                    paddingY={"10px"}
-                    paddingX={"35px"}
-                    borderRadius={"16px"}
-                  >
-                    <div>
-                      <Typography
-                        color={"#334155"}
-                        variant="h6"
-                        marginY={"15px"}
-                      >
-                        {course.courseName}
-                      </Typography>
-                      <Typography variant="body2" color={"#334155"}>
-                        Course Id: {course.courseid}
-                      </Typography>
-                      <IconButton
-                        color={"#334155"}
-                        sx={{ marginLeft: -5 }}
-                        onClick={() => downloadStudentsList(course.id)}
-                      >
+            {isLoading && (
+              <div className="flex items-center justify-center h-40 my-8 mx-auto">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-gray-900"></div>
+              </div>
+            )}
+            {isSuccess && (
+              <Box sx={{ marginTop: 2}}>
+                <Box className="flex justify-between mb-1 mx-4">
+                  {courses.map((course) => (
+                    <Box
+                      bgcolor={"#DFE9F7"}
+                      paddingY={"10px"}
+                      paddingX={"35px"}
+                      className="h-40"
+                      borderRadius={"16px"}
+                    >
+                      <div>
                         <Typography
-                          variant="body2"
-                          fontSize={10}
                           color={"#334155"}
-                          marginLeft={"40px"}
+                          variant="h6"
+                          marginY={"15px"}
                         >
-                          {course.credithour}
-                        </Typography>{" "}
-                        <FileDownload sx={{ color: "#334155" }} />
-                      </IconButton>
-                    </div>
-                  </Box>
-                ))}
+                          {course.courseName}
+                        </Typography>
+                        <Typography variant="body2" color={"#334155"}>
+                          Course Id: {course.courseid}
+                        </Typography>
+                      </div>
+                    </Box>
+                  ))}
+                </Box>
               </Box>
-              {/* ))} */}
-            </Box>
+            )}
             <span className="w-full mt-9 ml-4 text-[#334155] font-medium text-lg block">
               Current Batches
             </span>

@@ -5,6 +5,7 @@ import { FaTrash } from "react-icons/fa";
 import { useGetStudentsQuery } from "@/api/api-slice";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useDeleteStudentMutation } from "@/api/api-slice";
 
 const TABLE_HEAD = ["ID", "Full Name", "Gender", "Email", "Phone Number", "Department", "Actions"];
 
@@ -12,6 +13,12 @@ export default function StudentList() {
   const { data, isLoading, isError, isSuccess } = useGetStudentsQuery();
   const [students, setStudents] = useState([]);
   const router = useRouter();
+  const [deleteStudent] = useDeleteStudentMutation();
+
+  const handleDelete = (event, studentId) => {
+    event.stopPropagation();
+    deleteStudent(studentId)
+  };
 
   useEffect(() => {
     if (isSuccess)
@@ -47,8 +54,8 @@ export default function StudentList() {
             </tr>
           </thead>
           <tbody>
-            {students.map(({ id, fullName, gender, email, phoneNumber, department }, index) => (
-              <tr onClick={() => router.push(`/admin/student/${id}`)} key={id} className="even:bg-blue-gray-50/50">
+            {students.map(({_id, id, fullName, gender, email, phoneNumber, department }, index) => (
+              <tr onClick={() => router.push(`/admin/student/${_id}`)} key={id} className="even:bg-blue-gray-50/50">
                 <td className="p-4">
                   <Typography
                     variant="small"
@@ -105,7 +112,7 @@ export default function StudentList() {
                 </td>
                 <td className="flex">
                   <Tooltip content="Delete Student">
-                    <IconButton variant="text">
+                    <IconButton variant="text" onClick={(e)=>handleDelete(e,_id)} >
                       <FaTrash />
                     </IconButton>
                   </Tooltip>
