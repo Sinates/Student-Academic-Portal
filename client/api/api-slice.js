@@ -7,7 +7,8 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000" }),
   tagTypes: [
     'courses',
-    'pendingStudents'
+    'pendingStudents',
+    'pendingTeachers'
   ],
   endpoints: (builder) => ({
     getAllCourses: builder.query({
@@ -74,6 +75,13 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['pendingStudents'],
     }),
+    getPendingTeachers: builder.query({
+      query: () => ({
+        url: `/admin/pendingapprovalTeacher`,
+        method: "GET",
+      }),
+      invalidatesTags: ['pendingTeachers'],
+    }),
     
 
     
@@ -82,4 +90,4 @@ export const apiSlice = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useAddCourseMutation,useGetTeachersQuery,useGetStudentsQuery, useGetCoursesQuery,useGetPendingStudentsQuery,useApprovePendingStudentsMutation,useRejectPendingStudentsMutation } = apiSlice;
+export const { useAddCourseMutation,useGetTeachersQuery,useGetStudentsQuery, useGetCoursesQuery,useGetPendingStudentsQuery,useApprovePendingStudentsMutation,useRejectPendingStudentsMutation ,useGetPendingTeachersQuery} = apiSlice;

@@ -319,8 +319,8 @@ router.post("/verifyteacher", async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.email,
-        pass: process.env.pass,
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
       },
       tls: {
         rejectUnauthorized: false, // Bypass SSL certificate verification

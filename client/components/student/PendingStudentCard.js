@@ -4,10 +4,7 @@ import {
   CardBody,
   Typography,
 } from "@material-tailwind/react";
-import { IoMdClose } from "react-icons/io";
-import { FaCheck } from "react-icons/fa";
-import {moveStudentToStudents} from "../../data/student";
-import { IoMdCheckmark } from "react-icons/io";
+import { IoMdCheckmark ,IoMdClose} from "react-icons/io";
 import { useApprovePendingStudentsMutation, useRejectPendingStudentsMutation} from "@/api/api-slice";
 
 export default function PendingStudentCard({student}) {
@@ -36,10 +33,10 @@ export default function PendingStudentCard({student}) {
           "{student.aboutYou}"
         </Typography>
         <div className="flex my-2 justify-end">
-          <button className="bg-[#58A399] bg-opacity-10 text-[#58A399] text-sm px-4 py-2 rounded-md flex">
+          <button className="bg-[#58A399] bg-opacity-10 text-[#58A399] text-sm px-4 py-2 rounded-md flex" onClick={()=>approveStudent({data:{id:student.id}})}>
             <IoMdCheckmark size={18} /> <span className="ml-2">Accept</span>
           </button>
-          <button className="bg-[#CB373D] bg-opacity-10 text-[#CB373D] text-sm px-2 py-2 rounded-md ml-4 flex"  onClick={()=>removeStudent(student.id)}>
+          <button className="bg-[#CB373D] bg-opacity-10 text-[#CB373D] text-sm px-2 py-2 rounded-md ml-4 flex"  onClick={()=>removeStudent({data:{id:student.id}})}>
             <IoMdClose size={18} /> <span>Decline</span>
           </button>
         </div>

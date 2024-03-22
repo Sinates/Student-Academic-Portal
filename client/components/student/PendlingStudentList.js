@@ -2,17 +2,12 @@ import React, { useState } from "react";
 import PendingStudentCard from "./PendingStudentCard";
 import { pendingStudents } from "../../data/student";
 import { useGetPendingStudentsQuery } from "../../api/api-slice";
+import { Typography } from "@material-tailwind/react";
 
 function PendingStudentList() {
-  const { data, isloading, isError, isSuccess } = useGetPendingStudentsQuery();
-  const [pStudents, setPStudents] = useState(pendingStudents);
+  const { data, isLoading, isError, isSuccess } = useGetPendingStudentsQuery();
 
-  function removeStudent(index) {
-    const updatedStudents = [...pStudents];
-    updatedStudents.splice(index, 1);
-    setPStudents(updatedStudents);
-  }
-  if (isloading)
+  if (isLoading)
     return (
       <div className="flex items-center justify-center h-40">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-gray-900"></div>
@@ -26,10 +21,10 @@ function PendingStudentList() {
     );
   if (isSuccess)
     return (
-      <div className="grid grid-cols-3 gap-4 mx-16 overflow-y-auto h-[600px]" >
-      {data.map((student) => (
-        <PendingStudentCard key={student.id} student={student} />
-      ))}
+      <div className="grid grid-cols-3 gap-4 mx-16 overflow-y-auto h-[600px]">
+        {data.map((student) => (
+          <PendingStudentCard key={student.id} student={student} />
+        ))}
       </div>
     );
 }
