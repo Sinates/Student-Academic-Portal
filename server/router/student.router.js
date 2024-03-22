@@ -295,18 +295,18 @@ router.get("/grades", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
-router.get("/gradesoptional:id", (req, res) => {
-  const id = req.params;
+router.get("/gradesoptional", (req, res) => {
+  const id = req.query.id;
 
   if (!id) {
     return res
       .status(400)
-      .json({ error: "ID is required in the request body" });
+      .json({ error: "ID is required in the query parameters" });
   }
 
   // Search the grade model by ID
   gradeModel
-    .find({ id: id }) // Use find instead of findOne
+    .find({ id: id })
     .then((grades) => {
       if (grades.length === 0) {
         return res.status(404).json({ error: "Grades not found" });
