@@ -761,7 +761,7 @@ router.post("/rejectstudent", async (req, res) => {
     await studentModel.deleteOne({ _id: student._id });
 
     return res.status(200).json({
-      message: "Student rejection email sent successfully and teacher document deleted",
+      message: "Student rejection email sent successfully and student document deleted",
     });
   } catch (error) {
     console.error("Error rejecting teacher:", error);
