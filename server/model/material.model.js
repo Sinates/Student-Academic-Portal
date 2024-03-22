@@ -5,6 +5,7 @@ const newSchema = new mongoose.Schema({
   sender: String,
   message: String,
   file: String,
+  batch: String,
 });
 
 module.exports = mongoose.model("material", newSchema);

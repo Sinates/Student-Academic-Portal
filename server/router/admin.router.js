@@ -676,5 +676,97 @@ router.get("/pendingapprovalTeacher", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+router.post("/rejectteacher", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // Find the teacher by email
+    const teacher = await teacherModel.findOne({ id });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Send rejection email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.pass,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>', // Sender address
+      to: teacher.email, // Teacher's email address
+      subject: "Application Status Update", // Email subject
+      text: `Dear ${teacher.name},\n\nWe regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.\n\nBest regards,\nHilcoe School Admissions Team`, // Plain text body
+      html: `
+        <p><img src="https://hilcoe.net/wp-content/uploads/2022/03/logo-hilcoe.jpg" alt="Sample School Logo" width="100"></p>
+        <h2>Application Status Update</h2>
+        <p>We regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.</p>
+        <p>Best regards,<br>Hilcoe School Admissions Team</p>
+      `, // HTML body
+    };
+
+    // Send rejection email
+    await transporter.sendMail(mailOptions);
+
+    // Delete the teacher document
+    await teacherModel.deleteOne({ _id: teacher._id });
+
+    return res.status(200).json({
+      message: "Teacher rejection email sent successfully and teacher document deleted",
+    });
+  } catch (error) {
+    console.error("Error rejecting teacher:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/rejectstudent", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // Find the teacher by email
+    const student = await studentModel.findOne({ id });
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Send rejection email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.pass,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>', // Sender address
+      to: student.email, // Teacher's email address
+      subject: "Application Status Update", // Email subject
+      text: `Dear ${student.name},\n\nWe regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.\n\nBest regards,\nHilcoe School Admissions Team`, // Plain text body
+      html: `
+        <p><img src="https://hilcoe.net/wp-content/uploads/2022/03/logo-hilcoe.jpg" alt="Sample School Logo" width="100"></p>
+        <h2>Application Status Update</h2>
+        <p>We regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.</p>
+        <p>Best regards,<br>Hilcoe School Admissions Team</p>
+      `, // HTML body
+    };
+
+    // Send rejection email
+    await transporter.sendMail(mailOptions);
+
+    // Delete the teacher document
+    await studentModel.deleteOne({ _id: student._id });
+
+    return res.status(200).json({
+      message: "Student rejection email sent successfully and teacher document deleted",
+    });
+  } catch (error) {
+    console.error("Error rejecting teacher:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 module.exports = router;

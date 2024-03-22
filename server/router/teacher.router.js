@@ -354,6 +354,7 @@ router.post(
       const newMaterial = new materialModel({
         sender: sender, // Assuming admin is sending the notification
         message: message,
+        batch: batch,
         file: req.file.path, // File path returned by Multer
       });
       await newMaterial.save();
