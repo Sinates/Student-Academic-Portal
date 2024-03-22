@@ -7,6 +7,7 @@ const multer = require("multer");
 const crypto = require("crypto");
 const gradeModel = require("../model/grade.model");
 const teacherModel = require("../model/teacher.model");
+const materialModel = require("../model/material.model");
 const getHashedPassword = (password) => {
   const sha256 = crypto.createHash("sha256");
   const hash = sha256.update(password).digest("base64");
@@ -294,6 +295,29 @@ router.get("/grades", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
+router.get("/gradesoptional:id", (req, res) => {
+  const id = req.params;
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({ error: "ID is required in the request body" });
+  }
+
+  // Search the grade model by ID
+  gradeModel
+    .find({ id: id }) // Use find instead of findOne
+    .then((grades) => {
+      if (grades.length === 0) {
+        return res.status(404).json({ error: "Grades not found" });
+      }
+      res.status(200).json(grades);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
 
 router.get("/courses", async (req, res) => {
   try {
@@ -350,4 +374,22 @@ router.post("/gradeChangeRequest", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+router.get("/material", async (req, res) => {
+  try {
+    const { batch } = req.body;
+
+    // Find the material by ID
+    const material = await materialModel.find({ batch });
+    if (!material) {
+      return res.status(404).json({ error: "Material not found" });
+    }
+
+    // Return the material data
+    return res.status(200).json(material);
+  } catch (error) {
+    console.error("Error retrieving material:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;
