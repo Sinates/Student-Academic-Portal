@@ -1,115 +1,105 @@
 import RootLayout from "@/layouts/RootLayout";
-import React, { useState } from 'react';
-import { Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button,ThemeProvider, createTheme } from '@mui/material';
+import React, { useState } from "react";
+import StudentHeader from "@/components/common/StudentHeader";
+import { FaDownload } from "react-icons/fa";
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionBody,
+  IconButton,
+} from "@material-tailwind/react";
 
-const Resource = () => {
-    const [courses] = useState([
-        { id: 1, name: 'data structures and algorithms' },
-        { id: 2, name: 'database' },
-        { id: 3, name: 'Compiler Design' }
-    ]);
-    const [selectedCourse, setSelectedCourse] = useState(null);
-    const [materials, setMaterials] = useState([]);
+function Resource() {
+  const [courses] = useState([
+    {
+      id: 1,
+      name: "Data structures and algorithms",
+      materialsData: [
+        
+        { id: 3, name: "Sorting", type: "PDF" , file:"Chapter 5 Short Note.pdf"},
+        { id: 3, name: "Binary Search", type: "PDF", file:"Chapter 5 Short Note.pdf"},
+        { id: 1, name: "Stack", type: "PDF" ,file:"Chapter 6 Short Note.pdf"},
+        { id: 2, name: "Queue", type: "PDF",file:"Chapter 5 Short Note.pdf" },
+      ],
+    },
+    {
+      id: 2,
+      name: "Database",
+      materialsData: [
+        { id: 4, name: "1st normal form", type: "PPT",file:"Chapter 5 Short Note.pdf" },
+        { id: 5, name: "Second normal form", type: "PPT",file:"Chapter 5 Short Note.pdf" },
+        { id: 6, name: "Third normal form", type: "PPT" ,file:"Chapter 5 Short Note.pdf"},
+        { id: 7, name: "ER digram", type: "PPT" ,file:"Chapter 5 Short Note.pdf"},
+      ],
+    },
+    {
+      id: 3,
+      name: "Compiler Design",
+      materialsData: [
+        { id: 7, name: "Chapter1", type: "PDF",file:"Chapter 5 Short Note.pdf" },
+        { id: 8, name: "Chapter2", type: "PDF",file:"Chapter 5 Short Note.pdf" },
+        { id: 9, name: "Chapter3", type: "PDF" ,file:"Chapter 5 Short Note.pdf"},
+        { id: 10, name: "Chapter4", type: "PDF" ,file:"Chapter 5 Short Note.pdf"},
+      ],
+    },
+  ]);
 
-    const fetchMaterials = (courseId) => {
-        // Simulate fetching materials for the selected course
-        let materialsData = [];
-        if (courseId === 1) {
-            materialsData = [
-                { id: 1, name: 'Stack', type: 'PDF' },
-                { id: 2, name: 'queue', type: 'PDF' },
-                { id: 3, name: 'sort', type: 'PDF' }
-            ];
-        } else if (courseId === 2) {
-            materialsData = [
-                { id: 4, name: '1st normal form', type: 'PPT' },
-                { id: 5, name: 'second normal form', type: 'PPT' },
-                { id: 6, name: 'third normal form', type: 'PPT' }
-            ];
-        } else if (courseId === 3) {
-            materialsData = [
-                { id: 7, name: 'chapter1', type: 'PDF' },
-                { id: 8, name: 'chapter2', type: 'PDF' },
-                { id: 9, name: 'chapter3', type: 'PDF' }
-            ];
-        }
-        setMaterials(materialsData);
-    };
+  const handleDownload = (materialId, fileName) => {
+    const fileUrl = `/resource/${fileName}`; // Assuming the resource folder is in the public directory
+    downloadFile(fileUrl, fileName);
+  };
 
-    const handleCourseClick = (course) => {
-        setSelectedCourse(course);
-        fetchMaterials(course.id);
-    };
-
-    const handleDownload = (materialId, materialName) => {
-        // Simulate file download
-        const fileName = `${materialName}.pdf`; // Change the extension based on the material type
-        const fileContent = 'Dummy PDF content'; // Replace with actual file content or fetch from the server
-        downloadFile(fileContent, fileName);
-    };
-
-    const downloadFile = (content, fileName) => {
-        const blob = new Blob([content], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
+  const downloadFile = (url, fileName) => {
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
         a.download = fileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
+        URL.revokeObjectURL(blobUrl);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+      });
+  };
 
-    const theme = createTheme({
-        palette: {
-            primary: {
-                main: '#2196f3', // Primary button color
-            },
-            secondary: {
-                main: '#f44336', // Secondary button color
-            },
-        },
-    });
-    return (
-        <RootLayout>
-            <div>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: '0 20px' }}>
-                    {courses.map(course => (
-                        <Card key={course.id} onClick={() => handleCourseClick(course)} style={{ margin: '0 5px' }}>
-                            <CardContent>
-                                {course.name}
-                            </CardContent>
-                        </Card>
-                    ))}
+  const [alwaysOpen, setAlwaysOpen] = React.useState(true);
+
+  return (
+    <RootLayout>
+      <StudentHeader />
+      <Accordion open={alwaysOpen} className="mx-16">
+        {courses.map((course) => (
+          <AccordionBody key={course.id}>
+            <AccordionHeader>{course.name}</AccordionHeader>
+            <div className="px-4 py-2 grid grid-cols-2 gap-4 w-[90%]">
+              {course.materialsData.map((material) => (
+                <div
+                  key={material.id}
+                  className="border rounded p-2 flex items-center justify-between"
+                >
+                  <div>
+                    <p className="font-semibold">{material.name}</p>
+                    <p>{material.type}</p>
+                  </div>
+                  <IconButton
+                    className="bg-primary text-white rounded"
+                    onClick={() => handleDownload(material.id, material.file)}
+                  >
+                    <FaDownload />
+                  </IconButton>
                 </div>
-
-                {selectedCourse && (
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Resource</TableCell>
-                                    <TableCell>Type</TableCell>
-                                    <TableCell>Download</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {materials.map(material => (
-                                    <TableRow key={material.id}>
-                                        <TableCell>{material.name}</TableCell>
-                                        <TableCell>{material.type}</TableCell>
-                                        <TableCell>
-                                            <Button onClick={() => handleDownload(material.id, material.name)} variant="contained" color="primary">Download</Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
+              ))}
             </div>
-        </RootLayout>
-    );
-};
+          </AccordionBody>
+        ))}
+      </Accordion>
+    </RootLayout>
+  );
+}
 
 export default Resource;

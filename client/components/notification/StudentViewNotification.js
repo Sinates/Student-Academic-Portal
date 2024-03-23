@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
-  Tabs,
-  TabsHeader,
-  TabsBody,
-  Tab,
-  TabPanel,
+
+  Typography,
 } from "@material-tailwind/react";
 import { FaTrash } from "react-icons/fa";
 import { useGetNotificationQuery } from "@/api/api-slice";
 import { InsertEmoticon } from "@mui/icons-material";
 
 function Notification({ open, handler }) {
-  const { data, isLoading, isSuccess } = useGetNotificationQuery("65f18f340f14be25afd0b82e");
+  const { data, isLoading, isSuccess ,isError} = useGetNotificationQuery("65f18f340f14be25afd0b82e");
 
   if (isLoading)
     return (
@@ -19,7 +16,19 @@ function Notification({ open, handler }) {
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-gray-900"></div>
       </div>
     );
+    if (isError)
+    return (
+      <Typography variant="body" color="red" className="text-center mt-4 mx-16">
+        Error loading notifications. Please try again later. 
+      </Typography>
+    );
   if (isSuccess)
+    if (isLoading)
+      return (
+        <div className="flex items-center justify-center h-40">
+          <div className="">No New Notifications</div>
+        </div>
+      );
     return (
       <div className="p-8">
       {data?.notifications.map((item) => (

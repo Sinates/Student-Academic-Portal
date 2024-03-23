@@ -61,7 +61,7 @@ export default function TeacherList() {
             </tr>
           </thead>
           <tbody>
-            {data.map(
+            {data?.map(
               (
                 { _id,id, name, gender, email, phone },
                 index

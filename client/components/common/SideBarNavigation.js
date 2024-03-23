@@ -29,7 +29,7 @@ function classNames(...classes) {
 }
 
 export default function SideBarNav() {
-  let role = "Teacher";
+  let role = "Admin";
 
   const router = useRouter();
   const paths = router.pathname.split("/");
@@ -160,7 +160,7 @@ export default function SideBarNav() {
       {
         name: "Teachers",
         i: 4,
-        icon: IoFolderOpenOutline,
+        icon: MdOutlineTopic,
         link: "/admin/teacher",
       },
       { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/admin/payment" },
