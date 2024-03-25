@@ -16,6 +16,7 @@ const newSchema = new mongoose.Schema({
   department: String,
   aboutYou: String,
   academicRecord: String,
+  role: String,
   restricted: {
     default: true,
     type: Boolean,

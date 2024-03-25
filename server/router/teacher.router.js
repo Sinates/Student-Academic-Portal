@@ -4,11 +4,12 @@ const studentModel = require("../model/student.model");
 const materialModel = require("../model/material.model");
 const router = express.Router();
 const gradeModel = require("../model/grade.model");
-const fs = require("fs");
 const path = require("path");
 const xlsx = require("xlsx");
 const multer = require("multer");
 const crypto = require("crypto");
+const fs = require("fs");
+
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let id = "TR" + "";
@@ -49,8 +50,10 @@ router.post(
     { name: "qualifications", maxCount: 1 },
     { name: "certifications", maxCount: 1 },
   ]),
+
   (req, res) => {
     // Check if the provided email already exists
+    console.log(req.body)
     teacherModel
       .findOne({ email: req.body.email })
       .then((existingEmail) => {
@@ -69,9 +72,9 @@ router.post(
                 // Both email and ID are unique, perform file upload
                 // Retrieve uploaded files
                 const files = req.files;
-                const uploadedCV = files["curriculumVitae"][0];
-                const uploadedQualifications = files["qualifications"][0];
-                const uploadedCertifications = files["certifications"][0];
+                const uploadedCV = req.body.curriculumVitae;
+                const uploadedQualifications = req.body.qualifications;
+                const uploadedCertifications = req.body.certification
 
                 // Create and save the new teacher
                 const newTeacher = new teacherModel({
@@ -79,6 +82,7 @@ router.post(
                   name: req.body.name,
                   gender: req.body.gender,
                   email: req.body.email,
+                  role: "Teacher",
                   phone: req.body.phone,
                   curriculumVitae: uploadedCV ? uploadedCV.filename : null,
                   qualifications: uploadedQualifications
@@ -289,6 +293,7 @@ router.post("/signup", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+const courseModel = require("../model/course.model");
 router.get("/allocatedCourses", async (req, res) => {
   try {
     const { email } = req.body;
@@ -301,14 +306,30 @@ router.get("/allocatedCourses", async (req, res) => {
 
     // Retrieve assigned courses for the teacher
     const allocatedCourses = existingTeacher.assignedCourses;
+    const batch = existingTeacher.assignedCourses;
 
-    return res.status(200).json({ allocatedCourses });
+    // Fetch course details for each allocated course ID
+    const allocatedCourseNames = [];
+    for (const courseid of allocatedCourses) {
+      const course = await courseModel.findOne({ courseid });
+      if (course) {
+        allocatedCourseNames.push(course.courseName);
+      } else {
+        allocatedCourseNames.push(null);
+      }
+    }
+
+    // Return allocated courses with their names
+    return res.status(200).json({
+      allocatedCourses: allocatedCourses,
+      courseNames: allocatedCourseNames,
+      batch: batch,
+    });
   } catch (error) {
     console.error("Error retrieving allocated courses:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 // Route to upload file and send notifications to all students
 const materialStorage = multer.diskStorage({
@@ -322,36 +343,48 @@ const materialStorage = multer.diskStorage({
 
 const uploadMaterial = multer({ storage: materialStorage });
 
-router.post("/uploadmaterial", uploadMaterial.single("file"), async (req, res) => {
-  try {
-    // Extract notification message, sender, and batch from request body
-    const { message, sender, batch } = req.body;
+router.post(
+  "/uploadmaterial",
+  uploadMaterial.single("file"),
+  async (req, res) => {
+    try {
+      // Extract notification message, sender, and batch from request body
+      const { message, sender, batch } = req.body;
 
-    // Save the uploaded file path in the database
-    const newMaterial = new materialModel({
-      sender: sender, // Assuming admin is sending the notification
-      message: message,
-      file: req.file.path, // File path returned by Multer
-    });
-    await newMaterial.save();
+      // Save the uploaded file path in the database
+      const newMaterial = new materialModel({
+        sender: sender, // Assuming admin is sending the notification
+        message: message,
+        batch: batch,
+        file: req.file.path, // File path returned by Multer
+      });
+      await newMaterial.save();
 
-    // Fetch students belonging to the specified batch from the database
-    const students = await studentModel.find({ batch: batch });
+      // Fetch students belonging to the specified batch from the database
+      const students = await studentModel.find({ batch: batch });
 
-    // Iterate over each student and send notification
-    students.forEach(async (student) => {
-      // Update student's notifications array with the new message
-      student.notifications.push({ message: message,sender: sender , file:req.file.path });
-      await student.save();
-    });
+      // Iterate over each student and send notification
+      students.forEach(async (student) => {
+        // Update student's notifications array with the new message
+        student.notifications.push({
+          message: message,
+          sender: sender,
+          file: req.file.path,
+        });
+        await student.save();
+      });
 
-    // Return success response
-    res.status(200).json({ message: "File uploaded and notifications sent to students in the specified batch." });
-  } catch (error) {
-    console.error("Error uploading file and sending notifications:", error);
-    res.status(500).json({ error: "Internal server error." });
+      // Return success response
+      res.status(200).json({
+        message:
+          "File uploaded and notifications sent to students in the specified batch.",
+      });
+    } catch (error) {
+      console.error("Error uploading file and sending notifications:", error);
+      res.status(500).json({ error: "Internal server error." });
+    }
   }
-});
+);
 router.post("/uploadattendance", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
@@ -396,10 +429,109 @@ router.post("/uploadattendance", upload.single("file"), async (req, res) => {
     // Delete the uploaded file after processing
     fs.unlinkSync(req.file.path);
 
-    return res.status(200).json({ message: "Attendance updated successfully." });
+    return res
+      .status(200)
+      .json({ message: "Attendance updated successfully." });
   } catch (error) {
     console.error("Error updating attendance:", error);
     return res.status(500).json({ error: "Internal server error." });
+  }
+});
+router.post("/approveGradeChangeRequest", async (req, res) => {
+  try {
+    const { requestId, instructorName } = req.body;
+
+    // Find the teacher by ID
+    const teacher = await teacherModel.findOne({ id: req.body.teacherId });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Find the index of the grade change request by requestId
+    const index = teacher.changeRequests.findIndex(
+      (req) => req.requestId === requestId
+    );
+    if (index === -1) {
+      return res.status(404).json({ error: "Grade change request not found" });
+    }
+
+    // Update the grade change request's approval status
+    teacher.changeRequests[index].approved = true;
+
+    // Update non-empty data (mid, final, assessment) in the grade model
+    if (req.body.mid !== "") {
+      // Update mid value in the grade model
+      await gradeModel.findOneAndUpdate(
+        {
+          studentId: teacher.changeRequests[index].sender,
+          course: teacher.changeRequests[index].course,
+          instructor: instructorName,
+        },
+        { mid: req.body.mid }
+      );
+    }
+    if (req.body.final !== "") {
+      // Update final value in the grade model
+      await gradeModel.findOneAndUpdate(
+        {
+          studentId: teacher.changeRequests[index].sender,
+          course: teacher.changeRequests[index].course,
+          instructor: instructorName,
+        },
+        { final: req.body.final }
+      );
+    }
+    if (req.body.assessment !== "") {
+      // Update assessment value in the grade model
+      await gradeModel.findOneAndUpdate(
+        {
+          studentId: teacher.changeRequests[index].sender,
+          course: teacher.changeRequests[index].course,
+          instructor: instructorName,
+        },
+        { assessment: req.body.assessment }
+      );
+    }
+
+    // Remove the approved request from the changeRequests array
+    teacher.changeRequests = teacher.changeRequests.filter(
+      (req, idx) => idx !== index
+    );
+
+    // Save the updated teacher document
+    await teacher.save();
+
+    return res
+      .status(200)
+      .json({ message: "Grade change request approved and removed successfully" });
+  } catch (error) {
+    console.error("Error approving grade change request:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/gradeChangeRequests", async (req, res) => {
+  try {
+    const id = req.body.id;
+
+    // Find the teacher by ID
+    const teacher = await teacherModel.findOne({ id: id });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Check if there are any change requests for the teacher
+    if (!teacher.changeRequests || teacher.changeRequests.length === 0) {
+      return res.status(404).json({ message: "No change requests found for this teacher" });
+    }
+
+    // Retrieve the change requests for the teacher
+    const changeRequests = teacher.changeRequests;
+
+    res.status(200).json(changeRequests);
+  } catch (error) {
+    console.error("Error retrieving change requests:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

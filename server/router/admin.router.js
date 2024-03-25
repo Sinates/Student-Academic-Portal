@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
+
 const Admin = require("../model/admin.model");
 const studentModel = require("../model/student.model");
 const payment = require("../model/payment.model");
@@ -38,36 +40,93 @@ router.post("/verifypayment", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
-router.post("/verifystudent", (req, res) => {
-  const studentId = req.body.id;
+const nodemailer = require("nodemailer");
+const paymentModel = require("../model/payment.model");
 
-  // Check if the student exists
-  studentModel
-    .findOne({ id: studentId })
-    .then((student) => {
-      if (!student) {
-        // Student not found
-        return res.status(404).json({ error: "Student not found" });
-      }
+router.post("/verifystudent", async (req, res) => {
+  try {
+    const studentId = req.body.id;
 
-      // Update the student's verification status
-      student.restricted = false;
-      student
-        .save()
-        .then(() => {
-          res
-            .status(200)
-            .json({ message: "Student sign-up verified successfully" });
-        })
-        .catch((err) => {
-          console.error(err);
-          res.status(500).json({ error: "Internal server error" });
-        });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+    // Find the student by ID
+    const student = await studentModel.findOne({ id: studentId });
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Check if the student is already verified
+    if (!student.restricted) {
+      return res.status(200).json({ message: "Student is already verified" });
+    }
+
+    // Update the student's verification status
+    student.restricted = false;
+    await student.save();
+
+    // Send congratulatory email with student's ID
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.pass,
+      },
     });
+
+    const mailOptions = {
+      from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>', // Sender address
+      to: student.email, // Student's email address
+      subject: "Congratulations on Your Acceptance to Hilcoe School!", // Email subject
+      text: `Dear ${student.name},\n\nCongratulations! We are pleased to inform you that you have been accepted to Hilcoe School of Computer Science & Technology. Your student ID is ${student.id}. To complete your registration, please proceed to the signup page using the following link:\n\nhttps://hilcoe-school.com/signup?id=${student.id}\n\nOnce signed up, you will be able to assign a password and access your dashboard.\n\nBest regards,\nHilcoe School Admissions Team`, // Plain text body
+      html: `
+        <p><img src="https://hilcoe.net/wp-content/uploads/2022/03/logo-hilcoe.jpg" alt="Sample School Logo" width="100"></p>
+        <h2>Congratulations ${student.name}!</h2>
+        <p>We are pleased to inform you that you have been accepted to Hilcoe School of Computer Science & Technology. Your student ID is <strong>${student.id}</strong>. Now got to the Signup page and set your password and access your dashboard. Welcome aboard!</p>
+        <p>Best regards,<br>Hilcoe School Admissions Team</p>
+      `, // HTML body
+    };
+
+    // Send email and schedule rejection email after 10 days
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ error: "Internal server error" });
+      } else {
+        console.log("Email sent:", info.response);
+
+        // Schedule rejection email after 10 days
+        setTimeout(
+          () => {
+            const rejectionMailOptions = {
+              from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>', // Sender address
+              to: student.email, // Student's email address
+              subject: "Application Status Update", // Email subject
+              text: `Dear ${student.name},\n\nWe regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.\n\nBest regards,\nHilcoe School Admissions Team`, // Plain text body
+              html: `
+              <p><img src="https://hilcoe.net/wp-content/uploads/2022/03/logo-hilcoe.jpg" alt="Sample School Logo" width="100"></p>
+              <h2>Application Status Update</h2>
+              <p>We regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.</p>
+              <p>Best regards,<br>Hilcoe School Admissions Team</p>
+            `, // HTML body
+            };
+            transporter.sendMail(rejectionMailOptions, (error, info) => {
+              if (error) {
+                console.error("Error sending rejection email:", error);
+              } else {
+                console.log("Rejection email sent:", info.response);
+              }
+            });
+          },
+          10 * 24 * 60 * 60 * 1000
+        ); // 10 days in milliseconds
+
+        return res.status(200).json({
+          message: "Student sign-up verified successfully and email sent",
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Error verifying student:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Endpoint to retrieve all students with restricted value as true
@@ -87,7 +146,7 @@ router.get("/restricted", (req, res) => {
 router.post("/courses", async (req, res) => {
   try {
     // Extract course name and courseId from request body
-    const { name, courseId, year } = req.body;
+    const { name, courseId, year, creditHour } = req.body;
 
     // Check if the courseId already exists
     const existingCourse = await courseModel.findOne({ courseId });
@@ -99,9 +158,10 @@ router.post("/courses", async (req, res) => {
 
     // Create a new course instance
     const newCourse = new courseModel({
-      courseName: req.body.name,
+      courseName: name,
       courseid: req.body.courseId,
-      year: req.body.year,
+      year: year,
+      credithour: creditHour,
     });
 
     // Save the new course to the database
@@ -115,6 +175,65 @@ router.post("/courses", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+// Route to delete a course
+router.delete("/courses/:_id", async (req, res) => {
+  try {
+    const _id = req.params._id;
+
+    // Find the course by courseId
+    const course = await courseModel.findOne({ _id });
+
+    // If the course doesn't exist, return an error
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // Delete the course from the database
+    await courseModel.deleteOne({ _id });
+
+    // Return success message
+    res.status(200).json({ message: "Course deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting course:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+// Endpoint to get a student by ID
+router.get("/students/:id", (req, res) => {
+  const studentId = req.params.id;
+
+  // Find the student by ID
+  studentModel
+    .findOne({ _id: studentId })
+    .then((student) => {
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      res.status(200).json(student);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+// Endpoint to fetch a teacher by ID
+router.get("/teachers/:id", (req, res) => {
+  const teacherId = req.params.id;
+  // Find the teacher by ID
+  teacherModel
+    .findOne({ _id: teacherId })
+    .then((teacher) => {
+      if (!teacher) {
+        return res.status(404).json({ error: "Teacher not found" });
+      }
+      res.status(200).json(teacher);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+
 router.post("/restrictstudent", (req, res) => {
   const studentId = req.body.id;
 
@@ -157,20 +276,14 @@ router.get("/getstudents", async (req, res) => {
   const { batch } = req.body;
 
   try {
-    const studentsInBatch = await studentModel.find(
-      { batch: batch },
-      { name: 1, _id: 0 }
-    );
-    if (studentsInBatch.length === 0) {
-      return res.status(404).json({ error: "No students found in the batch" });
-    }
-    const studentNames = studentsInBatch.map((student) => student.name);
-    res.status(200).json({ students: studentNames });
+    const studentsInBatch = await studentModel.find({ batch: batch });
+    res.status(200).json({ students: studentsInBatch });
   } catch (error) {
     console.error(`Error retrieving students in batch ${batch}:`, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 router.post("/signin", (req, res) => {
   adminModel
     .findOne({
@@ -224,6 +337,7 @@ router.post("/signup", (req, res) => {
       const newAdmin = new adminModel({
         email,
         password: hashedPassword,
+        role: "Admin",
       });
 
       // Save the new admin to the database
@@ -243,36 +357,70 @@ router.post("/signup", (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     });
 });
-router.post("/verifyteacher", (req, res) => {
-  const teacherEmail = req.body.email;
+router.post("/verifyteacher/:id", async (req, res) => {
+  try {
+    const teacherId = req.params.id;
 
-  // Check if the student exists
-  teacherModel
-    .findOne({ email: teacherEmail })
-    .then((teacher) => {
-      if (!teacher) {
-        // Student not found
-        return res.status(404).json({ error: "Teacher not found" });
-      }
+    // Find the teacher by email
+    const teacher = await teacherModel.findOne({ _id: teacherId });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
 
-      // Update the student's verification status
-      teacher.restricted = false;
-      teacher
-        .save()
-        .then(() => {
-          res
-            .status(200)
-            .json({ message: "Teacher sign-up verified successfully" });
-        })
-        .catch((err) => {
-          console.error(err);
-          res.status(500).json({ error: "Internal server error" });
-        });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
+    // Update the teacher's verification status based on acceptance
+    teacher.restricted = false;
+    await teacher.save();
+
+    // Create transporter for sending emails
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.pass,
+      },
+      tls: {
+        rejectUnauthorized: false, // Bypass SSL certificate verification
+      },
     });
+
+    // Configure email options based on acceptance status
+    const mailOptions = {
+      from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>',
+      to: teacher.email,
+      subject: !teacher.restricted
+        ? "Congratulations! You've been accepted as a teacher"
+        : "Regarding your application as a teacher",
+      text: !teacher.restricted
+        ? `Dear ${teacher.name},\n\nCongratulations! We are pleased to inform you that you have been accepted as a teacher at Hilcoe School of Computer Science & Technology. Welcome to the team!\n\nBest regards,\nHilcoe School Admissions Team`
+        : `Dear ${teacher.name},\n\nWe regret to inform you that your application as a teacher at Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest in our institution.\n\nBest regards,\nHilcoe School Admissions Team`,
+      html: !teacher.restricted
+        ? `
+          <p>Dear ${teacher.name},</p>
+          <p>Congratulations! We are pleased to inform you that you have been accepted as a teacher at Hilcoe School of Computer Science & Technology. Welcome to the team!</p>
+          <p>Best regards,<br>Hilcoe School Admissions Team</p>
+        `
+        : `
+          <p>Dear ${teacher.name},</p>
+          <p>We regret to inform you that your application as a teacher at Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest in our institution.</p>
+          <p>Best regards,<br>Hilcoe School Admissions Team</p>
+        `,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+    console.log(
+      `${!teacher.restricted ? "Acceptance" : "Rejection"} email sent to teacher:`,
+      teacher.email
+    );
+
+    // Send response
+    return res.status(200).json({
+      message: `Teacher ${!teacher.restricted ? "accepted" : "rejected"} successfully`,
+    });
+  } catch (error) {
+    console.error("Error verifying teacher:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
 // Function to fetch student data based on batch
 async function getStudentsByBatch(batch) {
@@ -343,7 +491,7 @@ router.post("/generateExcel", async (req, res) => {
 // Route to assign courses to a teacher
 router.post("/assignCourses", async (req, res) => {
   try {
-    const { email, course } = req.body;
+    const { email, course, batch } = req.body;
 
     // Check if the provided teacher email exists
     const existingTeacher = await teacherModel.findOne({ email });
@@ -352,7 +500,9 @@ router.post("/assignCourses", async (req, res) => {
     }
 
     // Update the assigned courses for the teacher
-    existingTeacher.assignedCourses.push(course); // Push new courses to the existing array
+    existingTeacher.assignedCourses.push(course);
+    existingTeacher.batch.push(batch); // Push new courses to the existing array
+    // Push new courses to the existing array
     await existingTeacher.save();
 
     return res.status(200).json({ message: "Courses assigned successfully" });
@@ -361,15 +511,25 @@ router.post("/assignCourses", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+// router.get("/getteachers", async (req, res) => {
+//   try {
+//     const teachers = await teacherModel.find({}, { _id: 0, name: 1 });
+//     return res.status(200).json(teachers.map(teacher => teacher.name));
+//   } catch (error) {
+//     console.error("Error fetching teachers:", error);
+//     return res.status(500).json({ error: "Internal server error." });
+//   }
+// });
 router.get("/getteachers", async (req, res) => {
   try {
-    const teachers = await teacherModel.find({}, { _id: 0, name: 1 });
-    return res.status(200).json(teachers.map(teacher => teacher.name));
+    const teachers = await teacherModel.find({});
+    return res.status(200).json(teachers);
   } catch (error) {
     console.error("Error fetching teachers:", error);
     return res.status(500).json({ error: "Internal server error." });
   }
 });
+
 router.post("/sendnotifications", async (req, res) => {
   try {
     const { sender, message } = req.body;
@@ -378,9 +538,7 @@ router.post("/sendnotifications", async (req, res) => {
     const students = await studentModel.find({});
 
     if (!students || students.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No students found." });
+      return res.status(404).json({ error: "No students found." });
     }
 
     // Add the notification to each student's notifications array
@@ -395,6 +553,335 @@ router.post("/sendnotifications", async (req, res) => {
   } catch (error) {
     console.error("Error sending notifications:", error);
     return res.status(500).json({ error: "Internal server error." });
+  }
+});
+router.get("/courselist", async (req, res) => {
+  try {
+    // Query the database to find all courses
+    const courses = await courseModel.find({}, {});
+
+    // Return the retrieved courses as the response
+    res.status(200).json(courses);
+  } catch (error) {
+    // If an error occurs, return an error response
+    console.error("Error retrieving courses:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/getpayments", async (req, res) => {
+  try {
+    // Fetch all payments from the PaymentModel
+    const payments = await paymentModel.find(
+      {},
+      { id: 1, paymentReceipt: 1, verified: 1, _id: 0 }
+    );
+
+    // Map over the payments to retrieve student names
+    const paymentsWithNames = await Promise.all(
+      payments.map(async (payment) => {
+        // Fetch student details using the student ID from the payment
+        const student = await studentModel.findOne({ id: payment.id });
+        if (student) {
+          // If student found, add their name to the payment object
+          return { ...payment.toObject(), studentName: student.name };
+        } else {
+          // If student not found, add a placeholder name
+          return { ...payment.toObject(), studentName: "Unknown" };
+        }
+      })
+    );
+
+    // Return the payments with student names
+    res.status(200).json(paymentsWithNames);
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+async function generateAttendanceExcel(batch) {
+  // Fetch students in the specified batch
+  const students = await studentModel.find({ batch });
+
+  // Fetch attendance records for the specified batch
+  const attendanceRecords = await attendanceModel.find({ batch });
+
+  // Create a new workbook and worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Attendance");
+
+  // Add headers to the worksheet
+  worksheet.columns = [
+    { header: "Student Name", key: "name", width: 20 },
+    { header: "Student ID", key: "id", width: 15 },
+    { header: "Attendance", key: "attendance", width: 15 },
+  ];
+
+  // Add data rows for each student
+  students.forEach((student) => {
+    const attendanceRecord = attendanceRecords.find(
+      (record) => record.studentId === student.id
+    );
+    const attendanceStatus = attendanceRecord
+      ? attendanceRecord.attendance
+      : "Absent";
+    worksheet.addRow({
+      name: student.name,
+      id: student.id,
+      attendance: attendanceStatus,
+    });
+  });
+
+  // Generate a unique filename for the Excel file
+  const fileName = `attendance_${batch}_${Date.now()}.xlsx`;
+
+  // Save the workbook to a file
+  await workbook.xlsx.writeFile(fileName);
+
+  return fileName;
+}
+router.post("/generateAttendanceExcel", async (req, res) => {
+  const { batch } = req.body;
+  if (!batch) {
+    return res.status(400).json({ error: "Batch parameter is required" });
+  }
+
+  try {
+    // Fetch students in the specified batch
+    const students = await studentModel.find({ batch });
+
+    // Fetch attendance records for the specified batch
+    const attendanceRecords = await studentModel.find({ batch });
+
+    // Create a new workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Attendance");
+
+    // Add headers to the worksheet
+    worksheet.columns = [
+      { header: "Student Name", key: "name", width: 20 },
+      { header: "Student ID", key: "id", width: 15 },
+      { header: "Attendance", key: "attendance", width: 15 },
+    ];
+
+    // Add data rows for each student
+    students.forEach((student) => {
+      const attendanceRecord = attendanceRecords.find(
+        (record) => record.studentId === student.id
+      );
+      const attendanceStatus = attendanceRecord
+        ? attendanceRecord.attendance
+        : "";
+      worksheet.addRow({
+        name: student.name,
+        id: student.id,
+        attendance: attendanceStatus,
+      });
+    });
+
+    // Generate a unique filename for the Excel file
+    const fileName = `attendance_${batch}_${Date.now()}.xlsx`;
+
+    // Save the workbook to a file
+    const filePath = path.join(
+      __dirname,
+      "..",
+      "uploads",
+      "attendance",
+      fileName
+    );
+    await workbook.xlsx.writeFile(filePath);
+
+    // Send the generated Excel file as a download
+    res.download(filePath);
+  } catch (error) {
+    console.error("Error generating attendance Excel file:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/pendingapproval", async (req, res) => {
+  try {
+    // Find all students where restricted is true
+    const pendingStudents = await studentModel.find({ restricted: true });
+
+    // If no students are found with restricted true, return 404 error
+
+    // Return the list of pending students
+    res.status(200).json(pendingStudents);
+  } catch (error) {
+    console.error("Error retrieving pendin  g students:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/pendingapprovalTeacher", async (req, res) => {
+  try {
+    // Find all students where restricted is true
+    const pendingTeacher = await teacherModel.find({ restricted: true });
+
+    // If no students are found with restricted true, return 404 error
+
+    // Return the list of pending students
+    res.status(200).json(pendingTeacher);
+  } catch (error) {
+    console.error("Error retrieving pendin  g students:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/rejectteacher/:id", async (req, res) => {
+  try {
+    const teacherId = req.params.id;
+
+
+    const teacher = await teacherModel.findOne({ _id: teacherId });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Send rejection email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.pass,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>', // Sender address
+      to: teacher.email, // Teacher's email address
+      subject: "Application Status Update", // Email subject
+      text: `Dear ${teacher.name},\n\nWe regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.\n\nBest regards,\nHilcoe School Admissions Team`, // Plain text body
+      html: `
+        <p><img src="https://hilcoe.net/wp-content/uploads/2022/03/logo-hilcoe.jpg" alt="Sample School Logo" width="100"></p>
+        <h2>Application Status Update</h2>
+        <p>We regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.</p>
+        <p>Best regards,<br>Hilcoe School Admissions Team</p>
+      `, // HTML body
+    };
+
+    // Send rejection email
+    await transporter.sendMail(mailOptions);
+
+    // Delete the teacher document
+    await teacherModel.deleteOne({ _id: teacher._id });
+
+    return res.status(200).json({
+      message:
+        "Teacher rejection email sent successfully and teacher document deleted",
+    });
+  } catch (error) {
+    console.error("Error rejecting teacher:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/rejectstudent", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // Find the teacher by email
+    const student = await studentModel.findOne({ id });
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Send rejection email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.email,
+        pass: process.env.pass,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>', // Sender address
+      to: student.email, // Teacher's email address
+      subject: "Application Status Update", // Email subject
+      text: `Dear ${student.name},\n\nWe regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.\n\nBest regards,\nHilcoe School Admissions Team`, // Plain text body
+      html: `
+        <p><img src="https://hilcoe.net/wp-content/uploads/2022/03/logo-hilcoe.jpg" alt="Sample School Logo" width="100"></p>
+        <h2>Application Status Update</h2>
+        <p>We regret to inform you that your application to Hilcoe School of Computer Science & Technology has been rejected. We appreciate your interest and wish you the best in your future endeavors.</p>
+        <p>Best regards,<br>Hilcoe School Admissions Team</p>
+      `, // HTML body
+    };
+
+    // Send rejection email
+    await transporter.sendMail(mailOptions);
+
+    // Delete the teacher document
+    await studentModel.deleteOne({ _id: student._id });
+
+    return res.status(200).json({
+      message:
+        "Student rejection email sent successfully and teacher document deleted",
+    });
+  } catch (error) {
+    console.error("Error rejecting teacher:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.delete("/courses", async (req, res) => {
+  try {
+    const courseId = req.body.courseid;
+
+    // Delete the course from the database
+    const result = await courseModel.deleteOne({ courseid: courseId });
+
+    // Check if the course was deleted
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // Return a success message
+    return res.status(200).json({ message: "Course deleted successfully" });
+  } catch (error) {
+    // If an error occurs, return an error response
+    console.error("Error deleting course:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.delete("/teachers/:_id", async (req, res) => {
+  try {
+    const _id = req.params._id;
+
+    // Find the course by courseId
+    const course = await teacherModel.findOne({ _id });
+
+    // If the course doesn't exist, return an error
+    if (!course) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Delete the course from the database
+    await teacherModel.deleteOne({ _id });
+
+    // Return success message
+    res.status(200).json({ message: "Teacher deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting teacher:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.delete("/students/:_id", async (req, res) => {
+  try {
+    const _id = req.params._id;
+
+    // Find the course by courseId
+    const course = await studentModel.findOne({ _id });
+
+    // If the course doesn't exist, return an error
+    if (!course) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Delete the course from the database
+    await studentModel.deleteOne({ _id });
+
+    // Return success message
+    res.status(200).json({ message: "Student deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

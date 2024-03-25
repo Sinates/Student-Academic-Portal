@@ -1,71 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { Tabs, TabsHeader, TabsBody, TabPanel } from "@material-tailwind/react";
-import { FaTrash } from "react-icons/fa";
-
+import React, { useState, useEffect } from "react";
+import { useGetNotificationQuery } from "@/api/api-slice";
+import {
+  Typography,
+} from "@material-tailwind/react";
 function Notification({ open, handler }) {
-  const [activeTab, setActiveTab] = useState("admin");
-  const [currentTime, setCurrentTime] = useState("");
-
-  useEffect(() => {
-    // Update the current time every second
-    const interval = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString());
-    }, 1000);
-
-    return () => clearInterval(interval); // Clean up interval on unmount
-  }, []);
-
-  const data1 = [
-    {
-      label: "Admin",
-      value: "admin",
-    },
-  ];
-
-  const data2 = [
-    {
-      label: "Admin Messages",
-      value: "adminMessages",
-      notifications: [
-        { id: 1, message: "Notification 1 for Admin", time: "10:00 AM" },
-        { id: 2, message: "Notification 2 for Admin", time: "11:00 AM"  },
-      ],
-    },
-  ];
-
-  const tabChangeHandler = (value) => {
-    setActiveTab(value);
-  };
-
-  return (
-    <div className="p-8">
-      <Tabs value={activeTab} onChange={tabChangeHandler}>
-        <TabsBody>
-          {data2.find(data => data.value === activeTab)?.notifications.map(notification => (
-            <div key={notification.id} className="bg-white p-4 rounded-md shadow-md mb-4 flex items-center">
-              <span className="text-sm">{notification.message}</span>
-              <span className="text-xs text-gray-500 ml-auto">{notification.time}</span>
-            </div>
-          ))}
-          {/* New row for notifications from Admin */}
-          <div>
-            <h1 className="text-lg font-semibold mb-4">Notifications from Admin</h1>
-            {(data2.find(data => data.value === "adminMessages")?.notifications || []).map(notification => (
-              <div key={notification.id} className="bg-white p-4 rounded-md shadow-md mb-4 flex items-center">
-                <span className="text-sm">{notification.message}</span>
-                <span className="text-xs text-gray-500 ml-auto">{notification.time}</span>
-              </div>
-            ))}
-          </div>
-          {/* New row for messages */}
-          <div className="bg-white p-4 rounded-md shadow-md mb-4 flex items-center">
-            <span className="text-sm">New message from Admin</span>
-            <span className="text-xs text-gray-500 ml-auto">{currentTime}</span>
-          </div>
-        </TabsBody>
-      </Tabs>
-    </div>
+  const { data, isLoading, isSuccess, isError } = useGetNotificationQuery(
+    "65f18f340f14be25afd0b82e"
   );
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-40">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-gray-900"></div>
+      </div>
+    );
+  if (isError)
+    return (
+      <Typography variant="body" color="red" className="text-center mt-4 mx-16">
+        Error loading notification. Please try again later.
+      </Typography>
+    );
+  if (isSuccess)
+    return (
+      <div className="p-8">
+        {data?.notifications.map((item) => (
+          <div
+            key={item._id}
+            className="flex justify-between bg-[#DCDCDC]  bg-opacity-20 p-4 rounded-md border my-4 border-gray-300"
+          >
+            <span className="text-sm">{item.sender}</span>
+            <span className="text-sm">{item.message}</span>
+            <span className="text-xs text-gray-500 ">
+              {new Date(item.time).toLocaleString()}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
 }
 
 export default Notification;

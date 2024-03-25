@@ -7,6 +7,7 @@ const multer = require("multer");
 const crypto = require("crypto");
 const gradeModel = require("../model/grade.model");
 const teacherModel = require("../model/teacher.model");
+const materialModel = require("../model/material.model");
 const getHashedPassword = (password) => {
   const sha256 = crypto.createHash("sha256");
   const hash = sha256.update(password).digest("base64");
@@ -112,6 +113,7 @@ router.post("/register", (req, res) => {
                 const newStudent = new studentModel({
                   id: generateID(), // Use provided ID
                   batch: generateBatch(),
+                  role: "Student",
                   name: req.body.name,
                   gender: req.body.gender,
                   email: req.body.email,
@@ -279,27 +281,48 @@ router.get("/grades", (req, res) => {
       .json({ error: "ID is required in the request body" });
   }
 
-  // Search the payment model by ID
+  // Search the grade model by ID
   gradeModel
-    .findOne({ id: id })
-    .then((grade) => {
-      if (!grade) {
-        return res.status(404).json({ error: "Grade not found" });
+    .find({ id: id }) // Use find instead of findOne
+    .then((grades) => {
+      if (grades.length === 0) {
+        return res.status(404).json({ error: "Grades not found" });
       }
-      res.status(200).json(grade);
+      res.status(200).json(grades);
     })
     .catch((err) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     });
 });
+router.get("/gradesoptional", (req, res) => {
+  const id = req.query.id;
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({ error: "ID is required in the query parameters" });
+  }
+
+  // Search the grade model by ID
+  gradeModel
+    .find({ id: id })
+    .then((grades) => {
+      if (grades.length === 0) {
+        return res.status(404).json({ error: "Grades not found" });
+      }
+      res.status(200).json(grades);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+
 router.get("/courses", async (req, res) => {
   try {
     // Query the database to find all courses
-    const courses = await courseModel.find(
-      {},
-      { _id: 0, courseName: 1, courseid: 1 }
-    );
+    const courses = await courseModel.find({}, {});
 
     // Return the retrieved courses as the response
     res.status(200).json(courses);
@@ -311,7 +334,8 @@ router.get("/courses", async (req, res) => {
 });
 router.post("/gradeChangeRequest", async (req, res) => {
   try {
-    const { studentId, teacherId, message } = req.body;
+    const { studentId, teacherId, message, course, mid, final, assessment } =
+      req.body;
 
     // Find the student by ID
     const student = await studentModel.findOne({ id: studentId });
@@ -319,19 +343,24 @@ router.post("/gradeChangeRequest", async (req, res) => {
       return res.status(404).json({ error: "Student not found" });
     }
 
-    // Create the grade change request object
-    const changeRequest = {
-      sender: studentId,
-      message: message,
-      approved: false,
-      time: Date.now(),
-    };
-
     // Find the teacher by ID
     const teacher = await teacherModel.findOne({ id: teacherId });
     if (!teacher) {
       return res.status(404).json({ error: "Teacher not found" });
     }
+
+    // Create the grade change request object
+    const changeRequest = {
+      course: course,
+      requestId: "RQ" + generateID(),
+      sender: studentId,
+      message: message,
+      approved: false,
+      time: Date.now(),
+      mid: mid,
+      final: final,
+      assessment: assessment,
+    };
 
     // Add the grade change request to the teacher's changeRequests array
     teacher.changeRequests.push(changeRequest);
@@ -339,13 +368,50 @@ router.post("/gradeChangeRequest", async (req, res) => {
     // Save the updated teacher document
     await teacher.save();
 
-    return res
-      .status(200)
-      .json({ message: "Grade change request submitted successfully" });
+    return res.status(200).json({ changeRequest });
   } catch (error) {
     console.error("Error submitting grade change request:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
+});
+router.get("/material", async (req, res) => {
+  try {
+    const { batch } = req.body;
+
+    // Find the material by ID
+    const material = await materialModel.find({ batch });
+    if (!material) {
+      return res.status(404).json({ error: "Material not found" });
+    }
+
+    // Return the material data
+    return res.status(200).json(material);
+  } catch (error) {
+    console.error("Error retrieving material:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/getnotification/:id", (req, res) => {
+  const studentId = req.params.id;;
+
+  // Find the student by ID
+  studentModel
+    .findOne({ _id: studentId })
+    .then((student) => {
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+
+      // Get the notifications array from the student object
+      const notifications = student.notifications;
+
+      // Return the notifications array as the response
+      res.status(200).json({ notifications });
+    })
+    .catch((error) => {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ error: "Internal server error" });
+    });
 });
 
 module.exports = router;

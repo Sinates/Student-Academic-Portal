@@ -1,5 +1,7 @@
 import "@/styles/globals.css";
 import { Poppins } from "next/font/google";
+import { store} from '../store'
+import { Provider } from 'react-redux'
 
 // Subsets are really important. CHECK BELOW FOR MORE INFO
 const poppins = Poppins({
@@ -11,8 +13,12 @@ const poppins = Poppins({
 
 export default function App({ Component, pageProps }) {
   return (
+<Provider store={store}>
     <main className={poppins.className}>
-      <Component {...pageProps} />
+      <div className="bg-primary bg-opacity-5">
+        <Component {...pageProps} />
+      </div>
     </main>
+    </Provider>
   );
 }

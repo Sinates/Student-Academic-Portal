@@ -1,10 +1,17 @@
 import RootLayout from '@/layouts/RootLayout'
-const Notification = () => {
-    return ( 
-        <RootLayout>
-            <div> Notification </div>
-        </RootLayout>
-     );
-}
  
-export default Notification;
+import TopHeader from '@/components/common/Header'
+import React from 'react'
+import TeacherViewNotification from '@/components/notification/TeacherViewNotification'
+ 
+function Notification() {
+  return (
+    <RootLayout>
+    <  TopHeader/>
+    <TeacherViewNotification/>
+ 
+    </RootLayout>
+  )
+}
+
+export default Notification

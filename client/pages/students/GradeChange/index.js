@@ -1,19 +1,18 @@
-import RootLayout from "@/layouts/RootLayout";
 import React, { useState } from 'react';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
+import DropdownComponent from "@/components/student/dropDown";
+import CourseDropdown from "@/components/student/dropdownCourse";
+import RootLayout from '@/layouts/RootLayout';
 
 const GradeChange = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
     studentId: '',
-    term: '',
-    courseCode: '',
-    courseTitle: '',
-    gradeChangeFrom: '',
-    gradeChangeTo: '',
-    reasonForChange: '',
+    teacherId: '', // Added teacherId to formData
+    message: '',
+    mid: '',
+    final: '',
+    assessment: '',
+    course: '', // Added course to formData
   });
   const [formErrors, setFormErrors] = useState({});
 
@@ -24,29 +23,50 @@ const GradeChange = () => {
     setFormErrors({ ...formErrors, [name]: '' });
   };
 
+  // Updated handleTeacherChange to set teacherId in formData
+  const handleTeacherChange = (teacherId) => {
+    setFormData({ ...formData, teacherId });
+  };
+
+  // Updated handleCourseChange to set course in formData
+  const handleCourseChange = (course) => {
+    setFormData({ ...formData, course });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log(formData);
     const errors = {};
     // Check if any fields are empty
     for (const key in formData) {
-      if (formData[key].trim() === '') {
+      // Check if the value is a string before calling trim()
+      if (typeof formData[key] === 'string' && formData[key].trim() === '') {
         errors[key] = 'This field is required';
       }
     }
     // Update errors state
     setFormErrors(errors);
-
+  
     if (Object.keys(errors).length === 0) {
+      // Serialize formData, filtering out non-serializable values
+      const serializedFormData = {};
+      for (const key in formData) {
+        if (typeof formData[key] !== 'function' && typeof formData[key] !== 'object') {
+          serializedFormData[key] = formData[key];
+        }
+      }
+  
       // All fields are filled, send data to server
       try {
-        const response = await fetch('YOUR_BACKEND_ENDPOINT', {
+        
+        const response = await fetch('http://localhost:8000/student/gradeChangeRequest', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(serializedFormData),
         });
-
+  
         if (response.ok) {
           const data = await response.json();
           console.log('Data sent successfully:', data);
@@ -59,155 +79,41 @@ const GradeChange = () => {
         console.error('Error sending data:', error.message);
         // Handle error accordingly
       }
+    } else {
+      console.error('Form has errors:', errors);
     }
   };
+  
 
   return (
     <RootLayout>
-      <Container maxWidth="sm" sx={{
-    background: 'rgb(51 65 85 / var(--tw-bg-opacity))', // Set the background color
-    padding: 4, // Add padding around the form
-    borderRadius: 8, // Add border radius for rounded corners
-  }}>
+      <Container maxWidth="sm">
         <Box
           sx={{
+            background: 'rgb(51 65 85 / var(--tw-bg-opacity))',
+            padding: 4,
+            borderRadius: 8,
             border: '1px solid #ccc',
-            borderRadius: '8px',
             boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
             marginTop: 8,
-            padding: '20px',
+            marginBottom: 8,
           }}
         >
           <Typography variant="h6" gutterBottom>
             Student Information
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-            <TextField
-              fullWidth
-              label="First Name"
-              variant="outlined"
-              margin="normal"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              error={!!formErrors.firstName}
-              helperText={formErrors.firstName}
-            />
-            <TextField
-              fullWidth
-              label="Last Name"
-              variant="outlined"
-              margin="normal"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              error={!!formErrors.lastName}
-              helperText={formErrors.lastName}
-            />
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              variant="outlined"
-              margin="normal"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              error={!!formErrors.email}
-              helperText={formErrors.email}
-            />
-            <TextField
-              fullWidth
-              label="Student ID"
-              variant="outlined"
-              margin="normal"
-              name="studentId"
-              value={formData.studentId}
-              onChange={handleChange}
-              error={!!formErrors.studentId}
-              helperText={formErrors.studentId}
-            />
-            <TextField
-              fullWidth
-              label="Term"
-              variant="outlined"
-              margin="normal"
-              name="term"
-              value={formData.term}
-              onChange={handleChange}
-              error={!!formErrors.term}
-              helperText={formErrors.term}
-            />
-            <TextField
-              fullWidth
-              label="Course Code"
-              variant="outlined"
-              margin="normal"
-              name="courseCode"
-              value={formData.courseCode}
-              onChange={handleChange}
-              error={!!formErrors.courseCode}
-              helperText={formErrors.courseCode}
-            />
-            <TextField
-              fullWidth
-              label="Course Title"
-              variant="outlined"
-              margin="normal"
-              name="courseTitle"
-              value={formData.courseTitle}
-              onChange={handleChange}
-              error={!!formErrors.courseTitle}
-              helperText={formErrors.courseTitle}
-            />
-            <TextField
-              fullWidth
-              label="Grade Change from"
-              variant="outlined"
-              margin="normal"
-              name="gradeChangeFrom"
-              value={formData.gradeChangeFrom}
-              onChange={handleChange}
-              error={!!formErrors.gradeChangeFrom}
-              helperText={formErrors.gradeChangeFrom}
-            />
-            <TextField
-              fullWidth
-              label="Grade Change to"
-              variant="outlined"
-              margin="normal"
-              name="gradeChangeTo"
-              value={formData.gradeChangeTo}
-              onChange={handleChange}
-              error={!!formErrors.gradeChangeTo}
-              helperText={formErrors.gradeChangeTo}
-            />
-            <TextField
-              fullWidth
-              label="Reason for Change"
-              variant="outlined"
-              margin="normal"
-              multiline
-              rows={4}
-              name="reasonForChange"
-              value={formData.reasonForChange}
-              onChange={handleChange}
-              error={!!formErrors.reasonForChange}
-              helperText={formErrors.reasonForChange}
-            />
-          <Button
-  type="submit"
-  variant="outlined"
-
->
-  Submit
-</Button>
-
-
-
-
-
-          </Box>
+          <form onSubmit={handleSubmit} autoComplete="off">
+            <TextField fullWidth label="Student ID" name="studentId" value={formData.studentId} onChange={handleChange} error={!!formErrors.studentId} helperText={formErrors.studentId} />
+            <DropdownComponent name="teacherId" label="Teacher ID" onChange={handleTeacherChange} value={formData.teacherId} error={formErrors.teacherId} helperText={formErrors.teacherId} />
+            <TextField fullWidth label="Message" name="message" multiline rows={4} value={formData.message} onChange={handleChange} error={!!formErrors.message} helperText={formErrors.message} />
+            <TextField fullWidth label="Mid" name="mid" value={formData.mid} onChange={handleChange} error={!!formErrors.mid} helperText={formErrors.mid} />
+            <TextField fullWidth label="Final" name="final" value={formData.final} onChange={handleChange} error={!!formErrors.final} helperText={formErrors.final} />
+            <TextField fullWidth label="Assessment" name="assessment" value={formData.assessment} onChange={handleChange} error={!!formErrors.assessment} helperText={formErrors.assessment} />
+            <CourseDropdown onChange={handleCourseChange} value={formData.course} error={formErrors.course} />
+            <Button type="submit" variant="outlined">
+              Submit
+            </Button>
+          </form>
         </Box>
       </Container>
     </RootLayout>
