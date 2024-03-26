@@ -27,13 +27,19 @@ const SignUp = () => {
 
     const response = await signup({ data: { email: email, password: password } });
     console.log(response)
-    if (response.data.status === 201) {
-     
-//router.push('/admin');
-      
+    if (response.data.status === 201) {      
       const {email, role, id} = response.data;
       setUserData(email,role,id);
-      router.push('/admin')
+      if(role === 'Admin'){
+        router.push('/admin')
+      }else if(role === 'Teacher'){
+        router.push('/teachers/dashboard')
+      }
+      else
+      {
+        router.push('/students/Dashboard')
+      }
+     
     }else{
       setErrorMessage('Error signing up. Please try again.');
     }
@@ -92,6 +98,15 @@ const SignUp = () => {
             Sign Up
           </button>
         </div>
+        <p className="mt-4 text-center">
+                    Don't have an account?{' '}
+                    <span
+                        className="text-primary hover:underline cursor-pointer"
+                        onClick={() => router.push('/signin')}
+                    >
+                        Sign In
+                    </span>
+                </p>
       </div>
     </div>
   );
