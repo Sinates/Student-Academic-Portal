@@ -13,6 +13,21 @@ export const apiSlice = createApi({
     "teachers",
   ],
   endpoints: (builder) => ({
+    signin: builder.mutation({
+      query: ({data}) => ({
+        url: `/auth/signin`,
+        method: "POST",
+        body:data
+      }),
+ 
+    }),
+    signup: builder.mutation({
+      query: ({data}) => ({
+        url: `/auth/signup`,
+        method: "POST",
+        body:data
+      }),
+    }),
     getAllCourses: builder.query({
       query: () => ({
         url: "/courses",
@@ -161,6 +176,8 @@ export const apiSlice = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
+  useSigninMutation,
+  useSignupMutation,
   useAddCourseMutation,
   useGetTeachersQuery,
   useGetStudentsQuery,

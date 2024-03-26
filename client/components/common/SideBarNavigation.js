@@ -22,6 +22,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import ChecklistIcon from "@mui/icons-material/Checklist";
+import {getUserData} from "../../utils/sessions";
 
 
 function classNames(...classes) {
@@ -29,7 +30,8 @@ function classNames(...classes) {
 }
 
 export default function SideBarNav() {
-  let role = "Admin";
+  
+  let role = getUserData().role;
 
   const router = useRouter();
   const paths = router.pathname.split("/");
