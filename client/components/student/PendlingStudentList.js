@@ -5,7 +5,12 @@ import { Typography } from "@material-tailwind/react";
 
 function PendingStudentList() {
   const { data, isLoading, isError, isSuccess } = useGetPendingStudentsQuery();
-
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-40">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-gray-900"></div>
+      </div>
+    );
   if (isError)
     return (
       <Typography variant="body" color="red" className="text-center mt-4 mx-16">
