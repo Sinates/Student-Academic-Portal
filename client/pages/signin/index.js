@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import SideBarNav from '@/components/common/SideBarNavigation';
 import RootLayout from '@/layouts/RootLayout';
 import { useSigninMutation } from '@/api/api-slice';
+import {setUserData,getUserData} from '@/utils/sessions';
 
 const SignIn = () => {
     const [emailOrId, setEmailOrId] = useState('');
@@ -18,18 +19,29 @@ const SignIn = () => {
         // Check if user is signed in and teacher profile exists in local storage
         const storedTeacherProfile = localStorage.getItem('teacherProfile');
         const isSignedIn = storedTeacherProfile && JSON.parse(storedTeacherProfile).signedIn;
-
-        // if (isSignedIn) {
-
-        //     setTeacherProfile(JSON.parse(storedTeacherProfile).profile);
-        //      <SideBarNav roleUser={role} />
-        //     router.push('components/common/SideBarNavigation'); // Navigate to /teachers/dashboard if signed in
-        // }
     }, [router]);
 
     const handleSignIn = async () => {
       
-        signIn({data:{email:emailOrId,password:password}});
+     const response = await signIn({data:{email:emailOrId,password:password}});
+     console.log(response.data)
+     if (response.data.status ===201) {      
+
+        const {email, role, id} = response.data.data;
+        setUserData(email,role,id);
+        if(role === 'Admin'){
+          router.push('/admin')
+        }else if(role === 'Teacher'){
+          router.push('/teachers/dashboard')
+        }
+        else
+        {
+          router.push('/students/Dashboard')
+        }
+       
+      }else{
+        setErrorMessage('Error signing up. Please try again.');
+      }
     };
     
     
@@ -67,7 +79,7 @@ const SignIn = () => {
                 <div className="text-center">
                     <button
                         onClick={()=>handleSignIn()}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="bg-primary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     >
                         Sign In
                     </button>
@@ -75,7 +87,7 @@ const SignIn = () => {
                 <p className="mt-4 text-center">
                     Don't have an account?{' '}
                     <span
-                        className="text-blue-500 hover:underline cursor-pointer"
+                        className="text-primary hover:underline cursor-pointer"
                         onClick={() => router.push('/signup')}
                     >
                         Sign up
