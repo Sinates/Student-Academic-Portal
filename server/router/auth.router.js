@@ -26,7 +26,7 @@ router.post("/signin", (req, res) => {
                 // Compare hashed password
                 if (hashedPassword === studentData.password) {
                     console.log(studentData);
-                    return res.status(200).json(studentData);
+                    return res.status(200).json({status:201,data:studentData});
                 } else {
                     // Password incorrect
                     return res.status(401).json({ error: "Password or email is incorrect." });
@@ -52,7 +52,7 @@ router.post("/signin", (req, res) => {
                         // Compare hashed password
                         if (hashedPassword === teacherData.password) {
                             console.log(teacherData);
-                            return res.status(200).json(teacherData);
+                            return res.status(200).json({status:201,data:teacherData});
                         } else {
                             // Password incorrect
                             return res.status(401).json({ error: "Password or email is incorrect." });
@@ -78,7 +78,7 @@ router.post("/signin", (req, res) => {
                                 // Compare hashed password
                                 if (hashedPassword === adminData.password) {
                                     console.log(adminData);
-                                    return res.status(200).json(adminData);
+                                    return res.status(200).json({status:201,data:adminData});
                                 } else {
                                     // Password incorrect
                                     return res.status(401).json({ error: "Password or email is incorrect." });
