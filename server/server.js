@@ -16,6 +16,8 @@ app.use(bodyParses.json());
 app.use("/teacher", require("./router/teacher.router"));
 app.use("/admin", require("./router/admin.router"));
 app.use("/student", require("./router/student.router"));
+app.use("/auth", require("./router/auth.router"));
+
 app.listen(PORT, () => {
   console.log(`Listening to port ${PORT}`);
 });
