@@ -170,6 +170,12 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["pendingTeachers"],
     }),
+    getBatches: builder.query({
+      query: () => ({
+        url: "/admin/getbatches",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -195,5 +201,6 @@ export const {
   useDeleteStudentMutation,
   useDeleteTeacherMutation,
   useApprovePendingTeachersMutation,
-  useRejectPendingTeachersMutation
+  useRejectPendingTeachersMutation,
+  useGetBatchesQuery,
 } = apiSlice;

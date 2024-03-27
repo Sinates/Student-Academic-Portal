@@ -9,6 +9,12 @@ const xlsx = require("xlsx");
 const multer = require("multer");
 const crypto = require("crypto");
 const fs = require("fs");
+const {
+  addGrade,
+  getAllGrades,
+  updateGrade,
+  getGradeByCourse,
+} = require("../controllers/teacher.controller");
 
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -534,5 +540,10 @@ router.get("/gradeChangeRequests", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+router.post("/addGrade", addGrade);
+router.get("/getAllGrades/:studentId", getAllGrades); 
+router.put("/updateGrade/:id", updateGrade);
+router.get("/getGradeByCourse/:courseId/:studentId", getGradeByCourse); 
 
 module.exports = router;
