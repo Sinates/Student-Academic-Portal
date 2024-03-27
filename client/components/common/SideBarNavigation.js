@@ -25,13 +25,26 @@ import ChecklistIcon from "@mui/icons-material/Checklist";
 import {getUserData} from "../../utils/sessions";
 
 
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function SideBarNav() {
   
-  let role = getUserData().role;
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('');
+ 
+
+useEffect(() => {
+  // Perform localStorage action
+  const item = localStorage.getItem('key')
+  setEmail(localStorage.getItem('email'));
+  setName(localStorage.getItem('name'));
+  setRole(localStorage.getItem('role'));
+}, [])
+
 
   const router = useRouter();
   const paths = router.pathname.split("/");
@@ -146,7 +159,7 @@ export default function SideBarNav() {
     ];
   else
     navigation = [
-      { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/admin/dashboard" },
+      { name: "Dashboard", i: 1, icon: MdAutoGraph, link: "/admin" },
       {
         name: "Courses",
         i: 2,

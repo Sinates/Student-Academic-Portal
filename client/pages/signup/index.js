@@ -28,8 +28,8 @@ const SignUp = () => {
     const response = await signup({ data: { email: email, password: password } });
     console.log(response)
     if (response.data.status === 201) {      
-      const {email, role, id} = response.data;
-      setUserData(email,role,id);
+      const {email, role, id,name} = response.data.data;
+      setUserData(email,role,id,name);
       if(role === 'Admin'){
         router.push('/admin')
       }else if(role === 'Teacher'){
