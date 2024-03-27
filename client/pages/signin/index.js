@@ -1,11 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import SideBarNav from '@/components/common/SideBarNavigation';
 import RootLayout from '@/layouts/RootLayout';
 import { useSigninMutation } from '@/api/api-slice';
-import {setUserData,getUserData} from '@/utils/sessions';
+
+import {setUserData,getUserData,setCookies} from '@/utils/sessions';
 
 const SignIn = () => {
     const [emailOrId, setEmailOrId] = useState('');
@@ -24,11 +24,10 @@ const SignIn = () => {
     const handleSignIn = async () => {
       
      const response = await signIn({data:{email:emailOrId,password:password}});
-     console.log(response.data)
      if (response.data.status ===201) {      
 
-        const {email, role, id} = response.data.data;
-        setUserData(email,role,id);
+        const {email, role, id,name} = response.data.data;
+        setUserData(email,role,name);
         if(role === 'Admin'){
           router.push('/admin')
         }else if(role === 'Teacher'){

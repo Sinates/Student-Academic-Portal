@@ -126,9 +126,7 @@ router.post("/signup", async (req, res) => {
                 return res.status(201).json({
                     status:201,
                     message: "User Signup completed",
-                    role: "Student",
-                    documentId: studentData._id,
-                    email: studentData.email
+                    data: studentData
                 });
             }
         }
