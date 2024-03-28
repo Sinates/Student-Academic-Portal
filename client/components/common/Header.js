@@ -40,8 +40,7 @@ useEffect(() => {
           ) : (
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400">
               <span className="font-medium text-xs leading-none text-white">
-                "A"
-                "K"
+              {name[0]?.toUpperCase() &&"S" }
               </span>
             </span>
           )}

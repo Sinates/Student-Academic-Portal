@@ -23,7 +23,8 @@ import { useRouter } from "next/router";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import {getUserData} from "../../utils/sessions";
-
+import {logo} from "@/public/assets/logo.png"
+import { Backup, Grading } from "@mui/icons-material";
 
 
 function classNames(...classes) {
@@ -109,6 +110,18 @@ useEffect(() => {
         i: 7,
         icon: IoFolderOpenOutline,
         link: "/teacher/gradeChangeRequests",
+      },
+      {
+        name: "Grade Management",
+        i: 8,
+        icon: Grading,
+        link: "/teacher/grades",
+      },
+      {
+        name: "Course Resources",
+        i: 8,
+        icon: Backup,
+        link: "/teacher/courseResources",
       },
     ];
   else if (role == "Student")
@@ -219,7 +232,9 @@ useEffect(() => {
           "bg-white flex col-span-11 flex-col gap-y-5 shadow-gray-300 shadow-2xl h-screen rounded-r-2xl"
         )}
       >
-        <div className="flex h-24 min-h-24 items-center bg-primary rounded-bl-xl rounded-tr-xl"></div>
+        <div className="flex h-24 min-h-24 items-center bg-primary flex items-center justify-center rounded-bl-xl rounded-tr-xl">
+          <Image height={60} width={60} src={logo} />
+        </div>
 
         <nav className="flex flex-1 flex-col px-6 bg-white overflow-scroll no-scrollbar rounded-br-xl pt-9">
           <ul role="list" className="flex flex-1 flex-col">
@@ -238,8 +253,8 @@ useEffect(() => {
                     >
                       <item.icon
                         className={classNames(
-                          activeTab == item.i ? "text-white" : "text-primary",
-                          "h-4 w-4 mt-1 ml-2"
+                          activeTab == item.i ? "text-white" : "text-primary ",
+                          "h-4 w-4 mt-1 ml-2 hover:text-white"
                         )}
                         aria-hidden="true"
                       />

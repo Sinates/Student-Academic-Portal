@@ -35,8 +35,7 @@ function StudentHeader({ title }) {
           ) : (
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-400">
               <span className="font-medium text-xs leading-none text-white">
-                {user.firstName[0]}
-                {user.lastName[0]}
+                {user.firstName[0] + user.lastName[0]}
               </span>
             </span>
           )}

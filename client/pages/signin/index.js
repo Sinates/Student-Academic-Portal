@@ -24,7 +24,8 @@ const SignIn = () => {
     const handleSignIn = async () => {
       
      const response = await signIn({data:{email:emailOrId,password:password}});
-     if (response.data.status ===201) {      
+    console.log('res',response)
+     if (response?.data?.status ===201) {      
 
         const {email, role, id,name} = response.data.data;
         setUserData(email,role,name);
