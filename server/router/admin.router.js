@@ -11,6 +11,11 @@ const router = express.Router();
 const ExcelJS = require("exceljs");
 const crypto = require("crypto");
 const teacherModel = require("../model/teacher.model");
+const {getStudentsByCourseAndBatch} = require("../controllers/admin.controller")
+
+router.post("/verifypayment", (req, res) => {
+  const studentId = req.body.id;
+})
 
 router.post("/verifypayment/:id", async (req, res) => {
   const id = req.params.id;
@@ -992,5 +997,7 @@ router.delete("/students/:_id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+router.get("/students/course/:courseId/:batchId",getStudentsByCourseAndBatch)
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const newSchema = new mongoose.Schema({
+const teacherSchema = new mongoose.Schema({
   id: String,
   name: String,
   gender: String,
@@ -38,4 +38,4 @@ const newSchema = new mongoose.Schema({
     },
   ],
 });
-module.exports = mongoose.model("teacher", newSchema);
+module.exports = mongoose.model("teacher", teacherSchema);
