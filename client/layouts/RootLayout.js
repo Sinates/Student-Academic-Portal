@@ -3,7 +3,7 @@ import SideBarNavigation from "../components/common/SideBarNavigation";
 
 const RootLayout = ({ children }) => {
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", backgroundColor:"white" }}>
       <div style={{ position: "fixed", top: 0, left: 0, bottom: 0 }}>
         <SideBarNavigation />
       </div>

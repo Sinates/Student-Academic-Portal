@@ -24,7 +24,7 @@ export default function PendingStudentCard({student}) {
   }
 
   return (
-    <Card color="#FFFFFF" shadow={true} className="w-full max-w-[26rem] mx- my-4" onClick={() => router.push(`/admin/student/${student._id}`)}>
+    <Card color="#FFFFFF" shadow={true} className="w-full max-w-[26rem] mx- my-4 h-[16rem]" onClick={() => router.push(`/admin/student/${student._id}`)}>
       <CardHeader
         color="transparent"
         floated={false}

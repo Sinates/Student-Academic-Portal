@@ -6,6 +6,7 @@ import {
   useGetCoursesQuery,
   useGetTeachersQuery,
   useGetStudentsQuery,
+  useGetBatchesQuery,
 } from "@/api/api-slice";
 import { useEffect,useState } from "react";
 // import { useGetAllTotalCountsQuery } from "@/api/dashboard-api";
@@ -15,9 +16,10 @@ const Stats = () => {
   //console.log(student,isError)
   const { data: teacher } = useGetTeachersQuery();
   const { data: course } = useGetCoursesQuery();
-  const [stat,setStat] = useState({students:0,teachers:0,courses:0});
+  const { data: batch } = useGetBatchesQuery();
+  const [stat,setStat] = useState({students:0,teachers:0,courses:0,batches:0});
   useEffect(() => {
-    setStat({students:student?.students?.length ,teachers:teacher?.length,courses:course?.length});
+    setStat({students:student?.students?.length ,teachers:teacher?.length,courses:course?.length,batches:batch?.batches?.length});
    console.log(student,teacher,course)
   }, [student, teacher, course]);
   // const { data } = useGetAllTotalCountsQuery();
@@ -44,7 +46,7 @@ const Stats = () => {
       icon: <IoFolderOpenOutline className="h-6 w-6 text-primary" />,
       title: "Total Batches",
       // subtitle: data?.data.totalCategoryCount,
-      subtitle: 4,
+      subtitle: stat.batches,
     },
   ];
 

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Card, Input, Button, Typography, Select } from "@material-tailwind/react";
 import { Textarea } from "@material-tailwind/react";
 import { useRegisterTeacherMutation } from '@/api/api-slice';
+import { toast,ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function StudentRegistration() {
   const [inputWidth, setInputWidth] = useState(300); // Initial width value
@@ -116,12 +118,17 @@ export default function StudentRegistration() {
           curriculumVitae: curriculumVitae
         }
       });
-      alert("You have successfully registered")
+      if(response && response.error !==null)
+      toast.error("Error occured while registering!");
+    else{
+      toast.success("You have successfully registered!");
+    }
     }
   };
 
   return (
     <Card color="transparent" shadow={false} className="">
+          <ToastContainer />
       <div className="p-8">
         <Typography variant="h4" color="blue-gray">
           Student Registration

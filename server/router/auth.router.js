@@ -26,7 +26,7 @@ router.post("/signin", (req, res) => {
                 // Compare hashed password
                 if (hashedPassword === studentData.password) {
                     console.log(studentData);
-                    return res.status(200).json({status:201,data:studentData});
+                    return res.status(200).json(studentData);
                 } else {
                     // Password incorrect
                     return res.status(401).json({ error: "Password or email is incorrect." });
@@ -52,7 +52,7 @@ router.post("/signin", (req, res) => {
                         // Compare hashed password
                         if (hashedPassword === teacherData.password) {
                             console.log(teacherData);
-                            return res.status(200).json({status:201,data:teacherData});
+                            return res.status(200).json(teacherData);
                         } else {
                             // Password incorrect
                             return res.status(401).json({ error: "Password or email is incorrect." });
@@ -78,7 +78,7 @@ router.post("/signin", (req, res) => {
                                 // Compare hashed password
                                 if (hashedPassword === adminData.password) {
                                     console.log(adminData);
-                                    return res.status(200).json({status:201,data:adminData});
+                                    return res.status(200).json(adminData);
                                 } else {
                                     // Password incorrect
                                     return res.status(401).json({ error: "Password or email is incorrect." });
@@ -126,7 +126,9 @@ router.post("/signup", async (req, res) => {
                 return res.status(201).json({
                     status:201,
                     message: "User Signup completed",
-                    data: studentData
+                    role: "Student",
+                    documentId: studentData._id,
+                    email: studentData.email
                 });
             }
         }

@@ -24,10 +24,10 @@ const SignIn = () => {
     const handleSignIn = async () => {
       
      const response = await signIn({data:{email:emailOrId,password:password}});
-    console.log('res',response)
-     if (response?.data?.status ===201) {      
 
-        const {email, role, id,name} = response.data.data;
+     if (response && response.data ) {      
+
+        const {email, role, id,name} = response.data;
         setUserData(email,role,name);
         if(role === 'Admin'){
           router.push('/admin')
@@ -40,7 +40,7 @@ const SignIn = () => {
         }
        
       }else{
-        setErrorMessage('Error signing up. Please try again.');
+        setErrorMessage('Error signing in. Please try again.');
       }
     };
     

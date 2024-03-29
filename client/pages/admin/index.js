@@ -24,7 +24,7 @@ function Dashboard() {
   const { data, isLoading, isError, isSuccess } = useGetCoursesQuery();
   console.log(data);
 
-  const courses = data?.slice(0, 4);
+  const courses = data?.slice(0, 3);
 
   const batches = [
     {
@@ -91,6 +91,7 @@ function Dashboard() {
                       paddingX={"35px"}
                       className="h-40"
                       borderRadius={"16px"}
+                      width={"350px"}
                     >
                       <div>
                         <Typography
@@ -101,7 +102,7 @@ function Dashboard() {
                           {course.courseName}
                         </Typography>
                         <Typography variant="body2" color={"#334155"}>
-                          Course Id: {course.courseid}
+                          Course Code: {course.courseid}
                         </Typography>
                       </div>
                     </Box>

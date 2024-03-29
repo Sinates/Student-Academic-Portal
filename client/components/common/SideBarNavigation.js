@@ -32,21 +32,24 @@ function classNames(...classes) {
 }
 
 export default function SideBarNav() {
-  
+
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
- 
-
-useEffect(() => {
-  // Perform localStorage action
-  const item = localStorage.getItem('key')
-  setEmail(localStorage.getItem('email'));
-  setName(localStorage.getItem('name'));
-  setRole(localStorage.getItem('role'));
-}, [])
 
 
+  useEffect(() => {
+    // Perform localStorage action
+    const item = localStorage.getItem('key')
+    setEmail(localStorage.getItem('email'));
+    setName(localStorage.getItem('name'));
+    setRole(localStorage.getItem('role'));
+  }, [])
+
+  const signOut = () => {
+    localStorage.clear();
+    router.push('/signin');
+  }
   const router = useRouter();
   const paths = router.pathname.split("/");
   const map = useMemo(() => new Map(), []);
@@ -126,29 +129,18 @@ useEffect(() => {
     ];
   else if (role == "Student")
     navigation = [
+
       {
-        name: "Dashboard",
-        i: 1,
-        icon: MdAutoGraph,
-        link: "/students/Dashboard",
+        name: "Course List",
+        i: 7,
+        icon: ChecklistIcon,
+        link: "/students/CourseList",
       },
       {
-        name: "Grade Change",
-        i: 2,
-        icon: RiGroupLine,
-        link: "/students/GradeChange",
-      },
-      {
-        name: "Resource", // Add the new item for student navigation
+        name: "Resources", // Add the new item for student navigation
         i: 3,
         icon: IoFolderOpenOutline,
         link: "/students/Resource",
-      },
-      {
-        name: "Grade Report",
-        i: 4,
-        icon: AssignmentIcon,
-        link: "/students/GradeReport",
       },
       {
         name: "Payments",
@@ -157,18 +149,19 @@ useEffect(() => {
         link: "/students/payment",
       },
       {
-        name: "notifications",
+        name: "Grade Change",
+        i: 2,
+        icon: RiGroupLine,
+        link: "/students/GradeChange",
+      },
+      {
+        name: "Notifications",
         i: 6,
         icon: NotificationAddIcon,
         link: "/students/notification",
       },
 
-      {
-        name: "Course List",
-        i: 7,
-        icon: ChecklistIcon,
-        link: "/students/CourseList",
-      },
+
     ];
   else
     navigation = [
@@ -192,13 +185,6 @@ useEffect(() => {
         link: "/admin/teacher",
       },
       { name: "Payments", i: 5, icon: MdOutlineTopic, link: "/admin/payment" },
-
-      {
-        name: "Assign course",
-        i: 6,
-        icon: AssignmentOutlinedIcon,
-        link: "/admin/Assigncourse",
-      },
     ];
 
   const SetActiveMenuTab = (tab, link) => {
