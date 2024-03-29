@@ -1,18 +1,23 @@
 const mongoose = require("mongoose");
 
 const gradeChangeRequestSchema = new mongoose.Schema({
-  teacherId: {
+  teacher: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Course",
+    ref: "teacher",
     required: true
   },
-  studentId: {
+  student: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Student",
+    ref: "student",
+    required: true
+  },
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "course",
     required: true
   },
   optionalNote: {
-    type: Number,
+    type: String,
     required: false
 },
   typeOfAssessment: {
@@ -20,7 +25,12 @@ const gradeChangeRequestSchema = new mongoose.Schema({
     enum: ["Final", "Assessment", "Mid"],
     required: true,
   },
+  isApproved: {
+    type: Boolean,
+    required: true,
+    default:false
+  }
 
 });
 
-module.exports = mongoose.model("CourseStudent", gradeChangeRequestSchema);
+module.exports = mongoose.model("GradeChangeRequest", gradeChangeRequestSchema);

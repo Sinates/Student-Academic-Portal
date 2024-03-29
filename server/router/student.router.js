@@ -13,6 +13,7 @@ const getHashedPassword = (password) => {
   const hash = sha256.update(password).digest("base64");
   return hash;
 };
+const {createGradeChangeRequest} = require('../controllers/student.controller')
 
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -332,48 +333,48 @@ router.get("/courses", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-router.post("/gradeChangeRequest", async (req, res) => {
-  try {
-    const { studentId, teacherId, message, course, mid, final, assessment } =
-      req.body;
+// router.post("/gradeChangeRequest", async (req, res) => {
+//   try {
+//     const { studentId, teacherId, message, course, mid, final, assessment } =
+//       req.body;
 
-    // Find the student by ID
-    const student = await studentModel.findOne({ id: studentId });
-    if (!student) {
-      return res.status(404).json({ error: "Student not found" });
-    }
+//     // Find the student by ID
+//     const student = await studentModel.findOne({ id: studentId });
+//     if (!student) {
+//       return res.status(404).json({ error: "Student not found" });
+//     }
 
-    // Find the teacher by ID
-    const teacher = await teacherModel.findOne({ id: teacherId });
-    if (!teacher) {
-      return res.status(404).json({ error: "Teacher not found" });
-    }
+//     // Find the teacher by ID
+//     const teacher = await teacherModel.findOne({ id: teacherId });
+//     if (!teacher) {
+//       return res.status(404).json({ error: "Teacher not found" });
+//     }
 
-    // Create the grade change request object
-    const changeRequest = {
-      course: course,
-      requestId: "RQ" + generateID(),
-      sender: studentId,
-      message: message,
-      approved: false,
-      time: Date.now(),
-      mid: mid,
-      final: final,
-      assessment: assessment,
-    };
+//     // Create the grade change request object
+//     const changeRequest = {
+//       course: course,
+//       requestId: "RQ" + generateID(),
+//       sender: studentId,
+//       message: message,
+//       approved: false,
+//       time: Date.now(),
+//       mid: mid,
+//       final: final,
+//       assessment: assessment,
+//     };
 
-    // Add the grade change request to the teacher's changeRequests array
-    teacher.changeRequests.push(changeRequest);
+//     // Add the grade change request to the teacher's changeRequests array
+//     teacher.changeRequests.push(changeRequest);
 
-    // Save the updated teacher document
-    await teacher.save();
+//     // Save the updated teacher document
+//     await teacher.save();
 
-    return res.status(200).json({ changeRequest });
-  } catch (error) {
-    console.error("Error submitting grade change request:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
+//     return res.status(200).json({ changeRequest });
+//   } catch (error) {
+//     console.error("Error submitting grade change request:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 router.get("/material", async (req, res) => {
   try {
     const { batch } = req.body;
@@ -413,5 +414,7 @@ router.get("/getnotification/:id", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
+
+router.post("/gradeChangeRequest", createGradeChangeRequest)
 
 module.exports = router;

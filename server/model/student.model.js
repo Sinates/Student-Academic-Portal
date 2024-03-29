@@ -1,11 +1,16 @@
 const mongoose = require("mongoose");
 
-const newSchema = new mongoose.Schema({
+const studentSchema = new mongoose.Schema({
   id: String,
-  batch: String,
+  batch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "batch",
+    required: true
+  },
   name: String,
   gender: String,
   email: String,
+  
   password: {
     type: String,
     default: null,
@@ -35,4 +40,4 @@ const newSchema = new mongoose.Schema({
   ],
 });
 
-module.exports = mongoose.model("student", newSchema);
+module.exports = mongoose.model("student", studentSchema);
