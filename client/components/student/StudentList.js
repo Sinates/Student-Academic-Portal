@@ -31,7 +31,13 @@ export default function StudentList() {
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-gray-900"></div>
       </div>
     );
-  else if (isSuccess)
+  else if (isSuccess){
+  if (students?.length === 0)
+      return (
+        <div className="flex items-center justify-center h-40">
+          <div className=" text-blue-gray-900">No students in the system</div>
+        </div>
+      );
     return (
       <Card className="h-full overflow-auto mx-16 mt-4">
         <table className="w-full min-w-max table-auto text-left">
@@ -54,7 +60,7 @@ export default function StudentList() {
             </tr>
           </thead>
           <tbody>
-            {students.map(({_id, id, fullName, gender, email, phoneNumber, department }, index) => (
+            {students.map(({_id, id, name, gender, email, phone, department }, index) => (
               <tr onClick={() => router.push(`/admin/student/${_id}`)} key={id} className="even:bg-blue-gray-50/50">
                 <td className="p-4">
                   <Typography
@@ -71,7 +77,7 @@ export default function StudentList() {
                     color="blue-gray"
                     className="font-normal"
                   >
-                    {fullName}
+                    {name}
                   </Typography>
                 </td>
                 <td className="p-4">
@@ -98,7 +104,7 @@ export default function StudentList() {
                     color="blue-gray"
                     className="font-normal"
                   >
-                    {phoneNumber}
+                    {phone}
                   </Typography>
                 </td>
                 <td className="p-4">
@@ -123,6 +129,7 @@ export default function StudentList() {
         </table>
       </Card>
     );
+            }
   else
     return (<div>Error Loading Students. Try Again.</div>);
 }

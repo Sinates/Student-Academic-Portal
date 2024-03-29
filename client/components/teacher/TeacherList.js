@@ -27,6 +27,12 @@ export default function TeacherList() {
     event.stopPropagation();
     deleteTeacher(teacherId)
   };
+  if (data?.length === 0)
+      return (
+        <div className="flex items-center justify-center h-40">
+          <div className=" text-blue-gray-900">No teachers in the system</div>
+        </div>
+      );
   return (
     <Card className="h-full  overflow-auto mx-8 mt-10">
       {isLoading && (
@@ -40,6 +46,7 @@ export default function TeacherList() {
           Error loading teachers. Please try again later.
         </Typography>
       )}
+      
       {isSuccess && (
         <table className="w-full min-w-max table-auto text-left px-20">
           <thead>

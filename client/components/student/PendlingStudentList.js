@@ -25,7 +25,7 @@ function PendingStudentList() {
         </div>
       );
   return (
-    <div className="grid grid-cols-3 gap-4 mx-16 overflow-y-auto h-[600px]">
+    <div className="grid grid-cols-3 gap-4 mx-16 overflow-y-auto">
       {data?.map((student) => (
         <PendingStudentCard key={student.id} student={student} />
       ))}

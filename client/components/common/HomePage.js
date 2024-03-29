@@ -17,7 +17,7 @@ function HomePage() {
             router.push('/teachers/dashboard')
         }
         else if (role === 'Student') {
-            router.push('/students/Dashboard')
+            router.push('/students')
         }
         else {
             router.push('/signin')

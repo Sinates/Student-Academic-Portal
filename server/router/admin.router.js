@@ -11,12 +11,13 @@ const router = express.Router();
 const ExcelJS = require("exceljs");
 const crypto = require("crypto");
 const teacherModel = require("../model/teacher.model");
-router.post("/verifypayment", (req, res) => {
-  const studentId = req.body.id;
 
-  // Check if the payment entry exists
+router.post("/verifypayment/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id)
+
   payment
-    .findOne({ id: studentId })
+    .findOne({ _id: id })
     .then((paymentEntry) => {
       if (!paymentEntry) {
         // Payment entry not found
@@ -30,6 +31,44 @@ router.post("/verifypayment", (req, res) => {
         .then(() => {
           res.status(200).json({ message: "Payment verified successfully" });
         })
+        .then(async () => {
+          const student = await studentModel.findOne({ id: paymentEntry.id });
+          if (!student) {
+            // Student not found
+            return res.status(404).json({ error: "Student not found" });
+          }
+
+          // Send email to the student
+          const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: process.env.email,
+              pass: process.env.pass,
+            },
+          });
+      
+          const mailOptions = {
+            from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>', // Sender address
+            to: student.email, // Student's email address
+            subject: "Payment Acceptance", // Email subject
+            text: `Dear ${student.name},\n\n Your payment reciept has been verified`, // Plain text body
+            html: `
+              <p><img src="https://hilcoe.net/wp-content/uploads/2022/03/logo-hilcoe.jpg" alt="Sample School Logo" width="100"></p>
+              <p>Your payment for the semester has been successfully verfied. Please contact the school registrar if you have any questions!</p>
+              <p>Best regards,<br>Hilcoe School Registrar Office</p>
+            `, // HTML body
+          };
+      
+          // Send email and schedule rejection email after 10 days
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              console.error("Error sending email:", error);
+              return res.status(500).json({ error: "Internal server error" });
+            } else {
+              console.log("Email sent:", info.response);
+            }  
+          });
+        })
         .catch((err) => {
           console.error(err);
           res.status(500).json({ error: "Internal server error" });
@@ -39,6 +78,76 @@ router.post("/verifypayment", (req, res) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     });
+});
+router.post("/declinePayment/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id)
+
+  payment.findOne({ _id: id })
+    .then((paymentEntry) => {
+      if (!paymentEntry) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+      const studentId = paymentEntry.id;
+      // Delete the payment entry
+      paymentEntry.deleteOne()
+        .then(() => {
+          res.status(200).json({ message: "Payment deleted successfully" });
+        })
+        .catch((err) => {
+          console.error("Error deleting payment:", err);
+          res.status(500).json({ error: "Internal server error" });
+        });
+
+      // Fetch student details
+      studentModel.findOne({ id: studentId })
+        .then((student) => {
+          if (!student) {
+            console.error("Student not found");
+            return res.status(500).json({ error: "Internal server error" });
+          }
+
+          // Send email to student
+          const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: process.env.email,
+              pass: process.env.pass,
+            },
+          });
+
+          const mailOptions = {
+            from: '"Hilcoe School of CS & Tech" <your_email@gmail.com>', // Sender address
+            to: student.email, // Student's email address
+            subject: "Payment rejection", // Email subject
+            text: `Dear ${student.name},\n\n Your payment receipt has been rejected`, // Plain text body
+            html: `
+              <p><img src="https://hilcoe.net/wp-content/uploads/2022/03/logo-hilcoe.jpg" alt="Sample School Logo" width="100"></p>
+              <p>Please contact the school registrar to resolve this issue!</p>
+              <p>Best regards,<br>Hilcoe School Registrar Office</p>
+            `, // HTML body
+          };
+
+          // Send email
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              console.error("Error sending email:", error);
+              return res.status(500).json({ error: "Internal server error" });
+            } else {
+              console.log("Email sent:", info.response,student.email,);
+            }
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: "Internal server error" });
+        });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+    
 });
 const nodemailer = require("nodemailer");
 const paymentModel = require("../model/payment.model");
@@ -572,8 +681,8 @@ router.get("/getpayments", async (req, res) => {
   try {
     // Fetch all payments from the PaymentModel
     const payments = await paymentModel.find(
-      {},
-      { id: 1, paymentReceipt: 1, verified: 1, _id: 0 }
+      {verified: false},
+      { id: 1, paymentReceipt: 1, verified: 1, _id: 1 }
     );
 
     // Map over the payments to retrieve student names
@@ -584,9 +693,8 @@ router.get("/getpayments", async (req, res) => {
         if (student) {
           // If student found, add their name to the payment object
           return { ...payment.toObject(), studentName: student.name };
-        } else {
-          // If student not found, add a placeholder name
-          return { ...payment.toObject(), studentName: "Unknown" };
+        } else{
+          return { ...payment.toObject(), studentName: "unknown" };
         }
       })
     );

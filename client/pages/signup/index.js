@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import { useSignupMutation } from '@/api/api-slice';
 import {setUserData,getUserData} from '@/utils/sessions';
+import { toast,ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -27,9 +29,10 @@ const SignUp = () => {
 
     const response = await signup({ data: { email: email, password: password } });
     console.log(response)
-    if (response.data.status === 201) {      
-      const {email, role, id,name} = response.data.data;
+    if (response && response.data && response.data.status === 201) {      
+      const {email, role, id,name} = response.data;
       setUserData(email,role,id,name);
+      toast.success("You have successfully signed up!");
       if(role === 'Admin'){
         router.push('/admin')
       }else if(role === 'Teacher'){
@@ -49,6 +52,7 @@ const SignUp = () => {
 
   return (
     <div className="flex items-center justify-center h-screen">
+      <ToastContainer />
       <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-4 text-center">Sign Up</h1>
       

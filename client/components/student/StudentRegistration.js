@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Card, Input, Button, Typography, Select } from "@material-tailwind/react";
 import { Textarea } from "@material-tailwind/react";
 import { useRegisterStudentMutation } from '@/api/api-slice';
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function StudentRegistration() {
   const [inputWidth, setInputWidth] = useState(300); // Initial width value
@@ -15,7 +17,7 @@ export default function StudentRegistration() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [guardianPhoneNumber, setGuardianPhoneNumber] = useState('');
   const [guardianName, setGuardianName] = useState('');
-  const [department, setDepartment] = useState('');
+  const [department, setDepartment] = useState('Computer Science');
   const [aboutYou, setAboutYou] = useState('');
   const [academicRecord, setAcademicRecord] = useState(null);
 
@@ -106,7 +108,7 @@ export default function StudentRegistration() {
       setAboutYouError('About You is required');
       isValid = false;
     }
-
+    console.log(isValid)
     if (isValid) {
       // Handle form submission here
       console.log("Submitted!");
@@ -122,7 +124,7 @@ export default function StudentRegistration() {
       console.log("Department:", department);
       console.log("About You:", aboutYou);
       console.log("Academic Record:", academicRecord);
-      registerStudent({
+      const response = registerStudent({
         data: {
           name: fullName,
           email: email,
@@ -136,11 +138,18 @@ export default function StudentRegistration() {
           academicRecord: academicRecord
         }
       });
+
+      if (response && response.error !== null)
+        toast.error("Error occured while registering!");
+      else {
+        toast.success("You have successfully registered!");
+      }
     }
   };
 
   return (
     <div className="flex justify-between">
+      <ToastContainer />
       <Card color="transparent" shadow={false} className="">
         <div className="p-8 ">
           <Typography variant="h4" color="blue-gray">
