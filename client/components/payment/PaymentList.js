@@ -131,7 +131,7 @@ function PaymentList() {
                   <td className="p-4">
                     <Link onClick={() => handleOpen(payment)}>
                       <Image
-                        src={img}
+                        src={payment.paymentReceipt?`http://localhost:8000/images/${payment.paymentReceipt}`:img}
                         alt={payment.studentName}
                         width="55"
                         height="55"
@@ -169,7 +169,7 @@ function PaymentList() {
                   <Image
                     // src={selectedStudent?.image}
                     // alt={selectedStudent?.name}
-                           src={img}
+                           src={selectedPayment?.paymentReceipt?`http://localhost:8000/images/${selectedPayment?.paymentReceipt}`:img}
                     alt={selectedPayment?.name}
                     width="550"
                     height="550"

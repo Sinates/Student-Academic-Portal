@@ -19,7 +19,7 @@ export default function StudentRegistration() {
   const [guardianName, setGuardianName] = useState('');
   const [department, setDepartment] = useState('Computer Science');
   const [aboutYou, setAboutYou] = useState('');
-  const [academicRecord, setAcademicRecord] = useState(null);
+  const [academicRecord, setAcademicRecord] = useState("");
 
   const [fullNameError, setFullNameError] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -139,11 +139,11 @@ export default function StudentRegistration() {
         }
       });
 
-      if (response && response.error !== null)
-        toast.error("Error occured while registering!");
-      else {
-        toast.success("You have successfully registered!");
-      }
+      // if (response && response.statusCode !== 201)
+      //   toast.error("Error occured while registering!");
+      // else {
+      //   toast.success("You have successfully registered!");
+      // }
     }
   };
 
@@ -300,16 +300,19 @@ export default function StudentRegistration() {
                     Academic Record
                   </Typography>
                   <Input
-                    type="file"
+                    type="text"
                     size="sm"
                     onChange={(e) => setAcademicRecord(e.target.value)}
                     style={{ width: `${inputWidth}px` }}
                   />
+                   <Typography variant="caption"  className='italic text-primary'>
+                        Please provide a link to the file on Google Drive.
+                      </Typography>
                 </div>
               </div>
             </div>
 
-            <Button type="submit" className='bg-primary' fullWidth>
+            <Button type="submit" className='bg-primary mt-2' fullWidth>
               Submit
             </Button>
           </form>

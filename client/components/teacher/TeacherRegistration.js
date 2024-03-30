@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Input, Button, Typography, Select } from "@material-tailwind/react";
 import { Textarea } from "@material-tailwind/react";
 import { useRegisterTeacherMutation } from '@/api/api-slice';
-import { toast,ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function StudentRegistration() {
@@ -106,7 +106,7 @@ export default function StudentRegistration() {
       console.log("Qualification:", qualifications);
       console.log("Certification:", certification);
       console.log("Curriculum Vitae:", curriculumVitae);
-      registerTeacher({
+      const response = registerTeacher({
         data: {
           name: fullName,
           email: email,
@@ -118,17 +118,17 @@ export default function StudentRegistration() {
           curriculumVitae: curriculumVitae
         }
       });
-      if(response && response.error !==null)
-      toast.error("Error occured while registering!");
-    else{
-      toast.success("You have successfully registered!");
-    }
+      // if (response && response.error !== null)
+      //   toast.error("Error occured while registering!");
+      // else {
+      //   toast.success("You have successfully registered!");
+      // }
     }
   };
 
   return (
     <Card color="transparent" shadow={false} className="">
-          <ToastContainer />
+      <ToastContainer />
       <div className="p-8">
         <Typography variant="h4" color="blue-gray">
           Student Registration
@@ -190,7 +190,7 @@ export default function StudentRegistration() {
                 <Input
                   type="password"
                   size="sm"
-                  
+
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   style={{ width: `${inputWidth}px` }}
@@ -202,7 +202,7 @@ export default function StudentRegistration() {
                 <Input
                   type="password"
                   size="sm"
-                  
+
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   style={{ width: `${inputWidth}px` }}
@@ -216,31 +216,42 @@ export default function StudentRegistration() {
                   Qualifications
                 </Typography>
                 <Input
-                  type="file"
+                  type="text"
                   size="sm"
                   onChange={(e) => setQualifications(e.target.value)}
                   style={{ width: `${inputWidth}px` }}
                 />
+                <Typography variant="caption" className='italic text-primary'>
+                  Please provide a link to the file on Google Drive.
+                </Typography>
                 {qualificationsError && <span className="text-red-500">{qualificationsError}</span>}
+
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
                   Certification
                 </Typography>
                 <Input
-                  type="file"
+                  type="text"
                   size="sm"
                   onChange={(e) => setCertification(e.target.value)}
                   style={{ width: `${inputWidth}px` }}
                 />
+                <Typography variant="caption" className='italic text-primary'>
+                  Please provide a link to the file on Google Drive.
+                </Typography>
                 {certificationError && <span className="text-red-500">{certificationError}</span>}
+
                 <Typography variant="h6" color="blue-gray" className="-mb-2">
-                  curriculum Vitae
+                  Curriculum Vitae
                 </Typography>
                 <Input
-                  type="file"
+                  type="text"
                   size="sm"
                   onChange={(e) => setCurriculumVitae(e.target.value)}
                   style={{ width: `${inputWidth}px` }}
                 />
+                <Typography variant="caption" className='italic text-primary'>
+                  Please provide a link to the file on Google Drive.
+                </Typography>
                 {curriculumVitaeError && <span className="text-red-500">{curriculumVitaeError}</span>}
               </div>
             </div>

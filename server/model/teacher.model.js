@@ -16,7 +16,14 @@ const teacherSchema = new mongoose.Schema({
   certifications: String,
   interviewDate: Date,
   assignedCourses: [String],
-  batch: [String],
+  batch: {
+    type: Array,
+    required: [true, "Please Add batch"],
+  },
+  course: {
+    type: Array,
+    required: [true, "Please Add course"],
+  },
   role: String,
   changeRequests: [
     {

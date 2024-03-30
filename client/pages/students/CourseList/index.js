@@ -1,10 +1,11 @@
+import React,{useState,useEffect} from "react";
 import { Card, Typography , IconButton,
     Tooltip } from "@material-tailwind/react";
 import { IoPencil } from "react-icons/io5";
 import { FaTrash } from "react-icons/fa";
 import RootLayout from "@/layouts/RootLayout";
 import StudentHeader from "@/components/common/StudentHeader";
-import { useGetCoursesQuery } from "@/api/api-slice";
+import { useGetStudentCoursesQuery } from "@/api/api-slice";
 import { TableRows } from "@mui/icons-material";
 
 const TABLE_HEAD = ["Course Code", "Course Name", "Credit Hour", "Grade","Status"];
@@ -73,7 +74,11 @@ const TABLE_ROWS = [
 ];
 
 export default function CourseList() {
-  const {data,isLoading,isError,isSuccess} = useGetCoursesQuery()
+  const [studentID, setStudentID] = useState('');
+  useEffect(() => {
+    setStudentID(localStorage.getItem('id'));
+  }, [])
+  const {data,isLoading,isError,isSuccess} = useGetStudentCoursesQuery(studentID)
   if (isLoading)
   return (
     <div className="flex items-center justify-center h-40">
@@ -110,9 +115,9 @@ export default function CourseList() {
           </tr>
         </thead>
         <tbody>
-        {data.map(({_id, courseid, courseName, credithour ,year}, index) => (
+        {data?.courses.map(({course ,grade}, index) => (
 
-
+         
 
             <tr key={name} className="even:bg-blue-gray-50/50">
               <td className="p-4">
@@ -121,7 +126,7 @@ export default function CourseList() {
                   color="blue-gray"
                   className="font-normal"
                 >
-                  {courseid}
+                  {course.courseid}
                 </Typography>
               </td>
               <td className="p-4">
@@ -130,7 +135,7 @@ export default function CourseList() {
                   color="blue-gray"
                   className="font-normal"
                 >
-                  {courseName}
+                  {course.courseName}
                 </Typography>
               </td>
               <td className="p-4">
@@ -139,7 +144,7 @@ export default function CourseList() {
                   color="blue-gray"
                   className="font-normal"
                 >
-                  {credithour}
+                  {course.credithour}
                 </Typography>
               </td>
               <td className="p-4">
@@ -148,7 +153,7 @@ export default function CourseList() {
                   color="blue-gray"
                   className="font-normal"
                 >
-                  {TABLE_ROWS[index].grade}
+                  {grade}
                 </Typography>
               </td>
               <td className="p-4">
@@ -156,7 +161,7 @@ export default function CourseList() {
                   variant="small"
                   color="blue-gray"
                   className="font-normal"
-                >{TABLE_ROWS[index].status}
+                >{grade?"Taken":"Not Taken"}
                 </Typography>
               </td>
           

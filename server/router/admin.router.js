@@ -11,7 +11,7 @@ const router = express.Router();
 const ExcelJS = require("exceljs");
 const crypto = require("crypto");
 const teacherModel = require("../model/teacher.model");
-const {getStudentsByCourseAndBatch} = require("../controllers/admin.controller")
+const {getStudentsByCourseAndBatch,addBatchAndCourseForTeacher} = require("../controllers/admin.controller")
 
 router.post("/verifypayment", (req, res) => {
   const studentId = req.body.id;
@@ -316,6 +316,11 @@ router.delete("/courses/:_id", async (req, res) => {
 router.get("/students/:id", (req, res) => {
   const studentId = req.params.id;
 
+  // Check if the studentId is undefined or empty
+  if (studentId === "1" ) {
+    return res.status(400).json({ error: "Invalid student ID" });
+  }
+  console.log("student", studentId);
   // Find the student by ID
   studentModel
     .findOne({ _id: studentId })
@@ -376,15 +381,6 @@ router.post("/restrictstudent", (req, res) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     });
-});
-router.get("/getbatches", async (req, res) => {
-  try {
-    const uniqueBatches = await studentModel.distinct("batch");
-    res.status(200).json({ batches: uniqueBatches });
-  } catch (error) {
-    console.error("Error retrieving unique batches:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
 });
 router.get("/getstudents", async (req, res) => {
   const { batch } = req.body;
@@ -999,5 +995,6 @@ router.delete("/students/:_id", async (req, res) => {
 });
 
 router.get("/students/course/:courseId/:batchId",getStudentsByCourseAndBatch)
+router.put("/assignCourseBatch/:id",addBatchAndCourseForTeacher)
 
 module.exports = router;

@@ -78,16 +78,10 @@ export default function SideBarNav() {
         link: "/teachers/dashboard",
       },
       {
-        name: "Upload",
-        i: 2,
-        icon: FileUploadIcon,
-        link: "/teachers/upload",
-      },
-      {
         name: "Change Request",
         i: 3,
         icon: ChangeCircleIcon,
-        link: "/teachers/gradeAttendanceChange",
+        link: "/teacher/gradeChangeRequests",
       },
       {
         name: "Notification",
@@ -100,19 +94,6 @@ export default function SideBarNav() {
         i: 5,
         icon: NotificationAddIcon,
         link: "/teachers/pushNotification",
-      },
-
-      {
-        name: "Payments",
-        i: 6,
-        icon: MdOutlineTopic,
-        link: "/student/payments",
-      },
-      {
-        name: "Grade change requests",
-        i: 7,
-        icon: IoFolderOpenOutline,
-        link: "/teacher/gradeChangeRequests",
       },
       {
         name: "Grade Management",
@@ -219,7 +200,7 @@ export default function SideBarNav() {
         )}
       >
         <div className="flex h-24 min-h-24 items-center bg-primary flex items-center justify-center rounded-bl-xl rounded-tr-xl">
-          <Image height={60} width={60} src={logo} />
+          <Image height={60} width={60} src="/logo.png" />
         </div>
 
         <nav className="flex flex-1 flex-col px-6 bg-white overflow-scroll no-scrollbar rounded-br-xl pt-9">

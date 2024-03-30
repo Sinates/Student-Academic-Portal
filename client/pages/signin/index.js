@@ -27,8 +27,8 @@ const SignIn = () => {
 
      if (response && response.data ) {      
 
-        const {email, role, id,name} = response.data;
-        setUserData(email,role,name);
+        const {email, role, _id,name} = response.data;
+        setUserData(email,role,name,_id);
         if(role === 'Admin'){
           router.push('/admin')
         }else if(role === 'Teacher'){
