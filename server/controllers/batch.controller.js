@@ -16,7 +16,7 @@ const createBatch = async (req, res) => {
 const getAllBatches = async (req, res) => {
   try {
     const batches = await Batch.find();
-    res.status(200).json({ data: batches });
+    res.status(200).json( batches );
   } catch (error) {
     res.status(500).json({ message: "Error fetching batches", error: error.message });
   }

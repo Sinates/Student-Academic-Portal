@@ -4,6 +4,7 @@ import { AppBar, Box, Button, Typography } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import TopHeader from '@/components/common/Header';
 import Header from '@/components/common/Header';
+import { useUploadPaymentMutation } from '@/api/api-slice';
 import Image from "next/image";
 function Payment() {
   const [formData, setFormData] = React.useState({
@@ -14,6 +15,7 @@ function Payment() {
   const [fileName, setFileName] = useState();
   const [file, setFile] = useState();
   const [previewUrl, setPreviewUrl] = useState();
+  const [uploadPayment] = useUploadPaymentMutation();
   useEffect(() => {
     if (file) {
       const preview = URL.createObjectURL(file);
@@ -27,30 +29,27 @@ function Payment() {
     setFile(undefined);
     setPreviewUrl(undefined);
   };
+  const [studentID, setStudentID] = useState('');
+  useEffect(() => {
+    setStudentID(localStorage.getItem('id'));
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('id', formData.id);
-      formDataToSend.append('paymentReceipt', formData.receipt); // Updated key name
 
-      const response = await fetch('http://localhost:8000/student/uploadpayment', {
-        method: 'POST',
-        body: formDataToSend,
-      });
+    const formDataToSend = new FormData();
+    formDataToSend.append('id', formData.id);
+    formDataToSend.append('paymentReceipt', file); // Updated key name
+    const reponse = await uploadPayment({ id: studentID, data: formDataToSend });
 
-      const data = await response.json();
-      console.log('Response:', data);
 
-      // Reset form after successful submission
-      setFormData({
-        id: '',
-        receipt: null,
-      });
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    // Reset form after successful submission
+    setFormData({
+      id: '',
+      receipt: null,
+    });
+    removeImage();
+
   };
 
   const handleInputChange = (e) => {
@@ -189,7 +188,7 @@ function Payment() {
 
             )}
             <div className='flex justify-end mr-10'>
-              <button className='bg-primary text-white p-4 rounded-md mr-10'>
+              <button className='bg-primary text-white p-4 rounded-md mr-10' onClick={handleSubmit}>
                 Submit
               </button>
             </div>

@@ -9,7 +9,7 @@ const courseStudentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "student",
   },
-  grade: Number,
+  grade: String,
 });
 
 module.exports = mongoose.model("courseStudent", courseStudentSchema);

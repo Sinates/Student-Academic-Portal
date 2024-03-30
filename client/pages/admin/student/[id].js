@@ -29,7 +29,8 @@ function StudentProfile() {
   // Mock student data
   const router = useRouter();
   const { id } = router.query;
-  const { data, isLoading, isError, isSuccess } = useGetStudentQuery(id);
+  const newID = id?id:1;
+  const { data, isLoading, isError, isSuccess } = useGetStudentQuery(newID);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   const handleOpen = (student) => {
@@ -116,17 +117,9 @@ function StudentProfile() {
                 Academic Record
               </h2>
               <div className="flex space-x-4">
-                <div>
-                  <div  onClick={() => handleOpen(student)}>
-                  <Image
-                    src={img}
-                    alt="Curriculum Vitae"
-                    width={200}
-                    height={200}
-                  />
-                  </div>
-                
-                </div>
+              <a href={student.academicRecord} target="_blank" rel="noopener noreferrer">
+            {student.academicRecord}
+          </a>
               </div>
             </div>
             <Modal

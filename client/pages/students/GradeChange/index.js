@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import DropdownComponent from "@/components/student/dropDown";
 import CourseDropdown from "@/components/student/dropdownCourse";
 import RootLayout from '@/layouts/RootLayout';
 import TopHeader from '@/components/common/Header';
-import { useGetCoursesQuery, useGetTeachersQuery } from "@/api/api-slice";
+import { useGetCoursesQuery, useGetTeachersQuery,useGradeChangeRequestMutation } from "@/api/api-slice";
 
 const GradeChange = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +17,11 @@ const GradeChange = () => {
     assessment: '',
     course: '', // Added course to formData
   });
+  const [studentID, setStudentID] = useState('');
+  useEffect(() => {
+    setStudentID(localStorage.getItem('id'));
+  }, [])
+  const [createGradeChange] = useGradeChangeRequestMutation()
   const [formErrors, setFormErrors] = useState({});
   const [teacher, setTeacher] = useState("");
   const handleChange = (event) => {
@@ -48,46 +53,17 @@ const GradeChange = () => {
       if (typeof formData[key] === 'string' && formData[key].trim() === '') {
         errors[key] = 'This field is required';
       }
+      
     }
+
     // Update errors state
-    setFormErrors(errors);
+    // setFormErrors(errors);
   
-    if (Object.keys(errors).length === 0) {
-      // Serialize formData, filtering out non-serializable values
-      const serializedFormData = {};
-      for (const key in formData) {
-        if (typeof formData[key] !== 'function' && typeof formData[key] !== 'object') {
-          serializedFormData[key] = formData[key];
-        }
-      }
-  
-      // All fields are filled, send data to server
-      try {
-        
-        const response = await fetch('http://localhost:8000/student/gradeChangeRequest', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(serializedFormData),
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Data sent successfully:', data);
-          // Optionally, you can perform additional actions after successful data submission
-        } else {
-          console.error('Failed to send data:', response.statusText);
-          // Handle error accordingly
-        }
-      } catch (error) {
-        console.error('Error sending data:', error.message);
-        // Handle error accordingly
-      }
-    } else {
-      console.error('Form has errors:', errors);
-    }
-  };
+   
+      const response = await createGradeChange({data:{teacherId:formData.teacherId,studentId:studentID,courseId:formData.course,typeOfAssessment:formData.gradeType,optionalNote:formData.message}});
+      console.log(response);
+
+}
   if (  isTeachersLoading || isCoursesLoading) {
     return (
       <div className="flex items-center justify-center h-40">
@@ -127,7 +103,7 @@ const GradeChange = () => {
               <label htmlFor="teacher" className="mr-4 text-md">Select a teacher</label>
               <select  className="w-30 text-black border border-gray-400 rounded-md p-2"  id="teacher" name="teacher" value={formData.teacherId} helperText={formErrors.teacherId}  onChange={(e)=> handleTeacherChange(e.target.value)}>
                 {teachers.map((teacher) => (
-                  <option key={teacher._id} value={teacher._id}>{teacher.name}</option>
+                  <option key={teacher._id} value={teacher._id}>{teacher.firstname} {teacher.lastname}</option>
                 ))}
               </select>
               {formErrors.teacherId && <div style={{ color: 'red' }}>{formErrors.teacherId}</div>}
@@ -148,8 +124,8 @@ const GradeChange = () => {
                   <input
                     type="radio"
                     name="gradeType"
-                    value="midterm"
-                    checked={formData.gradeType === "midterm"}
+                    value="Mid"
+                    checked={formData.gradeType === "Mid"}
                     onChange={handleChange}
                   />
                   Midterm
@@ -158,8 +134,8 @@ const GradeChange = () => {
                   <input
                     type="radio"
                     name="gradeType"
-                    value="final"
-                    checked={formData.gradeType === "final"}
+                    value="Final"
+                    checked={formData.gradeType === "Final"}
                     onChange={handleChange}
                   />
                   Final
@@ -168,8 +144,8 @@ const GradeChange = () => {
                   <input
                     type="radio"
                     name="gradeType"
-                    value="assessment"
-                    checked={formData.gradeType === "assessment"}
+                    value="Assessment"
+                    checked={formData.gradeType === "Assessment"}
                     onChange={handleChange}
                   />
                   Assessment

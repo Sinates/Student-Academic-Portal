@@ -12,7 +12,8 @@ export const apiSlice = createApi({
     "pendingTeachers",
     "students",
     "teachers",
-    "payments"
+    "payments",
+    "GradeChangeRequest"
   ],
   endpoints: (builder) => ({
     // Students
@@ -138,7 +139,13 @@ export const apiSlice = createApi({
         method: "GET",
       }),
     }),
-
+    assignCourseBatch:builder.mutation({
+      query: ({ id,data }) => ({
+        url: `/admin/assignCourseBatch/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+    }),
     // Courses
     getAllCourses: builder.query({
       query: () => ({
@@ -161,6 +168,12 @@ export const apiSlice = createApi({
       }),
       providesTags: ["courses"],
     }),
+    getStudentCourses: builder.query({
+      query: (id) => ({
+        url: `/student/getStudentCourses/${id}`,
+        method: "GET",
+      }),
+    }),
     deleteCourse: builder.mutation({
       query: ({ id }) => ({
         url: `/admin/courses/${id}`,
@@ -170,6 +183,16 @@ export const apiSlice = createApi({
     }),
 
     //payment
+
+    uploadPayment: builder.mutation({
+      query: ({ data, id }) => ({
+        url: `/student/uploadpayment/${id}`,
+        method: "POST",
+        body: data,
+      }),
+      formdata: true,
+    }),
+
     getPayments: builder.query({
       query: () => ({
         url: "/admin/getpayments",
@@ -194,9 +217,42 @@ export const apiSlice = createApi({
     //batches
     getBatches: builder.query({
       query: () => ({
-        url: "/admin/getbatches",
+        url: "/batch",
         method: "GET",
       }),
+    }),
+
+    //gradechangerequest
+    gradeChangeRequest: builder.mutation({
+      query: ({ data }) => ({
+        url: "/student/gradeChangeRequest",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["GradeChangeRequest"],
+    }),
+
+    getGradeChangeRequest: builder.query({
+      query: (id) => ({
+        url: `/teacher/gradeChangeRequest/teacher/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["GradeChangeRequest"],
+    }),
+    updateGradeChangeRequest: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `teacher/gradeChangeRequest/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["GradeChangeRequest"],
+    }),
+    deleteGradeChangeRequest: builder.mutation({
+      query: (id) => ({
+        url: `teacher/gradeChangeRequest/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["GradeChangeRequest"],
     }),
 
   }),
@@ -225,12 +281,14 @@ export const {
   useRegisterTeacherMutation,
   useDeleteTeacherMutation,
   useGetTeacherQuery,
+  useAssignCourseBatchMutation,
 
   // Courses
   useGetAllCoursesQuery,
   useAddCourseMutation,
   useGetCoursesQuery,
   useDeleteCourseMutation,
+  useGetStudentCoursesQuery,
 
   //payments
   useGetPaymentsQuery,
@@ -240,4 +298,11 @@ export const {
 
   //batches
   useGetBatchesQuery,
+
+  //grade change request
+  useGradeChangeRequestMutation,
+  useGetGradeChangeRequestQuery,
+  useUpdateGradeChangeRequestMutation,
+  useDeleteGradeChangeRequestMutation,
+  useUploadPaymentMutation
 } = apiSlice;

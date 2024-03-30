@@ -2,6 +2,7 @@ const express = require("express");
 const studentModel = require("../model/student.model");
 const payment = require("../model/payment.model");
 const courseModel = require("../model/course.model");
+const batchModel = require("../model/batch.model");
 const router = express.Router();
 const multer = require("multer");
 const crypto = require("crypto");
@@ -13,7 +14,7 @@ const getHashedPassword = (password) => {
   const hash = sha256.update(password).digest("base64");
   return hash;
 };
-const {createGradeChangeRequest} = require('../controllers/student.controller')
+const {createGradeChangeRequest,getStudentCourses} = require('../controllers/student.controller')
 
 function generateID() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -75,7 +76,7 @@ const upload = multer({
 const uploadpayment = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, "uploads/payments"); // Define the destination directory for file uploads
+      cb(null, "uploads"); // Define the destination directory for file uploads
     },
     filename: function (req, file, cb) {
       cb(null, Date.now() + "-" + file.originalname); // Define the filename for the uploaded file
@@ -86,69 +87,90 @@ const uploadpayment = multer({
 
 // Handle POST request to register a new student with file upload for academic record
 router.post("/register", (req, res) => {
-  // Check if the provided email already exists
-  studentModel
-    .findOne({ email: req.body.email })
-    .then((existingEmail) => {
-      if (existingEmail) {
-        // Email already exists
-        return res.status(409).json({ error: "Email already exists" });
-      } else {
-        // Check if the provided ID already exists
-        studentModel
-          .findOne({ id: generateID() })
-          .then((existingID) => {
-            if (existingID) {
-              // ID already exists
-              return res.status(409).json({ error: "ID already exists" });
-            } else {
-              // Both email and ID are unique, perform file upload
-              upload.single("academicRecord")(req, res, (err) => {
-                if (err) {
-                  // Error during file upload
-                  console.error(err);
-                  return res.status(500).json({ error: "File upload error" });
-                }
+  const batch = generateBatch();
 
-                // File uploaded successfully, create and save the new student
-                const newStudent = new studentModel({
-                  id: generateID(), // Use provided ID
-                  batch: generateBatch(),
-                  role: "Student",
-                  name: req.body.name,
-                  gender: req.body.gender,
-                  email: req.body.email,
-                  phone: req.body.phone,
-                  guardianName: req.body.guardianName,
-                  guardianPhone: req.body.guardianPhone,
-                  department: req.body.department,
-                  aboutYou: req.body.aboutYou,
-                  academicRecord: req.file ? req.file.filename : null, // Save filename if file is uploaded
-                });
+  batchModel.findOne({ batchName: batch }).then((existingBatch) => {
+    if (existingBatch) {
+      // Batch already exists, return the batch ID
+      createStudent(existingBatch._id);
+    } else {
+      // Batch does not exist, create a new batch
+      const newBatch = new batchModel({
+        batchName: batch,
+        course: [],
+      });
 
-                newStudent
-                  .save()
-                  .then((savedStudent) => {
-                    res.status(201).json(savedStudent);
-                  })
-                  .catch((err) => {
+      newBatch
+        .save()
+        .then((savedBatch) => {
+          createStudent(savedBatch._id);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: "Internal server error" });
+        });
+    }
+  });
+
+  function createStudent(batchId) {
+    studentModel
+      .findOne({ email: req.body.email })
+      .then((existingEmail) => {
+        if (existingEmail) {
+          return res.status(409).json({ error: "Email already exists" });
+        } else {
+          studentModel
+            .findOne({ id: generateID() })
+            .then((existingID) => {
+              if (existingID) {
+                return res.status(409).json({ error: "ID already exists" });
+              } else {
+                upload.single("academicRecord")(req, res, (err) => {
+                  if (err) {
                     console.error(err);
-                    res.status(500).json({ error: "Internal server error" });
+                    return res.status(500).json({ error: "File upload error" });
+                  }
+
+                  const newStudent = new studentModel({
+                    id: generateID(),
+                    batch: batchId,
+                    role: "Student",
+                    name: req.body.name,
+                    gender: req.body.gender,
+                    email: req.body.email,
+                    phone: req.body.phone,
+                    guardianName: req.body.guardianName,
+                    guardianPhone: req.body.guardianPhone,
+                    department: req.body.department,
+                    aboutYou: req.body.aboutYou,
+                    academicRecord: req.body.academicRecord,
                   });
-              });
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            res.status(500).json({ error: "Internal server error" });
-          });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
-    });
+
+                  newStudent
+                    .save()
+                    .then((savedStudent) => {
+                      res.status(201).json({statusCode:201,data:savedStudent});
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                      res.status(500).json({ error: "Internal server error" });
+                    });
+                });
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+              res.status(500).json({ error: "Internal server error" });
+            });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
+      });
+  }
 });
+
 
 //TODO: Make sure to add frontend comparison of password and confirmation
 router.post("/signup", async (req, res) => {
@@ -217,14 +239,14 @@ router.post("/signin", (req, res) => {
 });
 
 router.post(
-  "/uploadpayment",
+  "/uploadpayment/:id",
   uploadpayment.single("paymentReceipt"),
   async (req, res) => {
     try {
-      const studentId = req.body.id;
+      const studentId =  req.params.id;;
 
       // Check if the provided ID already exists in the studentModel
-      const existingStudent = await studentModel.findOne({ id: studentId });
+      const existingStudent = await studentModel.findOne({ _id: studentId });
 
       if (!existingStudent) {
         // ID does not exist, return an error
@@ -416,5 +438,6 @@ router.get("/getnotification/:id", (req, res) => {
 });
 
 router.post("/gradeChangeRequest", createGradeChangeRequest)
+router.get("/getStudentCourses/:studentId", getStudentCourses)
 
 module.exports = router;

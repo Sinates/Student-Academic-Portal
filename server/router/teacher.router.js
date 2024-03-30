@@ -55,12 +55,6 @@ const upload = multer({ storage: storage });
 
 router.post(
   "/register",
-  upload.fields([
-    { name: "curriculumVitae", maxCount: 1 },
-    { name: "qualifications", maxCount: 1 },
-    { name: "certifications", maxCount: 1 },
-  ]),
-
   (req, res) => {
     // Check if the provided email already exists
     console.log(req.body)
@@ -94,13 +88,9 @@ router.post(
                   email: req.body.email,
                   role: "Teacher",
                   phone: req.body.phone,
-                  curriculumVitae: uploadedCV ? uploadedCV.filename : null,
-                  qualifications: uploadedQualifications
-                    ? uploadedQualifications.filename
-                    : null,
-                  certifications: uploadedCertifications
-                    ? uploadedCertifications.filename
-                    : null,
+                  curriculumVitae: uploadedCV,
+                  qualifications: uploadedQualifications,
+                  certifications: uploadedCertifications,
                   interviewDate: req.body.date,
                 });
 
@@ -546,9 +536,9 @@ router.post("/approveGradeChangeRequest", async (req, res) => {
 // });
 
 router.post("/addGrade", addGrade);
-router.get("/getAllGrades/:studentId", getAllGrades); 
+router.get("/getAllGrades/:studentId", getAllGrades);
 router.put("/updateGrade/:id", updateGrade);
-router.get("/getGradeByCourse/:courseId/:studentId", getGradeByCourse); 
+router.get("/getGradeByCourse/:courseId/:studentId", getGradeByCourse);
 const teacherController = require("../controllers/teacher.controller");
 
 // Update Grade Change Request by ID

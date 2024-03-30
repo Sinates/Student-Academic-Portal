@@ -18,6 +18,9 @@ app.use("/admin", require("./router/admin.router"));
 app.use("/student", require("./router/student.router"));
 app.use("/auth", require("./router/auth.router"));
 app.use("/batch",require("./router/batch.router"))
+app.use("/course", require("./router/course.router"));
+app.use("/resource", require("./router/resource.router"));
+app.use("/images", express.static("uploads"));
 
 app.listen(PORT, () => {
   console.log(`Listening to port ${PORT}`);
