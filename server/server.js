@@ -19,7 +19,7 @@ app.use("/student", require("./router/student.router"));
 app.use("/auth", require("./router/auth.router"));
 app.use("/batch",require("./router/batch.router"))
 app.use("/course", require("./router/course.router"));
-app.use("/resource", require("./router/resource.router"));
+app.use("/resource", require("./router/ResourceRoute"));
 app.use("/images", express.static("uploads"));
 
 app.listen(PORT, () => {

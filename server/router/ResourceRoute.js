@@ -2,7 +2,7 @@ const {
   createResource,
   getResource,
   deleteResource,
-} = require("../Controller/ResourceController");
+} = require("../controllers/ResourceController");
 
 const multer = require("multer");
 
