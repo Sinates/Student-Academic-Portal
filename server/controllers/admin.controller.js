@@ -33,11 +33,12 @@ const getStudentsByCourseAndBatch = async (req, res) => {
 
     for (const student of students) {
       const courseStudent = await CourseStudent.findOne({
-      student: student._id,
-      course: courseId,
+      studentId: student._id,
+      courseId: courseId,
       });
 
       if (courseStudent) {
+        console.log(courseStudent)
       response.push({
         student: student,
         grade: courseStudent.grade,
