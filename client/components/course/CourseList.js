@@ -24,10 +24,7 @@ import { IoMdAdd } from "react-icons/io";
 const TABLE_HEAD = ["Course Code", "Course Name", "Credit Hour", "Year", "Action"];
 
 export default function CourseList() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [teacher, setTeacher] = useState("");
-  const [batch, setBatch] = useState("");
-  const [courseId, setCourseId] = useState(""); // New state to store course ID
+; // New state to store course ID
 
   const { data: teachers, isLoading: isTeachersLoading, isError: isTeachersError } = useGetTeachersQuery();
   const { data: batchesData, isLoading: isBatchLoading, isError: isBatchError } = useGetBatchesQuery();
@@ -50,6 +47,10 @@ export default function CourseList() {
       </div>
     );
   }
+  const [isOpen, setIsOpen] = useState(false);
+  const [teacher, setTeacher] = useState(teachers[0]._id);
+  const [batch, setBatch] = useState(batchesData[0]._id);
+  const [courseId, setCourseId] = useState("")
 
   const handleOpen = (courseId) => {
     setIsOpen(!isOpen);
@@ -128,6 +129,7 @@ export default function CourseList() {
                 id="teacher"
                 name="teacher"
                 value={teacher}
+                defaultValue={teachers[0]._id}
                 onChange={(e) => setTeacher(e.target.value)}
               >
                 {teachers.map((teacher) => (
@@ -145,6 +147,7 @@ export default function CourseList() {
                 className="ml-4"
                 id="batch"
                 name="batch"
+                defaultValue={batchesData[0]._id}
                 value={batch}
                 onChange={(e) => {
                   setBatch(e.target.value);

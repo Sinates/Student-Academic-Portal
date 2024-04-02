@@ -3,13 +3,15 @@ const studentModel = require("../model/student.model");
 const teacherModel = require("../model/teacher.model");
 const batchModel = require("../model/batch.model")
 const courseModel = require("../model/course.model")
+const CourseStudent = require("../model/courseStudent.model")
 
 const getStudentsByCourseAndBatch = async (req, res) => {
+
   try {
     const { courseId, batchId } = req.params;
 
     // Find the batch by ID and populate the courses field
-    const batch = await Batch.findById(batchId).populate("courses");
+    const batch = await batchModel.findById(batchId).populate("courses");
 
     if (!batch) {
       return res.status(404).json({ message: "Batch not found" });
@@ -27,7 +29,28 @@ const getStudentsByCourseAndBatch = async (req, res) => {
       batch: batchId,
     });
 
-    res.status(200).json({ data: students });
+    const response = [];
+
+    for (const student of students) {
+      const courseStudent = await CourseStudent.findOne({
+      student: student._id,
+      course: courseId,
+      });
+
+      if (courseStudent) {
+      response.push({
+        student: student,
+        grade: courseStudent.grade,
+      });
+      } else {
+      response.push({
+        student: student,
+        grade: null,
+      });
+      }
+    }
+
+    res.status(200).json({ data: response });
   } catch (error) {
     res.status(500).json({ message: "Error fetching students", error: error.message });
   }

@@ -25,8 +25,8 @@ function TeacherProfile() {
   const router = useRouter();
   const { id } = router.query;
   const { data, isLoading, isError, isSuccess } = useGetTeacherQuery(id);
+  console.log(data)
   const [selectedDocument, setSelectedDocument] = useState(null);
-
   const handleOpen = (doc) => {
     // e.stopPropagation();
     setSelectedDocument(doc);
@@ -81,7 +81,7 @@ function TeacherProfile() {
                 </div>
                 <div>
                   <span className="font-semibold text-gray-600">Gender:</span>{" "}
-                  {teacher.gender==="M"?"Male":"Female"}
+                  {teacher.gender === "M" ? "Male" : "Female"}
                 </div>
                 <div>
                   <span className="font-semibold text-gray-600">Email:</span>{" "}
@@ -97,59 +97,66 @@ function TeacherProfile() {
               <h2 className="text-lg mt-10 font-semibold text-gray-800 mb-4">
                 Documents
               </h2>
-              <div className="flex justify-between ">
-                <div  onClick={() => handleOpen("Curriculum Vitae")}>
-                  <Image
-                    src={img}
-                    alt="Curriculum Vitae"
-                    width={200}
-                    height={200}
-                  />
-                  <p className="text-gray-600">Curriculum Vitae</p>
+              <div>
+                <h2 className="text-lg mt-10 font-semibold text-gray-800 mb-4">
+                  Curriculum Vitae
+                </h2>
+                <div className="flex space-x-4">
+                  <a href={teacher.curriculumVitae} target="_blank" rel="noopener noreferrer">
+                    {teacher.curriculumVitae}
+                  </a>
                 </div>
-                <div  onClick={() => handleOpen("Qualification")}>
-                  <Image
-                    src={img}
-                    alt="Qualification"
-                    width={200}
-                    height={200}
-                  />
-                  <p className="text-gray-600">Qualification</p>
+              </div>
+          
+                <div>
+                  <h2 className="text-lg mt-10 font-semibold text-gray-800 mb-4">
+                    Qualification
+                  </h2>
+                  <div className="flex space-x-4">
+                    <a href={teacher.qualifications} target="_blank" rel="noopener noreferrer">
+                      {teacher.qualifications}
+                    </a>
+                  </div>
                 </div>
-                <div onClick={() => handleOpen("Certification")}>
-                  <Image
-                  src={img}
-                    alt="Certification"
-                    width={200}
-                    height={200}
-                  />
-                  <p className="text-gray-600">Certification</p>
+                <div>
+                  <div>
+                    <h2 className="text-lg mt-10 font-semibold text-gray-800 mb-4">
+                      Certification
+                    </h2>
+                    <div className="flex space-x-4">
+                      <a href={teacher.certifications} target="_blank" rel="noopener noreferrer">
+                        {teacher.certifications}
+                      </a>
+                    </div>
+                  </div>
                 </div>
+
+
                 <Modal
-              open={selectedDocument !== null}
-              onClose={handleClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <Box sx={style}>
-                <Typography id="modal-modal-title" variant="h6" component="h2">
-                  {selectedDocument}
-                </Typography>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                  <Image
-                    src={img}
-                    alt={selectedDocument}
-                    width="550"
-                    height="550"
-                  />
-                </Typography>
-              </Box>
-            </Modal>
+                  open={selectedDocument !== null}
+                  onClose={handleClose}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                      {selectedDocument}
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                      <Image
+                        src={img}
+                        alt={selectedDocument}
+                        width="550"
+                        height="550"
+                      />
+                    </Typography>
+                  </Box>
+                </Modal>
               </div>
             </div>
 
           </div>
-        </div>
+    
       </RootLayout>
     );
 }

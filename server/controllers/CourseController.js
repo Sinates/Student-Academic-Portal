@@ -53,8 +53,10 @@ const getCourseByTeacherId = async (req, res) => {
   const { id } = req.params;
   const response = await teacher.findById(id);
   const Courses = response.course;
+ 
   for (course1 of Courses) {
     const newcourse = await course.findById(course1);
+    console.log(newcourse)
     MyCourses.push(newcourse);
 
   }

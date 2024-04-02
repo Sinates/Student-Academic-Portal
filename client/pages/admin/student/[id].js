@@ -117,9 +117,9 @@ function StudentProfile() {
                 Academic Record
               </h2>
               <div className="flex space-x-4">
-              <a href={student.academicRecord} target="_blank" rel="noopener noreferrer">
-            {student.academicRecord}
-          </a>
+                <a href={student.academicRecord} target="_blank" rel="noopener noreferrer">
+                  {student.academicRecord}
+                </a>
               </div>
             </div>
             <Modal

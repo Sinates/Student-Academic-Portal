@@ -30,8 +30,8 @@ const SignUp = () => {
     const response = await signup({ data: { email: email, password: password } });
     console.log(response)
     if (response && response.data && response.data.status === 201) {      
-      const {email, role, id,name} = response.data;
-      setUserData(email,role,id,name);
+      const {email, role, _id,name} = response.data;
+      setUserData(email,role,name,_id);
       toast.success("You have successfully signed up!");
       if(role === 'Admin'){
         router.push('/admin')
@@ -40,7 +40,7 @@ const SignUp = () => {
       }
       else
       {
-        router.push('/students/Dashboard')
+        router.push('/students')
       }
      
     }else{
